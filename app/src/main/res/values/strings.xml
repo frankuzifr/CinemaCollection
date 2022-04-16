@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">CinemaCollection</string>
-    <string name="more">Подробнее</string>
+    <string name="more">Детали</string>
+    <string name="cinema_collection">Кино коллекция</string>
 </resources>

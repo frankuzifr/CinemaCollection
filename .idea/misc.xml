@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/button_background.xml" value="0.196" />
+        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/image_style.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/activity_main.xml" value="0.22" />
-        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/film_view_card.xml" value="0.2" />
+        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/film_view_card.xml" value="0.5" />
+        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/film_view_card_new.xml" value="0.25" />
       </map>
     </option>
   </component>
