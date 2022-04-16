@@ -46,11 +46,14 @@ class FilmDetailActivity : AppCompatActivity() {
 
     private fun onShareButtonClick(filmName: String) {
 
-        val sendMessageIntent = Intent(Intent.ACTION_SEND)
+        val sendMessageIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, "Привет. Давай посмотрим фильм $filmName")
+        }
 
-        sendMessageIntent.type = "text/html"
-        sendMessageIntent.putExtra(Intent.EXTRA_TEXT, "Привет. Давай посмотрим фильм $filmName")
+        val sharedIntent = Intent.createChooser(sendMessageIntent, null)
 
-        startActivity(sendMessageIntent)
+        startActivity(sharedIntent)
     }
 }
