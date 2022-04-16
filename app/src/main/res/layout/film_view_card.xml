@@ -16,7 +16,7 @@
         <ImageView
             android:id="@+id/film_image"
             android:layout_width="180dp"
-            android:layout_height="300dp"
+            android:layout_height="250dp"
             android:background="@drawable/jentelmeni"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
