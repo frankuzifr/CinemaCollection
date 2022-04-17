@@ -3,13 +3,14 @@ package space.frankuzi.cinemacollection
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import space.frankuzi.cinemacollection.databinding.ActivityFilmDetailBinding
 import java.lang.Exception
 
 class FilmDetailActivity : AppCompatActivity() {
 
     private lateinit var _binding: ActivityFilmDetailBinding
+    private var _isFavourite: Boolean = false
+    private var _filmId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,11 +19,12 @@ class FilmDetailActivity : AppCompatActivity() {
         val view = _binding.root
         setContentView(view)
 
-        val filmId = intent.getIntExtra(FILM_ID, 0)
+        _filmId = intent.getIntExtra(FILM_ID, 0)
         val imageIdRes = intent.getIntExtra(IMAGE_ID_RES, 0)
         val nameIdRes = intent.getIntExtra(NAME_ID_RES, 0)
         val descriptionIdRes = intent.getIntExtra(DESCRIPTION_ID_RES, 0)
-        var isFavourite = intent.getBooleanExtra(IS_FAVOURITE, false)
+
+        _isFavourite = savedInstanceState?.getBoolean(IS_FAVOURITE) ?: intent.getBooleanExtra(IS_FAVOURITE, false)
 
         _binding.filmImage.setBackgroundResource(imageIdRes)
         val detailToolbar = _binding.detailToolbar
@@ -30,20 +32,18 @@ class FilmDetailActivity : AppCompatActivity() {
         _binding.filmDescription.setText(descriptionIdRes)
 
         detailToolbar.setNavigationOnClickListener {
-            val intent = Intent()
-            intent.putExtra(FILM_ID, filmId)
-            intent.putExtra(IS_FAVOURITE, isFavourite)
-            intent.putExtra(COMMENT, _binding.comment.editText?.text.toString())
-            setResult(RESULT_OK, intent)
+            sendResult()
             finish()
         }
 
         val favouriteItem = detailToolbar.menu.getItem(0)
-        favouriteItem.isChecked = isFavourite
+        favouriteItem.isChecked = _isFavourite
 
         favouriteItem.setIcon(
-            if (isFavourite) R.drawable.ic_baseline_favorite_24
-            else R.drawable.ic_baseline_favorite_border_24
+            if (_isFavourite)
+                R.drawable.ic_baseline_favorite_24
+            else
+                R.drawable.ic_baseline_favorite_border_24
         )
 
         detailToolbar.setOnMenuItemClickListener {
@@ -52,19 +52,30 @@ class FilmDetailActivity : AppCompatActivity() {
                 R.id.favourite -> {
                     if (it.isChecked){
                         it.isChecked = false
-                        isFavourite = false
+                        _isFavourite = false
                         it.setIcon(R.drawable.ic_baseline_favorite_border_24)
                     } else {
                         it.isChecked = true
-                        isFavourite = true
+                        _isFavourite = true
                         it.setIcon(R.drawable.ic_baseline_favorite_24)
                     }
-                    Log.i("", it.isChecked.toString())
                 }
                 else -> throw Exception()
             }
             true
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(IS_FAVOURITE, _isFavourite)
+        outState.putString(COMMENT, _binding.comment.editText?.text.toString())
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val comment = savedInstanceState.getString(COMMENT)
+        _binding.comment.editText?.setText(comment)
     }
 
     private fun onShareButtonClick(filmName: String) {
@@ -80,8 +91,21 @@ class FilmDetailActivity : AppCompatActivity() {
         startActivity(sharedIntent)
     }
 
+    override fun onBackPressed() {
+        sendResult()
+        super.onBackPressed()
+    }
+
+    private fun sendResult() {
+        val intent = Intent()
+        intent.putExtra(FILM_ID, _filmId)
+        intent.putExtra(IS_FAVOURITE, _isFavourite)
+        intent.putExtra(COMMENT, _binding.comment.editText?.text.toString())
+        setResult(RESULT_OK, intent)
+    }
+
     companion object {
-        const val FILM_ID = "film_id"
+        const val FILM_ID = "filmId"
         const val IMAGE_ID_RES = "imageIdRes"
         const val NAME_ID_RES = "nameIdRes"
         const val DESCRIPTION_ID_RES = "descriptionIdRes"

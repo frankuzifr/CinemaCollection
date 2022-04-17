@@ -30,6 +30,11 @@ class MainActivity : AppCompatActivity() {
             val filmName = filmCard.findViewById<TextView>(R.id.film_title_label)
             filmName.setText(film.nameIdRes)
 
+            filmName.setTextColor(
+                if (film.isSelected) resources.getColor(R.color.blue)
+                else resources.getColor(R.color.orange)
+            )
+
             val button = filmCard.findViewById<com.google.android.material.card.MaterialCardView>(R.id.film_card)
 
             button.setOnClickListener {
@@ -39,6 +44,8 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra(FilmDetailActivity.NAME_ID_RES, film.nameIdRes)
                 intent.putExtra(FilmDetailActivity.DESCRIPTION_ID_RES, film.descriptionIdRes)
                 intent.putExtra(FilmDetailActivity.IS_FAVOURITE, film.isFavourite)
+                film.isSelected = true
+                filmName.setTextColor(resources.getColor(R.color.blue))
                 startActivityForResult(intent, _requestCode)
             }
 

@@ -50,9 +50,11 @@
 
             <TextView
                 android:id="@+id/film_description"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
                 android:textSize="18sp"
                 app:layout_constraintTop_toBottomOf="@id/film_image"
                 app:layout_constraintStart_toStartOf="parent"
@@ -62,23 +64,24 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/comment"
-                android:layout_width="350dp"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:hint="@string/comment"
                 app:layout_constraintTop_toBottomOf="@id/film_description"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_margin="10dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
                 app:boxStrokeColor="@color/orange"
                 app:hintTextColor="@color/orange"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:maxLines="1"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>
