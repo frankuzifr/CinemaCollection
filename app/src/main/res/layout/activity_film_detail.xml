@@ -39,7 +39,7 @@
 
             <ImageView
                 android:id="@+id/film_image"
-                android:layout_width="350dp"
+                android:layout_width="300dp"
                 android:layout_height="450dp"
                 tools:src="@drawable/jentelmeni"
                 android:layout_marginTop="10dp"
