@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/button_background.xml" value="0.196" />
+        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/favourite_checkbox.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/ic_baseline_favorite_border_24.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/image_style.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/activity_film_detail.xml" value="0.25" />

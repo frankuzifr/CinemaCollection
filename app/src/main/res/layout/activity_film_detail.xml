@@ -61,7 +61,7 @@
                 />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/enter_player_name"
+                android:id="@+id/comment"
                 android:layout_width="350dp"
                 android:layout_height="match_parent"
                 android:hint="@string/comment"
