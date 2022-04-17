@@ -38,14 +38,15 @@ class MainActivity : AppCompatActivity() {
             val button = filmCard.findViewById<com.google.android.material.card.MaterialCardView>(R.id.film_card)
 
             button.setOnClickListener {
+                film.isSelected = true
+                filmName.setTextColor(resources.getColor(R.color.blue))
+
                 val intent = Intent(this, FilmDetailActivity::class.java)
                 intent.putExtra(FilmDetailActivity.FILM_ID, index)
                 intent.putExtra(FilmDetailActivity.IMAGE_ID_RES, film.imageIdRes)
                 intent.putExtra(FilmDetailActivity.NAME_ID_RES, film.nameIdRes)
                 intent.putExtra(FilmDetailActivity.DESCRIPTION_ID_RES, film.descriptionIdRes)
                 intent.putExtra(FilmDetailActivity.IS_FAVOURITE, film.isFavourite)
-                film.isSelected = true
-                filmName.setTextColor(resources.getColor(R.color.blue))
                 startActivityForResult(intent, _requestCode)
             }
 

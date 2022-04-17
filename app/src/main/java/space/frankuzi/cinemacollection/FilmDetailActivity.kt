@@ -27,8 +27,10 @@ class FilmDetailActivity : AppCompatActivity() {
         _isFavourite = savedInstanceState?.getBoolean(IS_FAVOURITE) ?: intent.getBooleanExtra(IS_FAVOURITE, false)
 
         _binding.filmImage.setBackgroundResource(imageIdRes)
+
         val detailToolbar = _binding.detailToolbar
         detailToolbar.setTitle(nameIdRes)
+
         _binding.filmDescription.setText(descriptionIdRes)
 
         detailToolbar.setNavigationOnClickListener {
