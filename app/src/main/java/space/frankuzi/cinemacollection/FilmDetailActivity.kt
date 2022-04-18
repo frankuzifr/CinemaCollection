@@ -3,12 +3,14 @@ package space.frankuzi.cinemacollection
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import space.frankuzi.cinemacollection.databinding.ActivityFilmDetailBinding
 import java.lang.Exception
 
 class FilmDetailActivity : AppCompatActivity() {
 
     private lateinit var _binding: ActivityFilmDetailBinding
+    private lateinit var _toast: Toast
     private var _isFavourite: Boolean = false
     private var _filmId: Int = 0
 
@@ -52,14 +54,23 @@ class FilmDetailActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.share -> onShareButtonClick(resources.getString(nameIdRes))
                 R.id.favourite -> {
+                    val filmName = resources.getString(nameIdRes)
                     if (it.isChecked){
                         it.isChecked = false
                         _isFavourite = false
                         it.setIcon(R.drawable.ic_baseline_favorite_border_24)
+                        showToastWithText(
+                            this,
+                            resources.getString(R.string.film_removed_from_favourites, filmName)
+                        )
                     } else {
                         it.isChecked = true
                         _isFavourite = true
                         it.setIcon(R.drawable.ic_baseline_favorite_24)
+                        showToastWithText(
+                            this,
+                            resources.getString(R.string.film_added_to_favourites, filmName)
+                        )
                     }
                 }
                 else -> throw Exception()
@@ -85,7 +96,7 @@ class FilmDetailActivity : AppCompatActivity() {
         val sendMessageIntent = Intent().apply {
             action = Intent.ACTION_SEND
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, "Привет. Давай посмотрим фильм $filmName")
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.invite_message, filmName))
         }
 
         val sharedIntent = Intent.createChooser(sendMessageIntent, null)

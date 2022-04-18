@@ -56,6 +56,7 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 android:textSize="18sp"
+                android:gravity="start|end"
                 app:layout_constraintTop_toBottomOf="@id/film_image"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -73,9 +74,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
-                app:boxStrokeColor="@color/orange"
-                app:hintTextColor="@color/orange"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/EditText"
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
