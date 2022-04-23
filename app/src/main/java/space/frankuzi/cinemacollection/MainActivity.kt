@@ -6,14 +6,22 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.TypefaceCompat
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import space.frankuzi.cinemacollection.adapter.FilmItemAdapter
 import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
+import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var _binding: ActivityMainBinding
-    private val _requestCode: Int = 100
+    private lateinit var _recyclerView: RecyclerView
+    val requestCode: Int = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,41 +29,16 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         val view = _binding.root
         setContentView(view)
+        _recyclerView = _binding.container
 
-        for ((index, film) in FilmsData.films.withIndex()) {
-            val filmCard = layoutInflater.inflate(R.layout.film_view_card, null)
-            val filmImage = filmCard.findViewById<ImageView>(R.id.film_image)
-            filmImage.setBackgroundResource(film.imageIdRes)
-
-            val filmName = filmCard.findViewById<TextView>(R.id.film_title_label)
-            filmName.setText(film.nameIdRes)
-
-            filmName.setTextColor(
-                if (film.isSelected) resources.getColor(R.color.blue)
-                else resources.getColor(R.color.orange)
-            )
-
-            val button = filmCard.findViewById<com.google.android.material.card.MaterialCardView>(R.id.film_card)
-
-            button.setOnClickListener {
-                film.isSelected = true
-                filmName.setTextColor(resources.getColor(R.color.blue))
-
-                val intent = Intent(this, FilmDetailActivity::class.java)
-                intent.putExtra(FilmDetailActivity.FILM_ID, index)
-                intent.putExtra(FilmDetailActivity.IMAGE_ID_RES, film.imageIdRes)
-                intent.putExtra(FilmDetailActivity.NAME_ID_RES, film.nameIdRes)
-                intent.putExtra(FilmDetailActivity.DESCRIPTION_ID_RES, film.descriptionIdRes)
-                intent.putExtra(FilmDetailActivity.IS_FAVOURITE, film.isFavourite)
-                startActivityForResult(intent, _requestCode)
-            }
-
-            _binding.container.addView(filmCard)
-        }
+        val layoutManager = GridLayoutManager(this, 2)
+        _recyclerView.layoutManager = layoutManager
+        _recyclerView.adapter = FilmItemAdapter(FilmsData.films, this)
+        _recyclerView.addItemDecoration(ViewHolderOffset(15))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode != _requestCode) {
+        if (requestCode != this.requestCode) {
             super.onActivityResult(requestCode, resultCode, data)
             return
         }
