@@ -17,17 +17,16 @@
             android:id="@+id/film_image"
             android:layout_width="match_parent"
             android:layout_height="240dp"
-            android:background="@drawable/jentelmeni"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            tools:src="@drawable/jentelmeni"
             />
 
         <TextView
             android:id="@+id/film_title_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="Карты, деньги,\n два ствола"
             android:textSize="18sp"
             android:lines="2"
             android:textColor="@color/orange"
@@ -38,6 +37,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Карты, деньги,\n два ствола"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

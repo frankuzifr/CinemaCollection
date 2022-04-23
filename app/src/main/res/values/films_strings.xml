@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="jentelmens_title">Джентельмены</string>
-    <string name="jentelmens_description">Наркобарон хочет уйти на покой, но криминальный мир не отпускает. Успешное возвращение Гая Ричи к корням</string>
+    <string name="jentelmens_title">The Gentlemen</string>
+    <string name="jentelmens_description">The drug lord wants to retire, but the criminal world does not let go. Successful return of Guy Ritchie to the roots.</string>
 
-    <string name="titansAttack_title">Атака титанов</string>
-    <string name="titansAttack_description">Подросток мстит гуманоидам - людоедам за убийство матери. Культовый аниме - сериал по постапокалиптической манге</string>
+    <string name="titansAttack_title">Attack on Titan</string>
+    <string name="titansAttack_description">A teenager takes revenge on humanoids - cannibals for the murder of his mother. Cult anime - series based on post-apocalyptic manga</string>
 
-    <string name="peaky_blinders_title">Острые козырьки</string>
-    <string name="peaky_blinders_description">Бывший солдат встает во главе криминального семейного бизнеса. Стильная британская сага с Киллианом Мёрфи</string>
+    <string name="peaky_blinders_title">Peaky blinders</string>
+    <string name="peaky_blinders_description">An ex-soldier takes over a criminal family business. Stylish British saga with Cillian Murphy</string>
 
-    <string name="arcane_title">Аркейн</string>
-    <string name="arcane_description">Анимационный проект «Аркейн» основан на популярной компьютерной игре League of Legends. События мультсериала разворачиваются во времена, когда был изобретен хекстек, а путь легендарных чемпионов Вай и Джинкс только начинался.</string>
+    <string name="arcane_title">Arcane</string>
+    <string name="arcane_description">The Arcane animation project is based on the popular computer game League of Legends. The events of the animated series unfold at a time when hextech was invented, and the path of the legendary champions Vi and Jinx was just beginning.</string>
 
-    <string name="lock_stock_and_two_smoking_barrels_title">Карты, деньги, два ствола</string>
-    <string name="lock_stock_and_two_smoking_barrels_description">Четверке друзей из Лондона нужно где-то найти 500 000 фунтов. Культовая черная комедия, дебют Гая Ричи</string>
+    <string name="lock_stock_and_two_smoking_barrels_title">Lock stock and two smoking barrels</string>
+    <string name="lock_stock_and_two_smoking_barrels_description">Four friends from London need to find £500,000 somewhere. Cult black comedy, Guy Ritchie\'s debut.</string>
 
-    <string name="lacasa_de_paper_title">Бумажный дом</string>
-    <string name="lacasa_de_paper_description">Действие первого и второго сезонов разворачивается в Мадриде вокруг группы авантюристов, использующих названия городов в качестве кодовых имён, во главе с таинственным Профессором. Их план заключается в том, чтобы вынести 2,4 миллиарда евро из Испанского королевского монетного двора  (исп.)рус.. Взявшей в заложники 67 человек команде предстоит в течение 11 дней напечатать деньги, противостоя при этом элитным силам полиции.После этого участники команды вынуждены залечь на дно на два года, а затем организовать второе ограбление, на этот раз — Банка Испании.</string>
+    <string name="lacasa_de_paper_title">Lacasa de paper</string>
+    <string name="lacasa_de_paper_description">The action of the first and second seasons takes place in Madrid around a group of adventurers using city names as code names, led by the mysterious Professor. Their plan is to steal 2.4 billion euros from the Spanish Royal Mint (Spanish) Russian. The team, which took 67 people hostage, will have to print money within 11 days, while confronting the elite police forces. After that, the team members are forced to lay low for two years, and then organize a second robbery, this time - the Bank of Spain.</string>
 
-    <string name="zveropolis_title">Зверополис</string>
-    <string name="zveropolis_description">Отважная крольчиха делает карьеру в полиции звериного города. Оскароносная комедия с серьезным подтекстом</string>
+    <string name="zveropolis_title">Zootopia</string>
+    <string name="zveropolis_description">The brave rabbit makes a career in the police of the animal city. Oscar-winning comedy with serious overtones</string>
 </resources>
