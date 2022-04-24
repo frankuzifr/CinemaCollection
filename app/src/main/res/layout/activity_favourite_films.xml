@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:title="@string/favourites"
-        android:background="?android:attr/colorPrimary"
+        android:background="?android:attr/colorPrimaryDark"
         app:titleTextColor="@color/white"
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         />

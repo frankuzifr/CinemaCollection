@@ -10,4 +10,7 @@
     <string name="favourites">Избранное</string>
     <string name="touch_one_more_time">Нажмите еще раз, чтобы выйти</string>
     <string name="general">Главная</string>
+    <string name="exit">Выход</string>
+    <string name="you_want_exit">Вы уверены, что хотите выйти?</string>
+    <string name="close_dialog">Вернуться</string>
 </resources>

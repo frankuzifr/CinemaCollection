@@ -119,14 +119,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (_backPressedTime + 2000 > System.currentTimeMillis()) {
-            cancelToast()
-            super.onBackPressed();
-            return
-        }
-
-        showToastWithText(this, getString(R.string.touch_one_more_time))
-        _backPressedTime = System.currentTimeMillis();
+        ExitDialog {
+            super.onBackPressed()
+        }.show(supportFragmentManager, "dialog")
     }
 
     companion object {
