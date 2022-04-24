@@ -8,10 +8,12 @@
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/ic_baseline_favorite_24.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/ic_baseline_favorite_border_24.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/image_style.xml" value="0.25" />
+        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/activity_favourite_films.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/activity_film_detail.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/film_view_card.xml" value="1.1" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/layout/film_view_card_new.xml" value="0.25" />
+        <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/menu/acivity_main_toolbar_menu.xml" value="0.23072916666666668" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/menu/activity_film_toolbar_menu.xml" value="0.36666666666666664" />
       </map>
     </option>

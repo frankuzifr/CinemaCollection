@@ -7,4 +7,5 @@
     <string name="film_added_to_favourites">Фильм \"%1$s\" добавлен в избанное</string>
     <string name="film_removed_from_favourites">Фильм \"%1$s\" удален из избанного</string>
     <string name="invite_message">Привет. Давай посмотрим фильм \"%1$s\"</string>
+    <string name="favourites">избранное</string>
 </resources>

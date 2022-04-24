@@ -1,5 +1,6 @@
 package space.frankuzi.cinemacollection.data
 
+import android.util.Log
 import space.frankuzi.cinemacollection.R
 
 object FilmsData {
@@ -40,5 +41,7 @@ object FilmsData {
             imageIdRes = R.drawable.peaky_blinder
         )
     )
+
+    val favouriteFilms = mutableListOf<FilmItem>()
 }
 

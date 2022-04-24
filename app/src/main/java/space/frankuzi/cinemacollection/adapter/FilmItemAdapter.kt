@@ -1,16 +1,16 @@
 package space.frankuzi.cinemacollection.adapter
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.viewholder.FilmItemViewHolder
 
 class FilmItemAdapter(
     private val items: List<FilmItem>,
-    private val mainActivity: MainActivity,
+    private val activity: Activity,
     private val listener: FilmClickListener
 ) : RecyclerView.Adapter<FilmItemViewHolder>() {
 
@@ -24,7 +24,7 @@ class FilmItemAdapter(
     }
 
     override fun onBindViewHolder(holder: FilmItemViewHolder, position: Int) {
-        holder.bind(items[position], mainActivity, listener)
+        holder.bind(items[position], activity, listener)
     }
 
     override fun getItemCount(): Int {

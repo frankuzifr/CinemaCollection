@@ -7,4 +7,5 @@
     <string name="film_added_to_favourites">Movie \"%1$s\" added to favorites</string>
     <string name="film_removed_from_favourites">Movie \"%1$s\" removed from favorites</string>
     <string name="invite_message">Hello. Let\'s watch the movie \"%1$s\"</string>
+    <string name="favourites">favourites</string>
 </resources>
