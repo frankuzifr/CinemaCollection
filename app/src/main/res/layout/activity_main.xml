@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:title="@string/cinema_collection"
+        app:title="@string/general"
         android:background="?android:attr/colorPrimary"
         app:titleTextColor="@color/white"
         app:menu="@menu/acivity_main_toolbar_menu"

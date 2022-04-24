@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.data
 
-import android.util.Log
 import space.frankuzi.cinemacollection.R
 
 object FilmsData {

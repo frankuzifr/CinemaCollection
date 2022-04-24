@@ -87,15 +87,14 @@ class FavouriteFilmsActivity : AppCompatActivity() {
 
         val filmId = data.getIntExtra(FilmDetailActivity.FILM_ID, 0)
         val isFavourite = data.getBooleanExtra(FilmDetailActivity.IS_FAVOURITE, false)
-        val comment = data.getStringExtra(FilmDetailActivity.COMMENT)
 
-        FilmsData.films[filmId].isFavourite = isFavourite
+        val filmItem = FilmsData.favouriteFilms[filmId]
+        if (!isFavourite) {
+            FilmsData.favouriteFilms.removeAt(filmId)
+            filmItem.isFavourite = false
+        }
 
-        _recyclerView.adapter?.notifyItemChanged(filmId)
-
-        Log.i("Film name", resources.getString(FilmsData.films[filmId].nameIdRes))
-        Log.i("Favourite", isFavourite.toString())
-        Log.i("Comment", comment.toString())
+        _recyclerView.adapter?.notifyItemRemoved(filmId)
     }
 
     private fun sendResult() {
