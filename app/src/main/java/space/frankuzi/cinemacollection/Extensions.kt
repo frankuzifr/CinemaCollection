@@ -10,3 +10,7 @@ fun showToastWithText(context: Context, text: String) {
     _toast = Toast.makeText(context, text, Toast.LENGTH_SHORT)
     _toast?.show()
 }
+
+fun cancelToast() {
+    _toast?.cancel()
+}

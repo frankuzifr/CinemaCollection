@@ -1,6 +1,7 @@
 package space.frankuzi.cinemacollection
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
     private lateinit var _recyclerView: RecyclerView
 
+    private var _backPressedTime: Long = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -27,7 +30,10 @@ class MainActivity : AppCompatActivity() {
 
         _recyclerView = _binding.container
 
-        val layoutManager = GridLayoutManager(this, 2)
+        val orientation = this.resources.configuration.orientation
+        val spanCount = if (orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 3
+
+        val layoutManager = GridLayoutManager(this, spanCount)
         _recyclerView.layoutManager = layoutManager
         _recyclerView.adapter = FilmItemAdapter(FilmsData.films, this, object : FilmClickListener {
             override fun onFilmClickListener(film: FilmItem, position: Int) {
@@ -110,6 +116,17 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == FAVOURITES_REQUEST_CODE) {
             _recyclerView.adapter?.notifyDataSetChanged()
         }
+    }
+
+    override fun onBackPressed() {
+        if (_backPressedTime + 2000 > System.currentTimeMillis()) {
+            cancelToast()
+            super.onBackPressed();
+            return
+        }
+
+        showToastWithText(this, getString(R.string.touch_one_more_time))
+        _backPressedTime = System.currentTimeMillis();
     }
 
     companion object {

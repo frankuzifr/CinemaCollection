@@ -8,4 +8,5 @@
     <string name="film_removed_from_favourites">Movie \"%1$s\" removed from favorites</string>
     <string name="invite_message">Hello. Let\'s watch the movie \"%1$s\"</string>
     <string name="favourites">favourites</string>
+    <string name="touch_one_more_time">Click again to exit</string>
 </resources>

@@ -1,6 +1,7 @@
 package space.frankuzi.cinemacollection
 
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +27,10 @@ class FavouriteFilmsActivity : AppCompatActivity() {
         setContentView(view)
         _recyclerView = _binding.container
 
-        val layoutManager = GridLayoutManager(this, 2)
+        val orientation = this.resources.configuration.orientation
+        val spanCount = if (orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 3
+
+        val layoutManager = GridLayoutManager(this, spanCount)
         _recyclerView.layoutManager = layoutManager
         _recyclerView.adapter = FilmItemAdapter(FilmsData.favouriteFilms, this, object : FilmClickListener {
             override fun onFilmClickListener(film: FilmItem, position: Int) {
