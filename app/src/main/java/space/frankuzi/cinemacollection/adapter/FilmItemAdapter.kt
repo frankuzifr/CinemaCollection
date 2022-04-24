@@ -10,7 +10,8 @@ import space.frankuzi.cinemacollection.viewholder.FilmItemViewHolder
 
 class FilmItemAdapter(
     private val items: List<FilmItem>,
-    private val mainActivity: MainActivity
+    private val mainActivity: MainActivity,
+    private val listener: FilmClickListener
 ) : RecyclerView.Adapter<FilmItemViewHolder>() {
 
 
@@ -23,11 +24,16 @@ class FilmItemAdapter(
     }
 
     override fun onBindViewHolder(holder: FilmItemViewHolder, position: Int) {
-        holder.bind(items[position], mainActivity)
+        holder.bind(items[position], mainActivity, listener)
     }
 
     override fun getItemCount(): Int {
         return items.size
     }
+}
 
+interface FilmClickListener
+{
+    fun onFilmClickListener(film: FilmItem, position: Int)
+    fun onFilmFavouriteClickListener(film: FilmItem, position: Int)
 }

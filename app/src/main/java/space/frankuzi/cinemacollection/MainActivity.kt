@@ -11,14 +11,15 @@ import androidx.core.graphics.TypefaceCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import space.frankuzi.cinemacollection.adapter.FilmClickListener
 import space.frankuzi.cinemacollection.adapter.FilmItemAdapter
+import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var _binding: ActivityMainBinding
     private lateinit var _recyclerView: RecyclerView
     val requestCode: Int = 100
@@ -33,7 +34,15 @@ class MainActivity : AppCompatActivity() {
 
         val layoutManager = GridLayoutManager(this, 2)
         _recyclerView.layoutManager = layoutManager
-        _recyclerView.adapter = FilmItemAdapter(FilmsData.films, this)
+        _recyclerView.adapter = FilmItemAdapter(FilmsData.films, this, object : FilmClickListener {
+            override fun onFilmClickListener(film: FilmItem, position: Int) {
+                _recyclerView.adapter?.notifyItemChanged(position)
+            }
+
+            override fun onFilmFavouriteClickListener(film: FilmItem, position: Int) {
+
+            }
+        })
         _recyclerView.addItemDecoration(ViewHolderOffset(15))
     }
 
@@ -54,6 +63,8 @@ class MainActivity : AppCompatActivity() {
         val comment = data.getStringExtra(FilmDetailActivity.COMMENT)
 
         FilmsData.films[filmId].isFavourite = isFavourite
+
+        _recyclerView.adapter?.notifyItemChanged(filmId)
 
         Log.i("Film name", resources.getString(FilmsData.films[filmId].nameIdRes))
         Log.i("Favourite", isFavourite.toString())
