@@ -11,6 +11,7 @@ import space.frankuzi.cinemacollection.adapter.FilmItemAdapter
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.databinding.ActivityFavouriteFilmsBinding
+import space.frankuzi.cinemacollection.viewholderanim.CustomItemAnimator
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 
 class FavouriteFilmsActivity : AppCompatActivity() {
@@ -58,6 +59,7 @@ class FavouriteFilmsActivity : AppCompatActivity() {
             }
         })
         _recyclerView.addItemDecoration(ViewHolderOffset(15))
+        _recyclerView.itemAnimator = CustomItemAnimator()
 
         val toolbar = _binding.toolbar
 
