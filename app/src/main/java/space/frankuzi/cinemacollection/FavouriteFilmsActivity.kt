@@ -92,9 +92,9 @@ class FavouriteFilmsActivity : AppCompatActivity() {
         if (!isFavourite) {
             FilmsData.favouriteFilms.removeAt(filmId)
             filmItem.isFavourite = false
+            _recyclerView.adapter?.notifyItemRemoved(filmId)
         }
 
-        _recyclerView.adapter?.notifyItemRemoved(filmId)
     }
 
     private fun sendResult() {
