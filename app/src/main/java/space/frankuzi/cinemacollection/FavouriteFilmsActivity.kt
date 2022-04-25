@@ -101,4 +101,9 @@ class FavouriteFilmsActivity : AppCompatActivity() {
         val intent = Intent()
         setResult(RESULT_OK, intent)
     }
+
+    override fun onBackPressed() {
+        sendResult()
+        super.onBackPressed()
+    }
 }
