@@ -20,7 +20,7 @@ data class FilmItem(
     val titleColorId: Int
     get() {
         return if (isSelected)
-            R.color.blue
+            R.color.purple
         else
             R.color.orange
     }

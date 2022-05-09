@@ -6,9 +6,15 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
+    <color name="grey">#6E6D6D</color>
+    <color name="light_grey">#DDDDDD</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00FFFFFF</color>
     <color name="orange">#DF8F03</color>
+    <color name="orange_50">#86DF8F03</color>
+    <color name="light_orange">#EDC073</color>
     <color name="blue">#062EF1</color>
+    <color name="purple">#B206F1</color>
     <color name="red">#F10606</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#474747</color>
 </resources>

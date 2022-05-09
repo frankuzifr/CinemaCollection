@@ -13,4 +13,7 @@
     <string name="exit">Exit</string>
     <string name="you_want_exit">Are you sure you want to exit?</string>
     <string name="close_dialog">Return</string>
+    <string name="share">Share</string>
+    <string name="liked">Liked</string>
+    <string name="no_liked">No liked</string>
 </resources>
