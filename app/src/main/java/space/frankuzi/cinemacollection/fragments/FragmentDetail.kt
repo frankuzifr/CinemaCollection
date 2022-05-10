@@ -1,8 +1,10 @@
 package space.frankuzi.cinemacollection.fragments
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -110,6 +112,12 @@ class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
         result.putInt(FILM_ID, _filmId)
         parentFragmentManager.setFragmentResult(REQUEST_KEY_DETAIL, result)
         parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
+        val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocus = requireActivity().currentFocus
+        currentFocus?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 
     private fun initDescription(view: View) {
