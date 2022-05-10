@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.showToastWithText
@@ -51,10 +52,7 @@ class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
         toolBar.setTitle(_nameIdRes)
 
         toolBar.setNavigationOnClickListener {
-            val result = Bundle()
-            result.putInt(FILM_ID, _filmId)
-            parentFragmentManager.setFragmentResult(REQUEST_KEY_DETAIL, result)
-            parentFragmentManager.popBackStack()
+            closeDetail()
         }
 
         val favouriteItem = toolBar.menu.getItem(0)
@@ -105,6 +103,13 @@ class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
             }
             true
         }
+    }
+
+    fun closeDetail() {
+        val result = Bundle()
+        result.putInt(FILM_ID, _filmId)
+        parentFragmentManager.setFragmentResult(REQUEST_KEY_DETAIL, result)
+        parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
     private fun initDescription(view: View) {

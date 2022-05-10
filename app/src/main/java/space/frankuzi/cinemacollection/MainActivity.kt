@@ -1,15 +1,17 @@
 package space.frankuzi.cinemacollection
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
+import space.frankuzi.cinemacollection.custombackstack.CustomBackStack
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.fragments.FragmentFavourites
 import space.frankuzi.cinemacollection.fragments.FragmentMain
 
 class MainActivity : AppCompatActivity() {
+    private val _customBackStack = CustomBackStack()
     private lateinit var _binding: ActivityMainBinding
+    private var _fragmentMain = FragmentMain()
+    private var _fragmentFavourites = FragmentFavourites()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,60 +40,61 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-//        bottomNavigation.setOnItemReselectedListener {
-//            true
-//        }
+        bottomNavigation.setOnItemReselectedListener {
+            true
+        }
     }
 
     private fun setMainFragment() {
 
-//        val isPop = supportFragmentManager.popBackStackImmediate("Main", 0)
-//
-//        if (!isPop) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.items_container, _fragmentMain)
+            .commit()
 
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.items_container, FragmentMain())
-                .addToBackStack("Main")
-                .commit()
-//        }
-        Log.i("", supportFragmentManager.backStackEntryCount.toString())
+        _customBackStack.addToBackStack("Main", R.id.main)
+
     }
 
     private fun setFavouritesFragment() {
 
-//        val isPop = supportFragmentManager.popBackStackImmediate("Favourites", 0)
-//
-//        if (!isPop) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.items_container, _fragmentFavourites)
+            .commit()
 
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.items_container, FragmentFavourites())
-                .addToBackStack("Favourites")
-                .commit()
-        //}
-        Log.i("", supportFragmentManager.backStackEntryCount.toString())
+        _customBackStack.addToBackStack("Favourites", R.id.favourites)
     }
 
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 1) {
+
+        _fragmentMain.let {
+
+            if (it.isVisible && it.childFragmentManager.backStackEntryCount > 0) {
+                it.closeDetail()
+                return
+            }
+        }
+
+        _fragmentFavourites.let {
+
+            if (it.isVisible && it.childFragmentManager.backStackEntryCount > 0) {
+                it.childFragmentManager.popBackStack()
+                return
+            }
+        }
+
+        val popFromBackStack = _customBackStack.popFromBackStack()
+
+        if (popFromBackStack != null) {
 
             val bottomNavigation = _binding.bottomNavigation
-            supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-            val name = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount - 1).name
-
-            when (name) {
-                "Main" -> bottomNavigation.selectedItemId = R.id.favourites
-                "Favourites" -> bottomNavigation.selectedItemId = R.id.main
-                else -> {
-                    bottomNavigation.selectedItemId = bottomNavigation.selectedItemId
-                }
-            }
-            Log.i("", name.toString())
+            bottomNavigation.selectedItemId = popFromBackStack.navigationBarId
 
         } else {
             ExitDialog {
                 super.onBackPressed()
             }.show(supportFragmentManager, "dialog")
         }
-        Log.i("", supportFragmentManager.backStackEntryCount.toString())
     }
 }

@@ -17,13 +17,20 @@ import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
     private lateinit var _itemContainer: RecyclerView
+    private var _fragmentDetail: FragmentDetail? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _fragmentDetail?.let { setFilmDetail(it) }
+
         initRecycleView(view)
         initToolbar(view)
         initResultListener()
+    }
+
+    fun closeDetail() {
+        _fragmentDetail?.closeDetail()
     }
 
     private fun initResultListener() {
@@ -31,6 +38,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         childFragmentManager.setFragmentResultListener(FragmentDetail.REQUEST_KEY_DETAIL, this) {_, result ->
             val filmId = result.getInt(FragmentDetail.FILM_ID)
             _itemContainer.adapter?.notifyItemChanged(filmId)
+            _fragmentDetail = null
         }
     }
 
@@ -48,16 +56,12 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             override fun onFilmClickListener(film: FilmItem, position: Int) {
                 film.isSelected = true
 
-                val fragmentDetail = FragmentDetail()
+                _fragmentDetail = FragmentDetail()
                 val arguments = Bundle()
                 arguments.putInt(FragmentDetail.FILM_ID, position)
-                fragmentDetail.arguments = arguments
+                _fragmentDetail?.arguments = arguments
 
-                parentFragmentManager.beginTransaction()
-                    .setCustomAnimations(R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down, R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down)
-                    .replace(R.id.film_detail_fragment_container, fragmentDetail)
-                    .addToBackStack("Detail")
-                    .commit()
+                _fragmentDetail?.let { setFilmDetail(it) }
 
                 _itemContainer.adapter?.notifyItemChanged(position)
             }
@@ -77,6 +81,15 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         })
 
         _itemContainer.addItemDecoration(ViewHolderOffset(20))
+    }
+
+    private fun setFilmDetail(fragmentDetail: FragmentDetail) {
+
+        childFragmentManager.beginTransaction()
+            .setCustomAnimations(R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down, R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down)
+            .replace(R.id.film_detail_fragment_container, fragmentDetail)
+            .addToBackStack("Detail")
+            .commit()
     }
 
     private fun initToolbar(view: View) {
