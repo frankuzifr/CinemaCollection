@@ -2,20 +2,24 @@ package space.frankuzi.cinemacollection.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
+import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
 import space.frankuzi.cinemacollection.adapter.FilmItemAdapter
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
-import space.frankuzi.cinemacollection.showToastWithText
+import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 
-class FragmentFavourites : Fragment(R.layout.fragment_main) {
+class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
     private lateinit var _itemContainer: RecyclerView
     private var _fragmentDetail: FragmentDetail? = null
 
@@ -29,11 +33,16 @@ class FragmentFavourites : Fragment(R.layout.fragment_main) {
         initResultListener()
     }
 
+    fun closeDetail() {
+        _fragmentDetail?.closeDetail()
+    }
+
     private fun initResultListener() {
 
         childFragmentManager.setFragmentResultListener(FragmentDetail.REQUEST_KEY_DETAIL, this) {_, result ->
             val filmId = result.getInt(FragmentDetail.FILM_ID)
             _itemContainer.adapter?.notifyItemChanged(filmId)
+            _fragmentDetail = null
         }
     }
 
@@ -65,15 +74,23 @@ class FragmentFavourites : Fragment(R.layout.fragment_main) {
 
             override fun onFilmFavouriteClickListener(film: FilmItem, position: Int) {
                 val filmName = resources.getString(film.nameIdRes)
-                if (film.isFavourite) {
-                    film.isFavourite = false
-                    FilmsData.favouriteFilms.remove(film)
-                    showToastWithText(requireActivity(), resources.getString(R.string.film_removed_from_favourites, filmName))
-                } else {
-                    film.isFavourite = true
-                    FilmsData.favouriteFilms.add(film)
-                    showToastWithText(requireActivity(), resources.getString(R.string.film_added_to_favourites, filmName))
-                }
+
+                film.isFavourite = false
+                FilmsData.favouriteFilms.remove(film)
+                //showToastWithText(requireActivity(), resources.getString(R.string.film_removed_from_favourites, filmName))
+
+                val mainActivity = activity as MainActivity
+                mainActivity.showSnackBar(
+                    getString(R.string.film_removed_from_favourites, filmName),
+                    SnackBarAction(
+                        actionNameId = R.string.cancel,
+                        action = {
+                            film.isFavourite = true
+                            FilmsData.favouriteFilms.add(position, film)
+                            _itemContainer.adapter?.notifyItemInserted(position)
+                            Log.i("", filmName)
+                        }
+                    ))
 
                 _itemContainer.adapter?.notifyItemRemoved(position)
             }

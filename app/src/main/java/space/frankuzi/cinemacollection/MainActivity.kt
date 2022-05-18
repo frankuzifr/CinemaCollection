@@ -2,10 +2,12 @@ package space.frankuzi.cinemacollection
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import space.frankuzi.cinemacollection.custombackstack.CustomBackStack
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.fragments.FragmentFavourites
 import space.frankuzi.cinemacollection.fragments.FragmentMain
+import space.frankuzi.cinemacollection.structs.SnackBarAction
 
 class MainActivity : AppCompatActivity() {
     private val _customBackStack = CustomBackStack()
@@ -22,6 +24,16 @@ class MainActivity : AppCompatActivity() {
 
         setMainFragment()
         initBottomNavigationBar()
+    }
+
+    fun showSnackBar(snackBarText: String, snackBarAction: SnackBarAction) {
+        Snackbar.make(_binding.root, snackBarText, Snackbar.LENGTH_LONG)
+            .setAction(getString(snackBarAction.actionNameId)) {
+                snackBarAction.action.invoke()
+            }
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+            .setAnchorView(_binding.bottomNavigation)
+            .show()
     }
 
     private fun initBottomNavigationBar() {
@@ -79,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         _fragmentFavourites.let {
 
             if (it.isVisible && it.childFragmentManager.backStackEntryCount > 0) {
-                it.childFragmentManager.popBackStack()
+                it.closeDetail()
                 return
             }
         }
