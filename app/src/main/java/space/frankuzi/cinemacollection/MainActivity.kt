@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showSnackBar(snackBarText: String, snackBarAction: SnackBarAction) {
+        cancelToast()
+
         Snackbar.make(_binding.root, snackBarText, Snackbar.LENGTH_LONG)
             .setAction(getString(snackBarAction.actionNameId)) {
                 snackBarAction.action.invoke()

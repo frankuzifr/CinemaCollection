@@ -1,19 +1,14 @@
 package space.frankuzi.cinemacollection.viewholder
 
 import android.app.Activity
-import android.content.Intent
-import android.util.Log
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import space.frankuzi.cinemacollection.FilmDetailActivity
-import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.showToastWithText
 import com.google.android.material.card.MaterialCardView as MaterialCard
 
 class FilmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
