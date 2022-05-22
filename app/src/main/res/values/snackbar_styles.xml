@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="snackbar_style" parent="@style/Widget.MaterialComponents.Snackbar">
+
+        <item name="backgroundTint">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <style name="snackbar_button" parent="@style/Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="backgroundTint">?attr/colorPrimaryVariant</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="snackbar_text" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/white</item>
+    </style>
+</resources>

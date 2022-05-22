@@ -17,5 +17,10 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:textColorSecondary">@color/light_black</item>
+
+        <item name="snackbarStyle">@style/snackbar_style</item>
+        <item name="snackbarButtonStyle">@style/snackbar_button</item>
+        <item name="snackbarTextViewStyle">@style/snackbar_text</item>
+
     </style>
 </resources>

@@ -8,8 +8,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
