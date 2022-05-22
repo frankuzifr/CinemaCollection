@@ -61,6 +61,7 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
                 _fragmentDetail = FragmentDetail()
                 val arguments = Bundle()
                 arguments.putInt(FragmentDetail.FILM_ID, position)
+                arguments.putBoolean(FragmentDetail.IS_FROM_FAVOURITES, true)
                 _fragmentDetail?.arguments = arguments
 
                 _fragmentDetail?.let {

@@ -34,11 +34,31 @@ class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
     private fun initFilmIds() {
 
         _filmId = arguments?.getInt(FILM_ID) ?: return
+        val isFromFavourites = arguments?.getBoolean(IS_FROM_FAVOURITES) ?: return
 
-        _imageIdRes = FilmsData.films[_filmId].imageIdRes
-        _nameIdRes = FilmsData.films[_filmId].nameIdRes
-        _descriptionIdRes = FilmsData.films[_filmId].descriptionIdRes
-        _isFavourite = FilmsData.films[_filmId].isFavourite
+        _imageIdRes =
+            if (isFromFavourites)
+                FilmsData.favouriteFilms[_filmId].imageIdRes
+            else
+                FilmsData.films[_filmId].imageIdRes
+
+        _nameIdRes =
+            if (isFromFavourites)
+                FilmsData.favouriteFilms[_filmId].nameIdRes
+            else
+                FilmsData.films[_filmId].nameIdRes
+
+        _descriptionIdRes =
+            if (isFromFavourites)
+                FilmsData.favouriteFilms[_filmId].descriptionIdRes
+            else
+                FilmsData.films[_filmId].descriptionIdRes
+
+        _isFavourite =
+            if (isFromFavourites)
+                FilmsData.favouriteFilms[_filmId].isFavourite
+            else
+                FilmsData.films[_filmId].isFavourite
     }
 
     private fun initImage(view: View) {
@@ -142,6 +162,7 @@ class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
 
     companion object {
         const val FILM_ID = "filmId"
+        const val IS_FROM_FAVOURITES = "isFromFavourites"
         const val REQUEST_KEY_DETAIL = "detail"
     }
 }
