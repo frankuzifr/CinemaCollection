@@ -28,10 +28,10 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             film.isSelected = true
 
             _fragmentDetail = FragmentDetail()
-//            val arguments = Bundle()
-//            arguments.putInt(FragmentDetail.FILM_ID, position)
-//            arguments.putBoolean(FragmentDetail.IS_FROM_FAVOURITES, false)
-//            _fragmentDetail?.arguments = arguments
+            val arguments = Bundle()
+            arguments.putInt(FragmentDetail.FILM_ID, position)
+            arguments.putBoolean(FragmentDetail.IS_FROM_FAVOURITES, false)
+            _fragmentDetail?.arguments = arguments
 
             _fragmentDetail?.let {
                 setFilmDetail(it)
