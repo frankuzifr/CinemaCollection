@@ -54,7 +54,7 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
 
         _itemContainer.layoutManager = layoutManager
 
-        _itemContainer.adapter = FilmItemAdapter(FilmsData.favouriteFilms, requireActivity(), object : FilmClickListener {
+        _itemContainer.adapter = FilmItemAdapter(object : FilmClickListener {
             override fun onFilmClickListener(film: FilmItem, position: Int) {
                 film.isSelected = true
 

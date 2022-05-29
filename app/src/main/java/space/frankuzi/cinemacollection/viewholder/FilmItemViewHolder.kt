@@ -17,10 +17,10 @@ class FilmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val _filmCard: MaterialCard = itemView.findViewById(R.id.film_card)
     private val _filmFavourite: CheckBox = itemView.findViewById(R.id.favourite_checkbox)
 
-    fun bind(film: FilmItem, activity: Activity, listener: FilmClickListener) {
+    fun bind(film: FilmItem, listener: FilmClickListener) {
         _filmImage.setBackgroundResource(film.imageIdRes)
         _filmTitle.setText(film.nameIdRes)
-        _filmTitle.setTextColor(activity.resources.getColor(film.titleColorId))
+        //_filmTitle.setTextColor(activity.resources.getColor(film.titleColorId))
         _filmFavourite.isChecked = film.isFavourite
 
         _filmCard.setOnClickListener {

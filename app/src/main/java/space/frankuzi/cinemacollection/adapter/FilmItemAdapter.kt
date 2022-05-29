@@ -9,11 +9,10 @@ import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.viewholder.FilmItemViewHolder
 
 class FilmItemAdapter(
-    private val items: List<FilmItem>,
-    private val activity: Activity,
     private val listener: FilmClickListener
 ) : RecyclerView.Adapter<FilmItemViewHolder>() {
 
+    private val _items = mutableListOf<FilmItem>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -24,11 +23,18 @@ class FilmItemAdapter(
     }
 
     override fun onBindViewHolder(holder: FilmItemViewHolder, position: Int) {
-        holder.bind(items[position], activity, listener)
+        holder.bind(_items[position], listener)
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return _items.size
+    }
+
+    fun setItems(items: List<FilmItem>) {
+        _items.clear()
+        _items.addAll(items)
+
+        notifyDataSetChanged()
     }
 }
 
