@@ -3,18 +3,18 @@ package space.frankuzi.cinemacollection.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
-import space.frankuzi.cinemacollection.showToastWithText
 
 class MainViewModel : ViewModel() {
 
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
+    private val _selectedFilm = MutableLiveData<FilmItem>()
 
     val films: LiveData<List<FilmItem>> = _films
     val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
+    val selectedFilm: LiveData<FilmItem> = _selectedFilm
 
     fun loadFilms() {
         _films.value = FilmsData.films
@@ -35,7 +35,7 @@ class MainViewModel : ViewModel() {
         _favouritesFilms.value = FilmsData.favouriteFilms
     }
 
-    fun onClickFilmCard() {
-
+    fun onClickDetail(item: FilmItem) {
+        _selectedFilm.value = item
     }
 }

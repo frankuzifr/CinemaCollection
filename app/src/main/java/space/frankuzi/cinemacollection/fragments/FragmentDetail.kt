@@ -3,6 +3,7 @@ package space.frankuzi.cinemacollection.fragments
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
@@ -10,11 +11,16 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import space.frankuzi.cinemacollection.R
+import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.showToastWithText
+import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 
 class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
+    private val detailViewModel: DetailsViewModel by activityViewModels()
+    private val filmItem: FilmItem? = null
     private var _filmId: Int = 0
     private var _imageIdRes: Int = 0
     private var _nameIdRes: Int = 0
@@ -24,41 +30,16 @@ class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initFilmIds()
+        detailViewModel.selectedItem.observe(viewLifecycleOwner) {
+            _imageIdRes = it.imageIdRes
+            _nameIdRes = it.nameIdRes
+            _descriptionIdRes = it.descriptionIdRes
+            _isFavourite = it.isFavourite
 
-        initImage(view)
-        initToolbar(view)
-        initDescription(view)
-    }
-
-    private fun initFilmIds() {
-
-        _filmId = arguments?.getInt(FILM_ID) ?: return
-        val isFromFavourites = arguments?.getBoolean(IS_FROM_FAVOURITES) ?: return
-
-        _imageIdRes =
-            if (isFromFavourites)
-                FilmsData.favouriteFilms[_filmId].imageIdRes
-            else
-                FilmsData.films[_filmId].imageIdRes
-
-        _nameIdRes =
-            if (isFromFavourites)
-                FilmsData.favouriteFilms[_filmId].nameIdRes
-            else
-                FilmsData.films[_filmId].nameIdRes
-
-        _descriptionIdRes =
-            if (isFromFavourites)
-                FilmsData.favouriteFilms[_filmId].descriptionIdRes
-            else
-                FilmsData.films[_filmId].descriptionIdRes
-
-        _isFavourite =
-            if (isFromFavourites)
-                FilmsData.favouriteFilms[_filmId].isFavourite
-            else
-                FilmsData.films[_filmId].isFavourite
+            initImage(view)
+            initToolbar(view)
+            initDescription(view)
+        }
     }
 
     private fun initImage(view: View) {
@@ -128,6 +109,7 @@ class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
     }
 
     fun closeDetail() {
+        Log.i("","lol")
         val result = Bundle()
         result.putInt(FILM_ID, _filmId)
         parentFragmentManager.setFragmentResult(REQUEST_KEY_DETAIL, result)

@@ -20,7 +20,6 @@ class FilmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(film: FilmItem, listener: FilmClickListener) {
         _filmImage.setBackgroundResource(film.imageIdRes)
         _filmTitle.setText(film.nameIdRes)
-        //_filmTitle.setTextColor(activity.resources.getColor(film.titleColorId))
         _filmFavourite.isChecked = film.isFavourite
 
         _filmCard.setOnClickListener {

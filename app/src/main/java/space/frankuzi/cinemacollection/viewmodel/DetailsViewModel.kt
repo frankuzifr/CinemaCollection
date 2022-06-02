@@ -11,6 +11,7 @@ class DetailsViewModel : ViewModel() {
     val selectedItem: LiveData<FilmItem> = _selectedItem
 
     fun setItem(item: FilmItem) {
+        item.isSelected = true
         _selectedItem.value = item
     }
 }

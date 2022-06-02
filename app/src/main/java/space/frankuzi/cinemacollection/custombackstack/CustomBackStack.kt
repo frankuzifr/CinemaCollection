@@ -27,4 +27,8 @@ class CustomBackStack {
 
         return backStack.lastOrNull()
     }
+
+    fun getCount() : Int {
+        return backStack.size
+    }
 }

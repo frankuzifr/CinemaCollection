@@ -2,6 +2,7 @@ package space.frankuzi.cinemacollection.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -16,28 +17,18 @@ import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.viewmodel.MainViewModel
+import kotlin.math.log
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
     private val viewModel: MainViewModel by viewModels()
+    private val detailViewModel: DetailsViewModel by activityViewModels()
 
     private lateinit var _itemContainer: RecyclerView
     private var _fragmentDetail: FragmentDetail? = null
 
     private val _adapter = FilmItemAdapter(object : FilmClickListener {
         override fun onFilmClickListener(film: FilmItem, position: Int) {
-            film.isSelected = true
-
-            _fragmentDetail = FragmentDetail()
-            val arguments = Bundle()
-            arguments.putInt(FragmentDetail.FILM_ID, position)
-            arguments.putBoolean(FragmentDetail.IS_FROM_FAVOURITES, false)
-            _fragmentDetail?.arguments = arguments
-
-            _fragmentDetail?.let {
-                setFilmDetail(it)
-            }
-
-            _itemContainer.adapter?.notifyItemChanged(position)
+            detailViewModel.setItem(film)
         }
 
         override fun onFilmFavouriteClickListener(film: FilmItem, position: Int) {
@@ -61,6 +52,20 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     private fun initSubscribers() {
         viewModel.films.observe(viewLifecycleOwner) {
             _adapter.setItems(it)
+        }
+
+        detailViewModel.selectedItem.observe(viewLifecycleOwner) {
+            it.isSelected = true
+            //filmTitle.setTextColor(activity.resources.getColor(film.titleColorId))
+
+            _fragmentDetail = FragmentDetail()
+
+            _fragmentDetail?.let { fragment ->
+                setFilmDetail(fragment)
+            }
+
+            //_itemContainer.adapter?.notifyItemChanged(position)
+            //detailViewModel.setItem(film)
         }
     }
 
@@ -92,7 +97,6 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     }
 
     private fun setFilmDetail(fragmentDetail: FragmentDetail) {
-
         childFragmentManager.beginTransaction()
             .setCustomAnimations(R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down, R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down)
             .replace(R.id.film_detail_fragment_container, fragmentDetail)

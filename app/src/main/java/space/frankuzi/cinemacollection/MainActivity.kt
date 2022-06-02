@@ -1,6 +1,7 @@
 package space.frankuzi.cinemacollection
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import space.frankuzi.cinemacollection.custombackstack.CustomBackStack
@@ -12,7 +13,7 @@ import space.frankuzi.cinemacollection.structs.SnackBarAction
 class MainActivity : AppCompatActivity() {
     private val _customBackStack = CustomBackStack()
     private lateinit var _binding: ActivityMainBinding
-    private var _fragmentMain = FragmentMain()
+    private val _fragmentMain = FragmentMain()
     private var _fragmentFavourites = FragmentFavourites()
 
     override fun onCreate(savedInstanceState: Bundle?) {
