@@ -2,7 +2,6 @@ package space.frankuzi.cinemacollection.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -14,13 +13,13 @@ import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
 import space.frankuzi.cinemacollection.adapter.FilmItemAdapter
 import space.frankuzi.cinemacollection.data.FilmItem
+import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.viewmodel.MainViewModel
-import kotlin.math.log
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
-    private val viewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
     private val detailViewModel: DetailsViewModel by activityViewModels()
 
     private lateinit var _itemContainer: RecyclerView
@@ -32,7 +31,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         }
 
         override fun onFilmFavouriteClickListener(film: FilmItem, position: Int) {
-            viewModel.onClickFavourite(film)
+            mainViewModel.onClickFavourite(film)
         }
     })
 
@@ -43,15 +42,20 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
         initRecycleView(view)
         initToolbar(view)
-        initResultListener()
+        //initResultListener()
         initSubscribers()
 
-        viewModel.loadFilms()
+        mainViewModel.loadFilms()
     }
 
     private fun initSubscribers() {
-        viewModel.films.observe(viewLifecycleOwner) {
+        mainViewModel.films.observe(viewLifecycleOwner) {
             _adapter.setItems(it)
+        }
+
+        mainViewModel.filmItemChanged.observe(viewLifecycleOwner) {
+            val index = FilmsData.films.indexOf(it)
+            _adapter.notifyItemChanged(index)
         }
 
         detailViewModel.selectedItem.observe(viewLifecycleOwner) {
@@ -72,14 +76,14 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     fun closeDetail() {
         _fragmentDetail?.closeDetail()
     }
-
-    private fun initResultListener() {
-
-        childFragmentManager.setFragmentResultListener(FragmentDetail.REQUEST_KEY_DETAIL, this) {_, result ->
-            val filmId = result.getInt(FragmentDetail.FILM_ID)
-            _itemContainer.adapter?.notifyItemChanged(filmId)
-        }
-    }
+//
+//    private fun initResultListener() {
+//
+//        childFragmentManager.setFragmentResultListener(FragmentDetail.REQUEST_KEY_DETAIL, this) {_, result ->
+//            val filmId = result.getInt(FragmentDetail.FILM_ID)
+//            _itemContainer.adapter?.notifyItemChanged(filmId)
+//        }
+//    }
 
     private fun initRecycleView(view: View) {
 

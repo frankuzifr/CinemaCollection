@@ -10,11 +10,11 @@ class MainViewModel : ViewModel() {
 
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
-    private val _selectedFilm = MutableLiveData<FilmItem>()
+    private val _filmItemChanged = MutableLiveData<FilmItem>()
 
     val films: LiveData<List<FilmItem>> = _films
     val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
-    val selectedFilm: LiveData<FilmItem> = _selectedFilm
+    val filmItemChanged: LiveData<FilmItem> = _filmItemChanged
 
     fun loadFilms() {
         _films.value = FilmsData.films
@@ -35,7 +35,7 @@ class MainViewModel : ViewModel() {
         _favouritesFilms.value = FilmsData.favouriteFilms
     }
 
-    fun onClickDetail(item: FilmItem) {
-        _selectedFilm.value = item
+    fun onFilmItemChanged(filmItem: FilmItem) {
+        _filmItemChanged.value = filmItem
     }
 }
