@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener

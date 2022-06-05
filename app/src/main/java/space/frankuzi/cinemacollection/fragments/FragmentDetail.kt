@@ -3,24 +3,18 @@ package space.frankuzi.cinemacollection.fragments
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import space.frankuzi.cinemacollection.R
-import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
-import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.databinding.FragmentDetailFilmBinding
 import space.frankuzi.cinemacollection.showToastWithText
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 
-class FragmentDetail : Fragment(R.layout.fragment_detail_film) {
+class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
     private lateinit var _binding: FragmentDetailFilmBinding
     private val detailViewModel: DetailsViewModel by activityViewModels()
     //private var filmItem: FilmItem? = null

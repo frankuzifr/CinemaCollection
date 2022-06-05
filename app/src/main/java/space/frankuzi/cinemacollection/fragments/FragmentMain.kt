@@ -38,7 +38,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _fragmentDetail?.let { setFilmDetail(it) }
+        //_fragmentDetail?.let { setFilmDetail(it) }
 
         initRecycleView(view)
         initToolbar(view)
@@ -65,7 +65,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             _fragmentDetail = FragmentDetail()
 
             _fragmentDetail?.let { fragment ->
-                setFilmDetail(fragment)
+                //setFilmDetail(fragment)
             }
 
             //_itemContainer.adapter?.notifyItemChanged(position)
