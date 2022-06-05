@@ -11,6 +11,7 @@
     android:clickable="true"
     android:focusable="true"
     app:behavior_hideable="true"
+    app:behavior_skipCollapsed="true"
     app:behavior_peekHeight="?attr/actionBarSize"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     >

@@ -57,10 +57,21 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 R.id.favourite -> {
-                    it.isChecked = !it.isChecked
+
                     _filmItem?.let { filmItem ->
                         _detailViewModel.onClickFavourite(filmItem)
+
+                        val filmName = resources.getString(filmItem.nameIdRes)
+                        showToastWithText(
+                            this,
+                            if (it.isChecked)
+                                getString(R.string.film_added_to_favourites, filmName)
+                            else
+                                getString(R.string.film_removed_from_favourites, filmName)
+                        )
                     }
+
+                    it.isChecked = !it.isChecked
                 }
             }
             true
@@ -91,22 +102,14 @@ class MainActivity : AppCompatActivity() {
             val favouriteItem = _binding.bottomSheet.toolbar.menu.getItem(0)
             favouriteItem.isChecked = it.isFavourite
 
-            val filmName = resources.getString(it.nameIdRes)
-
             if (it.isFavourite) {
                 favouriteItem.setIcon(R.drawable.ic_baseline_favorite_24)
                 favouriteItem.setTitle(R.string.no_liked)
-                showToastWithText(
-                    this,
-                    resources.getString(R.string.film_added_to_favourites, filmName)
-                )
+
             } else {
                 favouriteItem.setIcon(R.drawable.ic_baseline_favorite_border_24)
                 favouriteItem.setTitle(R.string.liked)
-                showToastWithText(
-                    this,
-                    resources.getString(R.string.film_removed_from_favourites, filmName)
-                )
+
             }
         }
     }
@@ -120,6 +123,10 @@ class MainActivity : AppCompatActivity() {
                 it.filmImage.setImageResource(filmItem.imageIdRes)
                 it.filmDescription.setText(filmItem.descriptionIdRes)
             }
+            setFavouriteState()
+        }
+
+        _detailViewModel.favouriteToggleIsChanged.observe(this) {
             setFavouriteState()
         }
     }

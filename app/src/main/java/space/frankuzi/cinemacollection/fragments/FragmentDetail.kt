@@ -74,7 +74,7 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
 
     private fun initSubscribers() {
         detailViewModel.favouriteToggleIsChanged.observe(viewLifecycleOwner){
-            setFavouriteState(it)
+            setFavouriteState(it.isFavourite)
         }
     }
 

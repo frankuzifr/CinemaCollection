@@ -9,11 +9,11 @@ import space.frankuzi.cinemacollection.data.FilmsData
 class DetailsViewModel : ViewModel() {
     private val _selectedItem = MutableLiveData<FilmItem>()
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
-    private val _favouriteToggleIsChanged = MutableLiveData<Boolean>()
+    private val _favouriteToggleIsChanged = MutableLiveData<FilmItem>()
 
     val selectedItem: LiveData<FilmItem> = _selectedItem
     val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
-    val favouriteToggleIsChanged: LiveData<Boolean> = _favouriteToggleIsChanged
+    val favouriteToggleIsChanged: LiveData<FilmItem> = _favouriteToggleIsChanged
 
     fun setItem(item: FilmItem) {
         item.isSelected = true
@@ -33,6 +33,7 @@ class DetailsViewModel : ViewModel() {
         }
 
         _favouritesFilms.value = FilmsData.favouriteFilms
+        onFavouriteToggleChanged(film.isFavourite)
     }
 
     fun onFavouriteToggleChanged(isFavourite: Boolean) {
@@ -46,7 +47,7 @@ class DetailsViewModel : ViewModel() {
             else
                 FilmsData.favouriteFilms.remove(it)
 
-            _favouriteToggleIsChanged.value = isFavourite
+            _favouriteToggleIsChanged.value = it
         }
     }
 }

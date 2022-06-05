@@ -58,18 +58,23 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             _adapter.notifyItemChanged(index)
         }
 
-        detailViewModel.selectedItem.observe(viewLifecycleOwner) {
-            it.isSelected = true
+//        detailViewModel.selectedItem.observe(viewLifecycleOwner) {
+//            it.isSelected = true
             //filmTitle.setTextColor(activity.resources.getColor(film.titleColorId))
 
-            _fragmentDetail = FragmentDetail()
-
-            _fragmentDetail?.let { fragment ->
-                //setFilmDetail(fragment)
-            }
+//            _fragmentDetail = FragmentDetail()
+//
+//            _fragmentDetail?.let { fragment ->
+//                //setFilmDetail(fragment)
+//            }
 
             //_itemContainer.adapter?.notifyItemChanged(position)
             //detailViewModel.setItem(film)
+//        }
+
+        detailViewModel.favouriteToggleIsChanged.observe(viewLifecycleOwner) {
+            val index = FilmsData.films.indexOf(it)
+            _adapter.notifyItemChanged(index)
         }
     }
 
