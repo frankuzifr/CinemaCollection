@@ -109,7 +109,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 favouriteItem.setIcon(R.drawable.ic_baseline_favorite_border_24)
                 favouriteItem.setTitle(R.string.liked)
-
             }
         }
     }
@@ -120,6 +119,8 @@ class MainActivity : AppCompatActivity() {
             _filmItem = filmItem
             _bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             _binding.bottomSheet.let {
+                it.toolbar.setTitle(filmItem.nameIdRes)
+                it.collapsingToolbar.title = getString(filmItem.nameIdRes)
                 it.filmImage.setImageResource(filmItem.imageIdRes)
                 it.filmDescription.setText(filmItem.descriptionIdRes)
             }
