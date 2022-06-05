@@ -10,12 +10,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmsData
-import space.frankuzi.cinemacollection.databinding.FragmentDetailFilmBinding
 import space.frankuzi.cinemacollection.showToastWithText
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 
 class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
-    private lateinit var _binding: FragmentDetailFilmBinding
+    //private lateinit var _binding: FragmentDetailFilmBinding
     private val detailViewModel: DetailsViewModel by activityViewModels()
     //private var filmItem: FilmItem? = null
     private var _filmId: Int = 0
@@ -27,7 +26,7 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _binding = FragmentDetailFilmBinding.inflate(layoutInflater)
+        //_binding = FragmentDetailFilmBinding.inflate(layoutInflater)
 
         detailViewModel.selectedItem.observe(viewLifecycleOwner) {
             _imageIdRes = it.imageIdRes
@@ -44,33 +43,33 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
 
     private fun initImage(view: View) {
 
-        val imageView = _binding.filmImage
-
-        imageView.setBackgroundResource(_imageIdRes)
+//        val imageView = _binding.filmImage
+//
+//        imageView.setBackgroundResource(_imageIdRes)
     }
 
     private fun initToolbar(view: View) {
 
-        val toolBar = _binding.toolbar
-        toolBar.setTitle(_nameIdRes)
-
-        toolBar.setNavigationOnClickListener {
-            closeDetail()
-        }
-
-       setFavouriteState(_isFavourite)
-
-        toolBar.setOnMenuItemClickListener {
-            val filmItem = FilmsData.films[_filmId]
-            when (it.itemId) {
-                R.id.share -> onShareButtonClick(resources.getString(_nameIdRes))
-                R.id.favourite -> {
-                    it.isChecked = !it.isChecked
-                    detailViewModel.onClickFavourite(filmItem)
-                }
-            }
-            true
-        }
+//        val toolBar = _binding.toolbar
+//        toolBar.setTitle(_nameIdRes)
+//
+//        toolBar.setNavigationOnClickListener {
+//            closeDetail()
+//        }
+//
+//       setFavouriteState(_isFavourite)
+//
+//        toolBar.setOnMenuItemClickListener {
+//            val filmItem = FilmsData.films[_filmId]
+//            when (it.itemId) {
+//                R.id.share -> onShareButtonClick(resources.getString(_nameIdRes))
+//                R.id.favourite -> {
+//                    it.isChecked = !it.isChecked
+//                    detailViewModel.onClickFavourite(filmItem)
+//                }
+//            }
+//            true
+//        }
     }
 
     private fun initSubscribers() {
@@ -80,26 +79,26 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
     }
 
     private fun setFavouriteState(isFavourite: Boolean) {
-        val favouriteItem = _binding.toolbar.menu.getItem(0)
-        favouriteItem.isChecked = _isFavourite
-
-        val filmName = resources.getString(_nameIdRes)
-
-        if (isFavourite) {
-            favouriteItem.setIcon(R.drawable.ic_baseline_favorite_24)
-            favouriteItem.setTitle(R.string.no_liked)
-            showToastWithText(
-                requireActivity(),
-                resources.getString(R.string.film_added_to_favourites, filmName)
-            )
-        } else {
-            favouriteItem.setIcon(R.drawable.ic_baseline_favorite_border_24)
-            favouriteItem.setTitle(R.string.liked)
-            showToastWithText(
-                requireActivity(),
-                resources.getString(R.string.film_removed_from_favourites, filmName)
-            )
-        }
+//        val favouriteItem = _binding.toolbar.menu.getItem(0)
+//        favouriteItem.isChecked = _isFavourite
+//
+//        val filmName = resources.getString(_nameIdRes)
+//
+//        if (isFavourite) {
+//            favouriteItem.setIcon(R.drawable.ic_baseline_favorite_24)
+//            favouriteItem.setTitle(R.string.no_liked)
+//            showToastWithText(
+//                requireActivity(),
+//                resources.getString(R.string.film_added_to_favourites, filmName)
+//            )
+//        } else {
+//            favouriteItem.setIcon(R.drawable.ic_baseline_favorite_border_24)
+//            favouriteItem.setTitle(R.string.liked)
+//            showToastWithText(
+//                requireActivity(),
+//                resources.getString(R.string.film_removed_from_favourites, filmName)
+//            )
+//        }
     }
 
     fun closeDetail() {
@@ -117,9 +116,9 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
 
     private fun initDescription(view: View) {
 
-        val textView = _binding.filmDescription
-
-        textView.setText(_descriptionIdRes)
+//        val textView = _binding.filmDescription
+//
+//        textView.setText(_descriptionIdRes)
     }
 
     private fun onShareButtonClick(filmName: String) {
