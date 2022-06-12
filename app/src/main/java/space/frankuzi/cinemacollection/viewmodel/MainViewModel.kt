@@ -10,13 +10,15 @@ import retrofit2.Response
 import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
-import space.frankuzi.cinemacollection.network.response.GetFilmsResponse
+import space.frankuzi.cinemacollection.repository.GetFilmsCallback
+import space.frankuzi.cinemacollection.repository.MainRepository
 
 class MainViewModel : ViewModel() {
 
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = MutableLiveData<FilmItem>()
+    private val _mainRepository = MainRepository()
 
     val films: LiveData<List<FilmItem>> = _films
     val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
@@ -25,36 +27,16 @@ class MainViewModel : ViewModel() {
     fun loadFilms() {
         Log.i("ViewModel", "ViewModel")
 
-        val filmsApi = App.instance.filmsApi
+        _mainRepository.getFilms(object : GetFilmsCallback{
+            override fun onSuccess(films: List<FilmItem>) {
+                _films.value = films
+            }
 
-        filmsApi.getFilms(1)
-            .enqueue(object : Callback<GetFilmsResponse> {
-                override fun onResponse(
-                    call: Call<GetFilmsResponse>,
-                    response: Response<GetFilmsResponse>
-                ) {
-                    if (!response.isSuccessful)
-                        return
+            override fun onError(message: String) {
+                Log.i("EROOOOR", message)
+            }
 
-                    val getFilmsResponse = response.body()
-
-                    val films = getFilmsResponse?.items?.map {
-                        FilmItem(
-                            name = it?.nameRu,
-                            description = null,
-                            imageUrl = it?.posterUrl
-                        )
-                    }
-
-                    films?.let {
-                        _films.value = it
-                    }
-                }
-
-                override fun onFailure(call: Call<GetFilmsResponse>, t: Throwable) {
-                    Log.e("", "ERRRRROR")
-                }
-            })
+        })
 
         //_films.value = FilmsData.films
     }

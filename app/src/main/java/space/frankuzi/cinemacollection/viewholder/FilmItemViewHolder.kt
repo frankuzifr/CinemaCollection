@@ -6,6 +6,7 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
 import space.frankuzi.cinemacollection.data.FilmItem
@@ -18,7 +19,13 @@ class FilmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val _filmFavourite: CheckBox = itemView.findViewById(R.id.favourite_checkbox)
 
     fun bind(film: FilmItem, listener: FilmClickListener) {
-        //_filmImage.setBackgroundResource(film.imageIdRes)
+        Glide.with(itemView)
+            .load(film.imageUrl)
+            .placeholder(R.drawable.ic_baseline_image_24)
+            .error(R.drawable.ic_baseline_error_outline_24)
+            .centerCrop()
+            .into(_filmImage)
+
         _filmTitle.text = film.name
         _filmFavourite.isChecked = film.isFavourite
 
