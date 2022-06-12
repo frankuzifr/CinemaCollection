@@ -29,10 +29,10 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
         //_binding = FragmentDetailFilmBinding.inflate(layoutInflater)
 
         detailViewModel.selectedItem.observe(viewLifecycleOwner) {
-            _imageIdRes = it.imageIdRes
-            _nameIdRes = it.nameIdRes
-            _descriptionIdRes = it.descriptionIdRes
-            _isFavourite = it.isFavourite
+            //_imageIdRes = it.imageIdRes
+            //_nameIdRes = it.nameIdRes
+            //_descriptionIdRes = it.descriptionIdRes
+            //_isFavourite = it.isFavourite
 
             initSubscribers()
             initImage(view)

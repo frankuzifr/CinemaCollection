@@ -54,8 +54,8 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         }
 
         mainViewModel.filmItemChanged.observe(viewLifecycleOwner) {
-            val index = FilmsData.films.indexOf(it)
-            _adapter.notifyItemChanged(index)
+//            val index = FilmsData.films.indexOf(it)
+//            _adapter.notifyItemChanged(index)
         }
 
 //        detailViewModel.selectedItem.observe(viewLifecycleOwner) {
@@ -73,8 +73,8 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 //        }
 
         detailViewModel.favouriteToggleIsChanged.observe(viewLifecycleOwner) {
-            val index = FilmsData.films.indexOf(it)
-            _adapter.notifyItemChanged(index)
+//            val index = FilmsData.films.indexOf(it)
+//            _adapter.notifyItemChanged(index)
         }
     }
 

@@ -18,8 +18,8 @@ class FilmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val _filmFavourite: CheckBox = itemView.findViewById(R.id.favourite_checkbox)
 
     fun bind(film: FilmItem, listener: FilmClickListener) {
-        _filmImage.setBackgroundResource(film.imageIdRes)
-        _filmTitle.setText(film.nameIdRes)
+        //_filmImage.setBackgroundResource(film.imageIdRes)
+        _filmTitle.text = film.name
         _filmFavourite.isChecked = film.isFavourite
 
         _filmCard.setOnClickListener {

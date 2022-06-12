@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.share -> {
                     _filmItem?.let { filmItem ->
-                        onShareButtonClick(getString(filmItem.nameIdRes))
+                        onShareButtonClick(filmItem.name)
                     }
                 }
                 R.id.favourite -> {
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
                     _filmItem?.let { filmItem ->
                         _detailViewModel.onClickFavourite(filmItem)
 
-                        val filmName = resources.getString(filmItem.nameIdRes)
+                        val filmName = filmItem.name
                         showToastWithText(
                             this,
                             if (it.isChecked)
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onShareButtonClick(filmName: String) {
+    private fun onShareButtonClick(filmName: String?) {
 
         Log.i("", "VAR")
         val sendMessageIntent = Intent().apply {
@@ -119,10 +119,10 @@ class MainActivity : AppCompatActivity() {
             _filmItem = filmItem
             _bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             _binding.bottomSheet.let {
-                it.toolbar.setTitle(filmItem.nameIdRes)
-                it.collapsingToolbar.title = getString(filmItem.nameIdRes)
-                it.filmImage.setImageResource(filmItem.imageIdRes)
-                it.filmDescription.setText(filmItem.descriptionIdRes)
+                it.toolbar.title = filmItem.name
+                it.collapsingToolbar.title = filmItem.name
+                //it.filmImage.setImageResource(filmItem.imageIdRes)
+                //it.filmDescription.setText(filmItem.descriptionIdRes)
             }
             setFavouriteState()
         }

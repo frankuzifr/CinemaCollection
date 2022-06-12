@@ -46,7 +46,7 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
         }
 
         override fun onFilmFavouriteClickListener(film: FilmItem, position: Int) {
-            val filmName = resources.getString(film.nameIdRes)
+            val filmName = film.name
 
             favouritesViewModel.onItemRemoveFromFavourite(film)
             //showToastWithText(requireActivity(), resources.getString(R.string.film_removed_from_favourites, filmName))
