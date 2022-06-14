@@ -9,11 +9,15 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
-import space.frankuzi.cinemacollection.adapter.FilmItemAdapter
+import space.frankuzi.cinemacollection.adapter.FilmItemsPaginationAdapter
+import space.frankuzi.cinemacollection.adapter.RetryLoadListener
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.data.FilmsData
+import space.frankuzi.cinemacollection.databinding.FragmentMainBinding
+import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.viewmodel.MainViewModel
@@ -22,10 +26,11 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     private val mainViewModel: MainViewModel by viewModels()
     private val detailViewModel: DetailsViewModel by activityViewModels()
 
-    private lateinit var _itemContainer: RecyclerView
+    private lateinit var _recyclerView: RecyclerView
     private var _fragmentDetail: FragmentDetail? = null
+    private lateinit var _mainFragmentBinding: FragmentMainBinding
 
-    private val _adapter = FilmItemAdapter(object : FilmClickListener {
+    private val _adapter = FilmItemsPaginationAdapter(object : FilmClickListener {
         override fun onFilmClickListener(film: FilmItem, position: Int) {
             detailViewModel.setItem(film)
         }
@@ -33,18 +38,21 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         override fun onFilmFavouriteClickListener(film: FilmItem, position: Int) {
             mainViewModel.onClickFavourite(film)
         }
+    }, object : RetryLoadListener {
+        override fun onRetryLoadClickListener() {
+            retryLoadFilms()
+        }
     })
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         //_fragmentDetail?.let { setFilmDetail(it) }
-
+        _mainFragmentBinding = FragmentMainBinding.inflate(layoutInflater)
         initRecycleView(view)
         initToolbar(view)
         //initResultListener()
         initSubscribers()
-
         mainViewModel.loadFilms()
     }
 
@@ -56,6 +64,18 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         mainViewModel.filmItemChanged.observe(viewLifecycleOwner) {
 //            val index = FilmsData.films.indexOf(it)
 //            _adapter.notifyItemChanged(index)
+        }
+
+        mainViewModel.isLastFilmsPages.observe(viewLifecycleOwner) {
+            _adapter.isLastPages = it
+        }
+
+        mainViewModel.loadError.observe(viewLifecycleOwner) {
+            _adapter.setError(it)
+            val mainActivity = activity as MainActivity
+            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
+                retryLoadFilms()
+            })
         }
 
 //        detailViewModel.selectedItem.observe(viewLifecycleOwner) {
@@ -96,13 +116,47 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         val spanCount = if (orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 3
         val layoutManager = GridLayoutManager(requireActivity(), spanCount)
 
-        _itemContainer = view.findViewById(R.id.items_container)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup()
+        {
+            override fun getSpanSize(p0: Int): Int
+            {
+                return when (_adapter.getItemViewType(p0))
+                {
+                    FilmItemsPaginationAdapter.TYPE_FOOTER -> layoutManager.spanCount
+                    FilmItemsPaginationAdapter.TYPE_ITEMS -> 1
+                    else -> -1
+                }
+            }
+        }
 
-        _itemContainer.layoutManager = layoutManager
+        _recyclerView = view.findViewById(R.id.items_container)
 
-        _itemContainer.adapter = _adapter
+        _recyclerView.layoutManager = layoutManager
 
-        _itemContainer.addItemDecoration(ViewHolderOffset(20))
+        _recyclerView.adapter = _adapter
+
+        _recyclerView.addItemDecoration(ViewHolderOffset(20))
+
+        _recyclerView.addOnScrollListener(object : OnScrollListener(){
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+
+                if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastFilmsPages.value == false) {
+
+                    mainViewModel.loadFilms()
+//                    if (!loading && !isLastPage) {
+//
+//                        loading = true;
+//                        fetchData((++pageCount));
+//                        // Увеличиваем на 1 pagecount при каждой прокрутке для получения данных со следующей страницы
+//                        // make loading = false после загрузки данных
+//                        // Вызовите mAdapter.notifyDataSetChanged (), чтобы обновить адаптер и макет
+//                    }
+                }
+            }
+        })
     }
 
     private fun setFilmDetail(fragmentDetail: FragmentDetail) {
@@ -117,5 +171,10 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         toolbar.setTitle(R.string.general)
+    }
+
+    private fun retryLoadFilms() {
+        mainViewModel.retryLoadCurrentPage()
+        _adapter.setLoading()
     }
 }

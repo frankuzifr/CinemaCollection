@@ -8,25 +8,23 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
 import space.frankuzi.cinemacollection.R
+import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
+import space.frankuzi.cinemacollection.databinding.BottomSheetDetailBinding
 import space.frankuzi.cinemacollection.showToastWithText
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 
 class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
-    //private lateinit var _binding: FragmentDetailFilmBinding
+    private lateinit var _binding: BottomSheetDetailBinding
     private val detailViewModel: DetailsViewModel by activityViewModels()
-    //private var filmItem: FilmItem? = null
-    private var _filmId: Int = 0
-    private var _imageIdRes: Int = 0
-    private var _nameIdRes: Int = 0
-    private var _descriptionIdRes: Int = 0
-    private var _isFavourite: Boolean = false
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //_binding = FragmentDetailFilmBinding.inflate(layoutInflater)
+        _binding = BottomSheetDetailBinding.inflate(layoutInflater)
 
         detailViewModel.selectedItem.observe(viewLifecycleOwner) {
             //_imageIdRes = it.imageIdRes
@@ -35,41 +33,45 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
             //_isFavourite = it.isFavourite
 
             initSubscribers()
-            initImage(view)
-            initToolbar(view)
-            initDescription(view)
+            initImage(it)
+            initToolbar(it)
+            initDescription(it)
         }
     }
 
-    private fun initImage(view: View) {
+    private fun initImage(filmItem: FilmItem) {
 
-//        val imageView = _binding.filmImage
-//
-//        imageView.setBackgroundResource(_imageIdRes)
+        val imageView = _binding.filmImage
+        Glide.with(imageView)
+            .load(filmItem.imageUrl)
+            .placeholder(R.drawable.ic_baseline_image_24)
+            .error(R.drawable.ic_baseline_error_outline_24)
+            .centerCrop()
+            .into(imageView)
     }
 
-    private fun initToolbar(view: View) {
+    private fun initToolbar(filmItem: FilmItem) {
 
-//        val toolBar = _binding.toolbar
-//        toolBar.setTitle(_nameIdRes)
-//
-//        toolBar.setNavigationOnClickListener {
-//            closeDetail()
-//        }
-//
+        val toolBar = _binding.toolbar
+        toolBar.title = filmItem.name
+
+        toolBar.setNavigationOnClickListener {
+            closeDetail()
+        }
+
 //       setFavouriteState(_isFavourite)
-//
-//        toolBar.setOnMenuItemClickListener {
+
+        toolBar.setOnMenuItemClickListener {
 //            val filmItem = FilmsData.films[_filmId]
-//            when (it.itemId) {
-//                R.id.share -> onShareButtonClick(resources.getString(_nameIdRes))
-//                R.id.favourite -> {
-//                    it.isChecked = !it.isChecked
-//                    detailViewModel.onClickFavourite(filmItem)
-//                }
-//            }
-//            true
-//        }
+            when (it.itemId) {
+                R.id.share -> onShareButtonClick(filmItem.name)
+                R.id.favourite -> {
+                    it.isChecked = !it.isChecked
+                    detailViewModel.onClickFavourite(filmItem)
+                }
+            }
+            true
+        }
     }
 
     private fun initSubscribers() {
@@ -102,10 +104,10 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
     }
 
     fun closeDetail() {
-        val result = Bundle()
-        result.putInt(FILM_ID, _filmId)
-        parentFragmentManager.setFragmentResult(REQUEST_KEY_DETAIL, result)
-        parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+//        val result = Bundle()
+//        result.putInt(FILM_ID, _filmId)
+//        parentFragmentManager.setFragmentResult(REQUEST_KEY_DETAIL, result)
+//        parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
         val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val currentFocus = requireActivity().currentFocus
@@ -114,14 +116,14 @@ class FragmentDetail : Fragment(R.layout.bottom_sheet_detail) {
         }
     }
 
-    private fun initDescription(view: View) {
+    private fun initDescription(filmItem: FilmItem) {
 
 //        val textView = _binding.filmDescription
 //
 //        textView.setText(_descriptionIdRes)
     }
 
-    private fun onShareButtonClick(filmName: String) {
+    private fun onShareButtonClick(filmName: String?) {
 
         val sendMessageIntent = Intent().apply {
             action = Intent.ACTION_SEND

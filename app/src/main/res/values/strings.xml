@@ -17,4 +17,7 @@
     <string name="liked">Liked</string>
     <string name="no_liked">No liked</string>
     <string name="cancel">Cancel</string>
+    <string name="network_error">Network error probably...</string>
+    <string name="error_code">Error code: %1$s</string>
+    <string name="retry">Retry</string>
 </resources>

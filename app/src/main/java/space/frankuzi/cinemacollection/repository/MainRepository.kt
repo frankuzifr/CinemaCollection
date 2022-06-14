@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -9,19 +8,34 @@ import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.network.response.GetFilmsResponse
 
 class MainRepository {
-    fun getFilms(getFilmsCallback: GetFilmsCallback) {
+    private var _currentPage = 0
+    private var _lastPage = 1
+
+    fun getNextPages(getFilmsCallback: GetFilmsCallback) {
+        _currentPage++
+
+        getFilms(getFilmsCallback)
+    }
+
+    fun retryGetCurrentPage(getFilmsCallback: GetFilmsCallback) {
+        getFilms(getFilmsCallback)
+    }
+
+    private fun getFilms(getFilmsCallback: GetFilmsCallback) {
         val filmsApi = App.instance.filmsApi
 
-        filmsApi.getFilms(1)
+        filmsApi.getFilms(_currentPage)
             .enqueue(object : Callback<GetFilmsResponse> {
                 override fun onResponse(
                     call: Call<GetFilmsResponse>,
                     response: Response<GetFilmsResponse>
                 ) {
-                    if (response.isSuccessful) {
+                    if (response.isSuccessful && response.body() != null) {
 
                         val getFilmsResponse = response.body()
-
+                        getFilmsResponse?.let {
+                            _lastPage = it.totalPages
+                        }
                         val films = getFilmsResponse?.items?.map {
                             FilmItem(
                                 name = it?.nameRu,
@@ -31,22 +45,21 @@ class MainRepository {
                         }
 
                         films?.let {
-                            getFilmsCallback.onSuccess(it)
+                            getFilmsCallback.onSuccess(it, _currentPage == _lastPage)
                         }
                     } else {
-                        getFilmsCallback.onError("Error code: ${response.code()}")
+                        getFilmsCallback.onError("Код ошибки: ${response.code()}")
                     }
                 }
 
                 override fun onFailure(call: Call<GetFilmsResponse>, t: Throwable) {
-                    getFilmsCallback.onError("Network error probably...")
+                    getFilmsCallback.onError("Ошибка подключения...")
                 }
             })
     }
 }
 
-interface GetFilmsCallback
-{
-    fun onSuccess(films: List<FilmItem>)
+interface GetFilmsCallback {
+    fun onSuccess(films: List<FilmItem>, isLastPage: Boolean)
     fun onError(message: String)
 }

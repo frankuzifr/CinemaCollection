@@ -2,20 +2,18 @@ package space.frankuzi.cinemacollection.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
-import space.frankuzi.cinemacollection.adapter.FilmItemAdapter
+import space.frankuzi.cinemacollection.adapter.FilmItemsPaginationAdapter
+import space.frankuzi.cinemacollection.adapter.RetryLoadListener
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.databinding.FragmentFavouritesBinding
 import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
@@ -28,7 +26,7 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
     private lateinit var _binding: FragmentFavouritesBinding
     private var _fragmentDetail: FragmentDetail? = null
 
-    private val _adapter = FilmItemAdapter(object : FilmClickListener {
+    private val _adapter = FilmItemsPaginationAdapter(object : FilmClickListener {
         override fun onFilmClickListener(film: FilmItem, position: Int) {
 //                film.isSelected = true
 //
@@ -64,6 +62,11 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
 
             _itemContainer.adapter?.notifyItemRemoved(position)
         }
+    }, object : RetryLoadListener{
+        override fun onRetryLoadClickListener() {
+
+        }
+
     })
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

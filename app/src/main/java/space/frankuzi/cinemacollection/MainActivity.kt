@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import space.frankuzi.cinemacollection.custombackstack.CustomBackStack
@@ -39,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         initBottomSheet()
 
         initSubscribers()
-
     }
 
     private fun initBottomSheet() {
@@ -117,12 +117,18 @@ class MainActivity : AppCompatActivity() {
 
         _detailViewModel.selectedItem.observe(this) { filmItem ->
             _filmItem = filmItem
-            _bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            _bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             _binding.bottomSheet.let {
                 it.toolbar.title = filmItem.name
                 it.collapsingToolbar.title = filmItem.name
+                Glide.with(this)
+                    .load(filmItem.imageUrl)
+                    .placeholder(R.drawable.ic_baseline_image_24)
+                    .error(R.drawable.ic_baseline_error_outline_24)
+                    .centerCrop()
+                    .into(it.filmImage)
                 //it.filmImage.setImageResource(filmItem.imageIdRes)
-                //it.filmDescription.setText(filmItem.descriptionIdRes)
+//                it.filmDescription.setText("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             }
             setFavouriteState()
         }
