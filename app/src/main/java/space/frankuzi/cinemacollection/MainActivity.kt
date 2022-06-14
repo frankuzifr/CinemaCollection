@@ -150,7 +150,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-
     private fun initBottomNavigationBar() {
 
         val bottomNavigation = _binding.bottomNavigation

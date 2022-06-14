@@ -11,6 +11,8 @@ import space.frankuzi.cinemacollection.repository.MainRepository
 
 class MainViewModel : ViewModel() {
 
+    private var _isLoading = false
+
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = MutableLiveData<FilmItem>()
@@ -25,6 +27,10 @@ class MainViewModel : ViewModel() {
     val loadError: LiveData<String> = _loadError
 
     fun loadFilms() {
+        if (_isLoading)
+            return
+
+        _isLoading = true
 
         _mainRepository.getNextPages(object : GetFilmsCallback{
             override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
@@ -37,12 +43,14 @@ class MainViewModel : ViewModel() {
                         _films.value = filmsValue
                     }
                 }
+                _isLoading = false
 
                 _isLastFilmsPages.value = isLastPages
             }
 
             override fun onError(message: String) {
                 _loadError.value = message
+                _isLoading = false
             }
         })
 
@@ -50,6 +58,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun retryLoadCurrentPage() {
+        if (_isLoading)
+            return
+
+        _isLoading = true
+
         _mainRepository.retryGetCurrentPage(object : GetFilmsCallback{
             override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                 if (_films.value == null)
@@ -61,6 +74,7 @@ class MainViewModel : ViewModel() {
                         _films.value = filmsValue
                     }
                 }
+                _isLoading = false
 
                 _isLastFilmsPages.value = isLastPages
             }
@@ -68,6 +82,7 @@ class MainViewModel : ViewModel() {
             override fun onError(message: String) {
                 _loadError.value = message
                 Log.i("EROOOOR", message)
+                _isLoading = false
             }
         })
     }

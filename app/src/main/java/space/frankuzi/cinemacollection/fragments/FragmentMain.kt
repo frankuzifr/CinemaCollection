@@ -2,6 +2,7 @@ package space.frankuzi.cinemacollection.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -72,6 +73,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
         mainViewModel.loadError.observe(viewLifecycleOwner) {
             _adapter.setError(it)
+            Log.i("ERR", "ERRRROR")
             val mainActivity = activity as MainActivity
             mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
                 retryLoadFilms()
