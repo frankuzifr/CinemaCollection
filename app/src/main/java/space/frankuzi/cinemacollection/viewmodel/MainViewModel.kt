@@ -59,6 +59,25 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun refreshFilms() {
+        val rer = viewModelScope.launch {
+
+            _mainRepository.refreshFilms(object : GetFilmsCallback{
+                override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
+                    _films.value = films
+                    _isLoading = false
+
+                    _isLastFilmsPages.value = isLastPages
+                }
+
+                override fun onError(message: String) {
+                    _loadError.value = message
+                    _isLoading = false
+                }
+            })
+        }
+    }
+
     fun loadNextPage() {
         if (_isLoading)
             return

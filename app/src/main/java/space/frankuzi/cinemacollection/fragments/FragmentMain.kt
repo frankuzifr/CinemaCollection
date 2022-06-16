@@ -3,6 +3,8 @@ package space.frankuzi.cinemacollection.fragments
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -11,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
@@ -55,13 +58,20 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         //initResultListener()
         initSubscribers()
 
-        mainViewModel.getFilms()
+        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refresh)
+        refreshLayout.setOnRefreshListener {
+            mainViewModel.refreshFilms()
+        }
 
+        mainViewModel.getFilms()
     }
 
     private fun initSubscribers() {
         mainViewModel.films.observe(viewLifecycleOwner) {
             _adapter.setItems(it)
+            //todo разобраться
+            view?.findViewById<SwipeRefreshLayout>(R.id.refresh)?.isRefreshing = false
+            _mainFragmentBinding.refresh.isRefreshing = false
         }
 
         mainViewModel.filmItemChanged.observe(viewLifecycleOwner) {
@@ -173,7 +183,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
     private fun initToolbar(view: View) {
 
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        val toolbar = view.findViewById<Toolbar>(R.id.include)
         toolbar.setTitle(R.string.general)
     }
 

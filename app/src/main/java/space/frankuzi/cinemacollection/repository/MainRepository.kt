@@ -21,6 +21,14 @@ class MainRepository {
         getFilmsByApi(getFilmsCallback)
     }
 
+    suspend fun refreshFilms(getFilmsCallback: GetFilmsCallback) {
+        val database = App.instance.database
+
+        _currentPage = 1
+        database.getFilmsDao().clearFilms()
+        getFilmsByApi(getFilmsCallback)
+    }
+
     suspend fun getFilms(getFilmsCallback: GetFilmsCallback) {
         val database = App.instance.database
 
