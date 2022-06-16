@@ -6,54 +6,54 @@ import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.data.FilmItem
+import space.frankuzi.cinemacollection.network.FilmsApi
 import space.frankuzi.cinemacollection.network.response.GetFilmsResponse
+import space.frankuzi.cinemacollection.room.FilmsDao
 import space.frankuzi.cinemacollection.room.entity.FilmDbEntity
 
-class MainRepository {
-    private var _currentPage = 1
+class MainRepository(
+    private val filmsApi: FilmsApi,
+    private val database: FilmsDao
+) {
+    private var _currentPage = 0
     private var _lastPage = 0
 
-    fun getNextPages(getFilmsCallback: GetFilmsCallback) {
+    fun loadNextPageFilms(loadFilmsCallback: LoadFilmsCallback) {
         _currentPage++
+        Log.i("page", _currentPage.toString())
 
-        getFilmsByApi(getFilmsCallback)
+        loadFilmsByApi(loadFilmsCallback)
     }
 
-    suspend fun refreshFilms(getFilmsCallback: GetFilmsCallback) {
-        val database = App.instance.database
-
+    suspend fun refreshFilms(loadFilmsCallback: LoadFilmsCallback) {
         _currentPage = 1
-        database.getFilmsDao().clearFilms()
-        getFilmsByApi(getFilmsCallback)
+        database.clearFilms()
+        loadFilmsByApi(loadFilmsCallback)
     }
 
-    suspend fun getFilms(getFilmsCallback: GetFilmsCallback) {
-        val database = App.instance.database
-
-        val films = database.getFilmsDao().getFilms()
+    suspend fun loadFilms(loadFilmsCallback: LoadFilmsCallback) {
+        val films = database.getFilms()
 
         if (films != null && films.isNotEmpty()) {
             val filmItems = films.map { film ->
                 film.toFilmItem()
             }
 
-            Log.i("", "dfsdfsf")
-            //todo
-            getFilmsCallback.onSuccess(filmItems, false)
+            setPagesInfo(filmItems.size)
+
+            loadFilmsCallback.onSuccess(filmItems, _currentPage == _lastPage)
         } else {
-            getFilmsByApi(getFilmsCallback)
+            _currentPage = 1
+            loadFilmsByApi(loadFilmsCallback)
         }
     }
 
-    fun retryGetCurrentPage(getFilmsCallback: GetFilmsCallback) {
-        getFilmsByApi(getFilmsCallback)
+    fun retryLoadCurrentPage(loadFilmsCallback: LoadFilmsCallback) {
+        loadFilmsByApi(loadFilmsCallback)
     }
 
-    private fun getFilmsByApi(getFilmsCallback: GetFilmsCallback) {
-        val filmsApi = App.instance.filmsApi
-
+    private fun loadFilmsByApi(loadFilmsCallback: LoadFilmsCallback) {
         filmsApi.getFilms(_currentPage)
             .enqueue(object : Callback<GetFilmsResponse> {
                 override fun onResponse(
@@ -67,12 +67,12 @@ class MainRepository {
                             _lastPage = it.totalPages
                         }
 
-                        val films = mutableListOf<FilmItem>()
                         val filmsDbEntity = mutableListOf<FilmDbEntity>()
                         getFilmsResponse?.items?.forEach {
                             filmsDbEntity.add(
                                 FilmDbEntity(
-                                    id = it.kinopoiskId,
+                                    id = 0,
+                                    kinopoiskId = it.kinopoiskId,
                                     nameOriginal = it.nameOriginal,
                                     nameRussian = it.nameRu,
                                     description = null,
@@ -80,41 +80,65 @@ class MainRepository {
                                     imageUrl = it.posterUrl
                                 )
                             )
-
-                            films.add(FilmItem(
-                                id = it.kinopoiskId,
-                                name = it.nameRu,
-                                description = null,
-                                imageUrl = it.posterUrl
-                            ))
                         }
 
-                        addFilmsToDb(filmsDbEntity)
+                        addFilmsToDatabase(filmsDbEntity)
 
-                        films?.let {
-                            getFilmsCallback.onSuccess(it, _currentPage == _lastPage)
-                        }
+                        getFilmsFromDatabase(loadFilmsCallback)
                     } else {
-                        getFilmsCallback.onError("Код ошибки: ${response.code()}")
+                        loadFilmsCallback.onError("Код ошибки: ${response.code()}")
                     }
                 }
 
                 override fun onFailure(call: Call<GetFilmsResponse>, t: Throwable) {
-                    getFilmsCallback.onError("Ошибка подключения...")
+                    loadFilmsCallback.onError("Ошибка подключения...")
                 }
             })
     }
 
-    private fun addFilmsToDb(filmsDbEntity: List<FilmDbEntity>) = runBlocking {
-        val database = App.instance.database
-
+    private fun getFilmsFromDatabase(loadFilmsCallback: LoadFilmsCallback) = runBlocking {
         launch {
-            database.getFilmsDao().addFilms(filmsDbEntity)
+            var filmsEntities = database.getFilms()
+
+            val films = filmsEntities?.map {
+                it.toFilmItem()
+            }
+
+            if (films != null)
+                loadFilmsCallback.onSuccess(films, _currentPage == _lastPage)
         }
+    }
+
+    private fun addFilmsToDatabase(filmsDbEntity: List<FilmDbEntity>) = runBlocking {
+        launch {
+            database.addFilms(filmsDbEntity)
+        }
+    }
+
+    private fun setPagesInfo(filmsCount: Int) {
+        filmsApi.getFilms(1)
+            .enqueue(object : Callback<GetFilmsResponse>{
+                override fun onResponse(
+                    call: Call<GetFilmsResponse>,
+                    response: Response<GetFilmsResponse>
+                ) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val filmsResponse = response.body()
+                        filmsResponse?.let {
+                            _lastPage = filmsResponse.totalPages
+                            _currentPage = filmsCount / filmsResponse.items.size
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<GetFilmsResponse>, t: Throwable) {
+
+                }
+            })
     }
 }
 
-interface GetFilmsCallback {
+interface LoadFilmsCallback {
     fun onSuccess(films: List<FilmItem>, isLastPage: Boolean)
     fun onError(message: String)
 }

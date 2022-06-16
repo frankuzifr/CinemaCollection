@@ -3,17 +3,19 @@ package space.frankuzi.cinemacollection.fragments
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.adapter.FilmClickListener
@@ -27,7 +29,27 @@ import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.viewmodel.MainViewModel
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
-    private val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels(factoryProducer = {
+        object : AbstractSavedStateViewModelFactory(this, null){
+            override fun <T : ViewModel?> create(
+                key: String,
+                modelClass: Class<T>,
+                handle: SavedStateHandle
+            ): T {
+                return if (modelClass == MainViewModel::class.java) {
+                    val application = activity?.application as App
+
+                    val api = application.filmsApi
+                    val database = application.database
+
+                    MainViewModel(api, database.getFilmsDao()) as T
+                } else {
+                    throw ClassNotFoundException()
+                }
+            }
+
+        }
+    })
     private val detailViewModel: DetailsViewModel by activityViewModels()
 
     private lateinit var _recyclerView: RecyclerView
@@ -63,7 +85,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             mainViewModel.refreshFilms()
         }
 
-        mainViewModel.getFilms()
+        mainViewModel.loadFilms()
     }
 
     private fun initSubscribers() {
@@ -90,6 +112,10 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
                 retryLoadFilms()
             })
+
+            //todo
+            view?.findViewById<SwipeRefreshLayout>(R.id.refresh)?.isRefreshing = false
+            _mainFragmentBinding.refresh.isRefreshing = false
         }
 
 //        detailViewModel.selectedItem.observe(viewLifecycleOwner) {

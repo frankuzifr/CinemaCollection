@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -14,13 +13,13 @@ class FilmItemsPaginationAdapter(
     private val retryLoadClickListener: RetryLoadListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private lateinit var _footerViewHolder: FooterViewHolder
+    private var _footerViewHolder: FooterViewHolder? = null
     private val _items = mutableListOf<FilmItem>()
     var isLastPages = false
         set(value) {
             field = value
             if (value)
-                _footerViewHolder.disableAll()
+                _footerViewHolder?.disableAll()
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -32,11 +31,13 @@ class FilmItemsPaginationAdapter(
             )
         }
         else {
-            _footerViewHolder = FooterViewHolder(
+            val footerViewHolder = FooterViewHolder(
                 inflater.inflate(R.layout.recycler_view_footer, parent, false)
             )
 
-            _footerViewHolder
+            _footerViewHolder = footerViewHolder
+
+            footerViewHolder
         }
     }
 
@@ -75,11 +76,11 @@ class FilmItemsPaginationAdapter(
     }
 
     fun setError(errorMessage: String) {
-        _footerViewHolder.enableErrorLabel(errorMessage)
+        _footerViewHolder?.enableErrorLabel(errorMessage)
     }
 
     fun setLoading() {
-        _footerViewHolder.enableLoading()
+        _footerViewHolder?.enableLoading()
     }
 
     companion object {

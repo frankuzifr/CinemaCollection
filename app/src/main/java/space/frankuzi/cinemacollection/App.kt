@@ -22,7 +22,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        instance = this
+        //instance = this
 
         val headers = Headers.Builder()
             .add("X-API-KEY", API_KEY)
@@ -53,7 +53,7 @@ class App : Application() {
         const val BASE_URL = "https://kinopoiskapiunofficial.tech/api/v2.2/"
         const val API_KEY = "16683e04-b3a2-4493-8117-4556fa7220f3"
 
-        lateinit var instance: App
-        private set
+//        lateinit var instance: App
+//        private set
     }
 }

@@ -11,7 +11,8 @@ import java.util.*
 
 @Entity(tableName = "films")
 data class FilmDbEntity(
-    @PrimaryKey(autoGenerate = false) val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "kinopoisk_id") val kinopoiskId: Int,
     @ColumnInfo(name = "name_original") val nameOriginal: String?,
     @ColumnInfo(name = "name_russian") val nameRussian: String?,
     val description: String?,
@@ -20,9 +21,10 @@ data class FilmDbEntity(
 ) {
     fun toFilmItem(): FilmItem {
         val language = Locale.getDefault().language
+
         return FilmItem(
-            id = id,
-            name = if (language == "ru" && nameRussian != null) nameRussian else nameOriginal,
+            id = kinopoiskId,
+            name = if (language != "ru" && nameOriginal != null && nameOriginal != "") nameOriginal else nameRussian,
             description = description,
             imageUrl = imageUrl
         )
@@ -31,7 +33,8 @@ data class FilmDbEntity(
     companion object {
         fun fromFilmResponse(filmResponse: FilmResponse): FilmDbEntity {
             return FilmDbEntity(
-                id = filmResponse.kinopoiskId,
+                id = 0,
+                kinopoiskId = filmResponse.kinopoiskId,
                 nameOriginal = filmResponse.nameOriginal,
                 nameRussian = filmResponse.nameRu,
                 description = filmResponse.description,

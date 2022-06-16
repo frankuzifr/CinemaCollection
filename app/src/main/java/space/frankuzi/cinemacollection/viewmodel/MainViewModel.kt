@@ -8,17 +8,23 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
-import space.frankuzi.cinemacollection.repository.GetFilmsCallback
+import space.frankuzi.cinemacollection.network.FilmsApi
+import space.frankuzi.cinemacollection.repository.LoadFilmsCallback
 import space.frankuzi.cinemacollection.repository.MainRepository
+import space.frankuzi.cinemacollection.room.AppDatabase
+import space.frankuzi.cinemacollection.room.FilmsDao
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val api: FilmsApi,
+    private val database: FilmsDao
+    ) : ViewModel() {
 
     private var _isLoading = false
 
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = MutableLiveData<FilmItem>()
-    private val _mainRepository = MainRepository()
+    private val _mainRepository = MainRepository(api, database)
     private val _isLastFilmsPages = MutableLiveData<Boolean>()
     private val _loadError = MutableLiveData<String>()
 
@@ -28,14 +34,14 @@ class MainViewModel : ViewModel() {
     val isLastFilmsPages: LiveData<Boolean> = _isLastFilmsPages
     val loadError: LiveData<String> = _loadError
 
-    fun getFilms() {
+    fun loadFilms() {
         if (_isLoading)
             return
 
         _isLoading = true
 
         viewModelScope.launch {
-            _mainRepository.getFilms(object : GetFilmsCallback{
+            _mainRepository.loadFilms(object : LoadFilmsCallback{
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                     if (_films.value == null)
                         _films.value = films
@@ -62,7 +68,7 @@ class MainViewModel : ViewModel() {
     fun refreshFilms() {
         val rer = viewModelScope.launch {
 
-            _mainRepository.refreshFilms(object : GetFilmsCallback{
+            _mainRepository.refreshFilms(object : LoadFilmsCallback{
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                     _films.value = films
                     _isLoading = false
@@ -84,17 +90,10 @@ class MainViewModel : ViewModel() {
 
         _isLoading = true
 
-        _mainRepository.getNextPages(object : GetFilmsCallback{
+        _mainRepository.loadNextPageFilms(object : LoadFilmsCallback{
             override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
-                if (_films.value == null)
-                    _films.value = films
-                else {
-                    _films.value?.let {
-                        val filmsValue = it.toMutableList()
-                        filmsValue.addAll(films)
-                        _films.value = filmsValue
-                    }
-                }
+                _films.value = films
+
                 _isLoading = false
 
                 _isLastFilmsPages.value = isLastPages
@@ -115,7 +114,7 @@ class MainViewModel : ViewModel() {
 
         _isLoading = true
 
-        _mainRepository.retryGetCurrentPage(object : GetFilmsCallback{
+        _mainRepository.retryLoadCurrentPage(object : LoadFilmsCallback{
             override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                 if (_films.value == null)
                     _films.value = films
