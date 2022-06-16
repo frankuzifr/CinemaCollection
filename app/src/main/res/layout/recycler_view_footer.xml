@@ -24,6 +24,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/retry_button"
+        android:layout_marginEnd="5dp"
         />
 
     <Button
@@ -37,6 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="?attr/colorPrimaryVariant"
         android:textColor="@color/white"
+        android:layout_marginStart="5dp"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

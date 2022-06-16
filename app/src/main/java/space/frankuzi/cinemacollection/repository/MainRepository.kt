@@ -1,27 +1,49 @@
 package space.frankuzi.cinemacollection.repository
 
+import android.util.Log
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.network.response.GetFilmsResponse
+import space.frankuzi.cinemacollection.room.entity.FilmDbEntity
 
 class MainRepository {
-    private var _currentPage = 0
-    private var _lastPage = 1
+    private var _currentPage = 1
+    private var _lastPage = 0
 
     fun getNextPages(getFilmsCallback: GetFilmsCallback) {
         _currentPage++
 
-        getFilms(getFilmsCallback)
+        getFilmsByApi(getFilmsCallback)
+    }
+
+    suspend fun getFilms(getFilmsCallback: GetFilmsCallback) {
+        val database = App.instance.database
+
+        val films = database.getFilmsDao().getFilms()
+
+        if (films != null && films.isNotEmpty()) {
+            val filmItems = films.map { film ->
+                film.toFilmItem()
+            }
+
+            Log.i("", "dfsdfsf")
+            //todo
+            getFilmsCallback.onSuccess(filmItems, false)
+        } else {
+            getFilmsByApi(getFilmsCallback)
+        }
     }
 
     fun retryGetCurrentPage(getFilmsCallback: GetFilmsCallback) {
-        getFilms(getFilmsCallback)
+        getFilmsByApi(getFilmsCallback)
     }
 
-    private fun getFilms(getFilmsCallback: GetFilmsCallback) {
+    private fun getFilmsByApi(getFilmsCallback: GetFilmsCallback) {
         val filmsApi = App.instance.filmsApi
 
         filmsApi.getFilms(_currentPage)
@@ -36,13 +58,30 @@ class MainRepository {
                         getFilmsResponse?.let {
                             _lastPage = it.totalPages
                         }
-                        val films = getFilmsResponse?.items?.map {
-                            FilmItem(
-                                name = it?.nameRu,
-                                description = null,
-                                imageUrl = it?.posterUrl
+
+                        val films = mutableListOf<FilmItem>()
+                        val filmsDbEntity = mutableListOf<FilmDbEntity>()
+                        getFilmsResponse?.items?.forEach {
+                            filmsDbEntity.add(
+                                FilmDbEntity(
+                                    id = it.kinopoiskId,
+                                    nameOriginal = it.nameOriginal,
+                                    nameRussian = it.nameRu,
+                                    description = null,
+                                    type = null,
+                                    imageUrl = it.posterUrl
+                                )
                             )
+
+                            films.add(FilmItem(
+                                id = it.kinopoiskId,
+                                name = it.nameRu,
+                                description = null,
+                                imageUrl = it.posterUrl
+                            ))
                         }
+
+                        addFilmsToDb(filmsDbEntity)
 
                         films?.let {
                             getFilmsCallback.onSuccess(it, _currentPage == _lastPage)
@@ -56,6 +95,14 @@ class MainRepository {
                     getFilmsCallback.onError("Ошибка подключения...")
                 }
             })
+    }
+
+    private fun addFilmsToDb(filmsDbEntity: List<FilmDbEntity>) = runBlocking {
+        val database = App.instance.database
+
+        launch {
+            database.getFilmsDao().addFilms(filmsDbEntity)
+        }
     }
 }
 

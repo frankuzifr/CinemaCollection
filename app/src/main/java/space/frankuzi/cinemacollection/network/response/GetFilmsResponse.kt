@@ -6,5 +6,5 @@ import space.frankuzi.cinemacollection.network.FilmItemResponse
 data class GetFilmsResponse(
     @SerializedName("total") val total: Int,
     @SerializedName("totalPages") val totalPages: Int,
-    @SerializedName("items") val items: List<FilmItemResponse?>
+    @SerializedName("items") val items: List<FilmItemResponse>
 )

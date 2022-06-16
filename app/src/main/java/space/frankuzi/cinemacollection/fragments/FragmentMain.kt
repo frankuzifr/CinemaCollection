@@ -54,7 +54,9 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         initToolbar(view)
         //initResultListener()
         initSubscribers()
-        mainViewModel.loadFilms()
+
+        mainViewModel.getFilms()
+
     }
 
     private fun initSubscribers() {
@@ -147,7 +149,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
                 if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastFilmsPages.value == false) {
 
-                    mainViewModel.loadFilms()
+                    mainViewModel.loadNextPage()
 //                    if (!loading && !isLastPage) {
 //
 //                        loading = true;

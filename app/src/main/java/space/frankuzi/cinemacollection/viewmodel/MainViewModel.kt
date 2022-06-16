@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.repository.GetFilmsCallback
@@ -26,7 +28,38 @@ class MainViewModel : ViewModel() {
     val isLastFilmsPages: LiveData<Boolean> = _isLastFilmsPages
     val loadError: LiveData<String> = _loadError
 
-    fun loadFilms() {
+    fun getFilms() {
+        if (_isLoading)
+            return
+
+        _isLoading = true
+
+        viewModelScope.launch {
+            _mainRepository.getFilms(object : GetFilmsCallback{
+                override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
+                    if (_films.value == null)
+                        _films.value = films
+                    else {
+                        _films.value?.let {
+                            val filmsValue = it.toMutableList()
+                            filmsValue.addAll(films)
+                            _films.value = filmsValue
+                        }
+                    }
+                    _isLoading = false
+
+                    _isLastFilmsPages.value = isLastPages
+                }
+
+                override fun onError(message: String) {
+                    _loadError.value = message
+                    _isLoading = false
+                }
+            })
+        }
+    }
+
+    fun loadNextPage() {
         if (_isLoading)
             return
 

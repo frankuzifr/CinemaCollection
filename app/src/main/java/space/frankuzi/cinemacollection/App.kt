@@ -2,16 +2,22 @@ package space.frankuzi.cinemacollection
 
 import android.app.Application
 import android.util.Log
+import androidx.room.Room
 import okhttp3.Headers
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import space.frankuzi.cinemacollection.network.FilmsApi
+import space.frankuzi.cinemacollection.room.AppDatabase
 
 
 class App : Application() {
 
     lateinit var filmsApi: FilmsApi
+    val database: AppDatabase by lazy {
+        Room.databaseBuilder(this, AppDatabase::class.java, "films_database.db")
+            .build()
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -40,7 +46,6 @@ class App : Application() {
             .client(client)
             .build()
 
-        Log.i("APP", "APP")
         filmsApi = retrofit.create(FilmsApi::class.java)
     }
 
