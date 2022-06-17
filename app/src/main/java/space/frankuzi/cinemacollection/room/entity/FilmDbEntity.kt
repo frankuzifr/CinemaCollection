@@ -4,9 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.network.FilmItemResponse
-import space.frankuzi.cinemacollection.network.response.FilmResponse
-import space.frankuzi.cinemacollection.network.response.GetFilmsResponse
 import java.util.*
 
 @Entity(tableName = "films")
@@ -30,17 +27,17 @@ data class FilmDbEntity(
         )
     }
 
-    companion object {
-        fun fromFilmResponse(filmResponse: FilmResponse): FilmDbEntity {
-            return FilmDbEntity(
-                id = 0,
-                kinopoiskId = filmResponse.kinopoiskId,
-                nameOriginal = filmResponse.nameOriginal,
-                nameRussian = filmResponse.nameRu,
-                description = filmResponse.description,
-                type = filmResponse.type,
-                imageUrl = filmResponse.posterUrl
-            )
-        }
-    }
+//    companion object {
+//        fun fromFilmResponse(filmDescriptionResponse: FilmDescriptionResponse): FilmDbEntity {
+//            return FilmDbEntity(
+//                id = 0,
+//                kinopoiskId = filmDescriptionResponse.kinopoiskId,
+//                nameOriginal = filmDescriptionResponse.nameOriginal,
+//                nameRussian = filmDescriptionResponse.nameRu,
+//                description = filmDescriptionResponse.description,
+//                type = filmDescriptionResponse.type,
+//                imageUrl = filmDescriptionResponse.posterUrl
+//            )
+//        }
+//    }
 }

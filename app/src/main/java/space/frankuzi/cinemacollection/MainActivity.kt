@@ -6,6 +6,9 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -18,7 +21,27 @@ import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 
 class MainActivity : AppCompatActivity() {
-    private val _detailViewModel: DetailsViewModel by viewModels()
+    private val _detailViewModel: DetailsViewModel by viewModels(factoryProducer = {
+        object : AbstractSavedStateViewModelFactory(this, null){
+            override fun <T : ViewModel?> create(
+                key: String,
+                modelClass: Class<T>,
+                handle: SavedStateHandle
+            ): T {
+                return if (modelClass == DetailsViewModel::class.java) {
+                    val application = application as App
+
+                    val api = application.filmsApi
+                    val database = application.database
+
+                    DetailsViewModel(api, database.getFilmsDao()) as T
+                } else {
+                    throw ClassNotFoundException()
+                }
+            }
+
+        }
+    })
 
     private val _customBackStack = CustomBackStack()
     private lateinit var _binding: ActivityMainBinding
@@ -78,13 +101,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         bottomSheet.toolbar.setNavigationOnClickListener {
-            _bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            closeDetail()
         }
+    }
+
+    private fun closeDetail() {
+        _bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        _binding.bottomSheet.appBar.setExpanded(true)
     }
 
     private fun onShareButtonClick(filmName: String?) {
 
-        Log.i("", "VAR")
         val sendMessageIntent = Intent().apply {
             action = Intent.ACTION_SEND
             type = "text/plain"
@@ -117,8 +144,8 @@ class MainActivity : AppCompatActivity() {
 
         _detailViewModel.selectedItem.observe(this) { filmItem ->
             _filmItem = filmItem
-            _bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             _binding.bottomSheet.let {
+                it.filmDescription.text = filmItem.description
                 it.toolbar.title = filmItem.name
                 it.collapsingToolbar.title = filmItem.name
                 Glide.with(this)
@@ -128,14 +155,24 @@ class MainActivity : AppCompatActivity() {
                     .centerCrop()
                     .into(it.filmImage)
                 //it.filmImage.setImageResource(filmItem.imageIdRes)
-//                it.filmDescription.setText("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             }
             setFavouriteState()
+            _bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
         _detailViewModel.favouriteToggleIsChanged.observe(this) {
             setFavouriteState()
         }
+
+        _detailViewModel.loadError.observe(this) {
+            showSnackBar(it, SnackBarAction(R.string.retry) {
+                retryLoadDescription()
+            })
+        }
+    }
+
+    private fun retryLoadDescription() {
+        _detailViewModel.retryLoadDescription()
     }
 
     fun showSnackBar(snackBarText: String, snackBarAction: SnackBarAction) {
@@ -194,20 +231,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        _fragmentMain.let {
-
-            if (it.isVisible && it.childFragmentManager.backStackEntryCount > 0) {
-                it.closeDetail()
-                return
-            }
-        }
-
-        _fragmentFavourites.let {
-
-            if (it.isVisible && it.childFragmentManager.backStackEntryCount > 0) {
-                it.closeDetail()
-                return
-            }
+        if (_bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            closeDetail()
+            return
         }
 
         val popFromBackStack = _customBackStack.popFromBackStack()

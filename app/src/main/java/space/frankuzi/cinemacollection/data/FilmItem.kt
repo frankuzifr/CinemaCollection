@@ -5,7 +5,7 @@ import space.frankuzi.cinemacollection.R
 data class FilmItem(
     val id: Int,
     val name: String?,
-    val description: String?,
+    var description: String?,
     val imageUrl: String?,
     var isFavourite: Boolean = false,
     var isSelected: Boolean = false
