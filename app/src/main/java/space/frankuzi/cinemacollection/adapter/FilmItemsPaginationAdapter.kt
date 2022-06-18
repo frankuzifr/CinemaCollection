@@ -15,6 +15,7 @@ class FilmItemsPaginationAdapter(
 
     private var _footerViewHolder: FooterViewHolder? = null
     private val _items = mutableListOf<FilmItem>()
+
     var isLastPages = false
         set(value) {
             field = value
@@ -87,11 +88,6 @@ class FilmItemsPaginationAdapter(
         const val TYPE_ITEMS = 0
         const val TYPE_FOOTER = 1
     }
-}
-
-interface FilmClickListener {
-    fun onFilmClickListener(film: FilmItem, position: Int)
-    fun onFilmFavouriteClickListener(film: FilmItem, position: Int)
 }
 
 interface RetryLoadListener {

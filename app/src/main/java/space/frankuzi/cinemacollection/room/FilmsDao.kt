@@ -1,10 +1,8 @@
 package space.frankuzi.cinemacollection.room
 
-import android.content.ClipDescription
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import retrofit2.http.DELETE
 import space.frankuzi.cinemacollection.room.entity.FilmDbEntity
 
 @Dao
@@ -22,6 +20,9 @@ interface FilmsDao {
     @Query("DELETE FROM films")
     suspend fun clearFilms()
 
-    @Query("UPDATE films SET description = :description WHERE kinopoisk_id = :filmId")
-    suspend fun setFilmDescription(filmId: Int, description: String?)
+    @Query("UPDATE films SET description = :description WHERE kinopoisk_id = :kinopoiskId")
+    suspend fun setFilmDescription(kinopoiskId: Int, description: String?)
+
+    @Query("SELECT * FROM films WHERE kinopoisk_id = :kinopoiskId")
+    suspend fun getFilmById(kinopoiskId: Int): FilmDbEntity
 }

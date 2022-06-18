@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.viewholder
 
-import android.app.Activity
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView

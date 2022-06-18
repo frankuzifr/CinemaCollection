@@ -1,40 +1,68 @@
 package space.frankuzi.cinemacollection.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.data.FilmsData
+import space.frankuzi.cinemacollection.repository.FavouriteRepository
+import space.frankuzi.cinemacollection.room.AppDatabase
+import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 
-class FavouritesViewModel : ViewModel() {
+class FavouritesViewModel(
+    private val database: AppDatabase
+) : ViewModel() {
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
-    private val _filmItemChanged = MutableLiveData<FilmItem>()
-    private val _itemRemoved = MutableLiveData<FilmItem>()
-    private val _itemRemoveCanceled = MutableLiveData<Int>()
+    private val _itemRemoved = SingleLiveEvent<FilmItem>()
+    private val _itemRemoveCanceled = SingleLiveEvent<FilmWithPosition>()
 
     val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
-    val filmItemChanged: LiveData<FilmItem> = _filmItemChanged
     val itemRemoved: LiveData<FilmItem> = _itemRemoved
-    val itemRemoveCanceled: LiveData<Int> = _itemRemoveCanceled
+    val itemRemoveCanceled: LiveData<FilmWithPosition> = _itemRemoveCanceled
 
+    private val favouriteRepository = FavouriteRepository(database)
+
+    private var job = Job()
+        get() {
+            if (field.isCancelled)
+                field = Job()
+            return field
+        }
 
     fun loadFavouritesFilms() {
-        _favouritesFilms.value = FilmsData.favouriteFilms
+        Log.i("", "LOAAD")
+        viewModelScope.launch(job) {
+            _favouritesFilms.value = favouriteRepository.getFavourites()
+        }
     }
 
     fun onItemRemoveFromFavourite(filmItem: FilmItem) {
-        filmItem.isFavourite = false
-        FilmsData.favouriteFilms.remove(filmItem)
-        _itemRemoved.value = filmItem
+        viewModelScope.launch(job) {
+            favouriteRepository.removeFilmFromFavourite(filmItem)
+            _itemRemoved.value = filmItem
+        }
     }
 
     fun onItemRemoveCancel(filmItem: FilmItem, index: Int) {
-        filmItem.isFavourite = true
-        FilmsData.favouriteFilms.add(index, filmItem)
-        _itemRemoveCanceled.value = index
+        viewModelScope.launch(job) {
+            favouriteRepository.addFilmToFavourite(filmItem)
+            _itemRemoveCanceled.value = FilmWithPosition(
+                index,
+                filmItem
+            )
+        }
     }
 
-    fun onFilmItemChanged(filmItem: FilmItem) {
-        _filmItemChanged.value = filmItem
+    override fun onCleared() {
+        super.onCleared()
+        job.cancel()
     }
+
+    inner class FilmWithPosition(
+        val position: Int,
+        val filmItem: FilmItem
+    )
 }

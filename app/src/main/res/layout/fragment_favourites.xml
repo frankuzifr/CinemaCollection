@@ -9,6 +9,7 @@
     >
 
     <include layout="@layout/toolbar"
+        android:id="@+id/include"
         />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -19,7 +20,7 @@
         android:paddingBottom="110dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toBottomOf="@id/include"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:itemCount="10"

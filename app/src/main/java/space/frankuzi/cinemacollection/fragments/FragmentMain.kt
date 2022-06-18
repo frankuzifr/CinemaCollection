@@ -3,8 +3,9 @@ package space.frankuzi.cinemacollection.fragments
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.widget.Toolbar
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -14,7 +15,6 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
@@ -24,6 +24,7 @@ import space.frankuzi.cinemacollection.adapter.RetryLoadListener
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.databinding.FragmentMainBinding
 import space.frankuzi.cinemacollection.structs.SnackBarAction
+import space.frankuzi.cinemacollection.viewholderanim.CustomItemAnimator
 import space.frankuzi.cinemacollection.viewholderdecor.ViewHolderOffset
 import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.viewmodel.MainViewModel
@@ -42,7 +43,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
                     val api = application.filmsApi
                     val database = application.database
 
-                    MainViewModel(api, database.getFilmsDao()) as T
+                    MainViewModel(api, database) as T
                 } else {
                     throw ClassNotFoundException()
                 }
@@ -53,7 +54,6 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     private val detailViewModel: DetailsViewModel by activityViewModels()
 
     private lateinit var _recyclerView: RecyclerView
-    private var _fragmentDetail: FragmentDetail? = null
     private lateinit var _mainFragmentBinding: FragmentMainBinding
 
     private val _adapter = FilmItemsPaginationAdapter(object : FilmClickListener {
@@ -70,18 +70,23 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         }
     })
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _mainFragmentBinding = FragmentMainBinding.inflate(layoutInflater)
+        return _mainFragmentBinding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //_fragmentDetail?.let { setFilmDetail(it) }
-        _mainFragmentBinding = FragmentMainBinding.inflate(layoutInflater)
-        initRecycleView(view)
-        initToolbar(view)
-        //initResultListener()
+        initRecycleView()
+        initToolbar()
         initSubscribers()
 
-        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refresh)
-        refreshLayout.setOnRefreshListener {
+        _mainFragmentBinding.refresh.setOnRefreshListener {
             mainViewModel.refreshFilms()
         }
 
@@ -91,14 +96,8 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     private fun initSubscribers() {
         mainViewModel.films.observe(viewLifecycleOwner) {
             _adapter.setItems(it)
-            //todo разобраться
-            view?.findViewById<SwipeRefreshLayout>(R.id.refresh)?.isRefreshing = false
-            _mainFragmentBinding.refresh.isRefreshing = false
-        }
 
-        mainViewModel.filmItemChanged.observe(viewLifecycleOwner) {
-//            val index = FilmsData.films.indexOf(it)
-//            _adapter.notifyItemChanged(index)
+            _mainFragmentBinding.refresh.isRefreshing = false
         }
 
         mainViewModel.isLastFilmsPages.observe(viewLifecycleOwner) {
@@ -107,50 +106,24 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
         mainViewModel.loadError.observe(viewLifecycleOwner) {
             _adapter.setError(it)
-            Log.i("ERR", "ERRRROR")
             val mainActivity = activity as MainActivity
             mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
                 retryLoadFilms()
             })
 
-            //todo
-            view?.findViewById<SwipeRefreshLayout>(R.id.refresh)?.isRefreshing = false
             _mainFragmentBinding.refresh.isRefreshing = false
         }
 
-//        detailViewModel.selectedItem.observe(viewLifecycleOwner) {
-//            it.isSelected = true
-            //filmTitle.setTextColor(activity.resources.getColor(film.titleColorId))
+        mainViewModel.filmItemChanged.observe(viewLifecycleOwner) {
+            _adapter.notifyItemChanged(it)
+        }
 
-//            _fragmentDetail = FragmentDetail()
-//
-//            _fragmentDetail?.let { fragment ->
-//                //setFilmDetail(fragment)
-//            }
-
-            //_itemContainer.adapter?.notifyItemChanged(position)
-            //detailViewModel.setItem(film)
-//        }
-
-        detailViewModel.favouriteToggleIsChanged.observe(viewLifecycleOwner) {
-//            val index = FilmsData.films.indexOf(it)
-//            _adapter.notifyItemChanged(index)
+        detailViewModel.filmChanged.observe(viewLifecycleOwner) {
+            mainViewModel.updateFilm(it)
         }
     }
 
-    fun closeDetail() {
-        _fragmentDetail?.closeDetail()
-    }
-//
-//    private fun initResultListener() {
-//
-//        childFragmentManager.setFragmentResultListener(FragmentDetail.REQUEST_KEY_DETAIL, this) {_, result ->
-//            val filmId = result.getInt(FragmentDetail.FILM_ID)
-//            _itemContainer.adapter?.notifyItemChanged(filmId)
-//        }
-//    }
-
-    private fun initRecycleView(view: View) {
+    private fun initRecycleView() {
 
         val orientation = this.resources.configuration.orientation
         val spanCount = if (orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 3
@@ -169,13 +142,15 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             }
         }
 
-        _recyclerView = view.findViewById(R.id.items_container)
+        _recyclerView = _mainFragmentBinding.itemsContainer
 
         _recyclerView.layoutManager = layoutManager
 
         _recyclerView.adapter = _adapter
 
         _recyclerView.addItemDecoration(ViewHolderOffset(20))
+
+        _recyclerView.itemAnimator = CustomItemAnimator()
 
         _recyclerView.addOnScrollListener(object : OnScrollListener(){
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -186,30 +161,14 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
                 if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastFilmsPages.value == false) {
 
                     mainViewModel.loadNextPage()
-//                    if (!loading && !isLastPage) {
-//
-//                        loading = true;
-//                        fetchData((++pageCount));
-//                        // Увеличиваем на 1 pagecount при каждой прокрутке для получения данных со следующей страницы
-//                        // make loading = false после загрузки данных
-//                        // Вызовите mAdapter.notifyDataSetChanged (), чтобы обновить адаптер и макет
-//                    }
                 }
             }
         })
     }
 
-    private fun setFilmDetail(fragmentDetail: FragmentDetail) {
-        childFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down, R.anim.fragment_from_down_to_up, R.anim.fragment_from_up_to_down)
-            .replace(R.id.film_detail_fragment_container, fragmentDetail)
-            .addToBackStack("Detail")
-            .commit()
-    }
+    private fun initToolbar() {
 
-    private fun initToolbar(view: View) {
-
-        val toolbar = view.findViewById<Toolbar>(R.id.include)
+        val toolbar = _mainFragmentBinding.include.toolbar
         toolbar.setTitle(R.string.general)
     }
 

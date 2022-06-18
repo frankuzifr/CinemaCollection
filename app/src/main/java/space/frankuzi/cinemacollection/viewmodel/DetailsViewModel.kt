@@ -3,29 +3,39 @@ package space.frankuzi.cinemacollection.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.network.FilmsApi
 import space.frankuzi.cinemacollection.repository.DetailRepository
+import space.frankuzi.cinemacollection.repository.FavouriteRepository
 import space.frankuzi.cinemacollection.repository.LoadFilmDescriptionCallback
-import space.frankuzi.cinemacollection.room.FilmsDao
+import space.frankuzi.cinemacollection.room.AppDatabase
+import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 
 class DetailsViewModel(
     private val api: FilmsApi,
-    private val database: FilmsDao
+    private val database: AppDatabase
 ) : ViewModel() {
     private val _selectedItem = MutableLiveData<FilmItem>()
-    private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
-    private val _favouriteToggleIsChanged = MutableLiveData<FilmItem>()
-    private val _loadError = MutableLiveData<String>()
+    private val _loadError = SingleLiveEvent<String>()
+    private val _filmChanged = SingleLiveEvent<FilmItem>()
 
     val selectedItem: LiveData<FilmItem> = _selectedItem
-    val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
-    val favouriteToggleIsChanged: LiveData<FilmItem> = _favouriteToggleIsChanged
     val loadError: LiveData<String> = _loadError
+    val filmChanged: LiveData<FilmItem> = _filmChanged
 
-    private val detailRepository = DetailRepository(api, database)
+    private val _detailRepository = DetailRepository(api, database.getFilmsDao())
+    private val _favouriteRepository = FavouriteRepository(database)
     private lateinit var _selectedFilmItem: FilmItem
+
+    private var job = Job()
+        get() {
+            if (field.isCancelled)
+                field = Job()
+            return field
+        }
 
     fun setItem(item: FilmItem) {
         _selectedFilmItem = item
@@ -38,9 +48,9 @@ class DetailsViewModel(
         loadDescription()
     }
 
-    fun loadDescription() {
+    private fun loadDescription() {
         if (_selectedFilmItem.description == null) {
-            detailRepository.loadDescription(_selectedFilmItem.id, object : LoadFilmDescriptionCallback{
+            _detailRepository.loadDescription(_selectedFilmItem.id, object : LoadFilmDescriptionCallback{
                 override fun onSuccess(description: String?) {
                     _selectedFilmItem.description = description
                     _selectedItem.value = _selectedFilmItem
@@ -56,33 +66,25 @@ class DetailsViewModel(
     }
 
     fun onClickFavourite(film: FilmItem) {
-//        val filmName = resources.getString(film.nameIdRes)
-        if (film.isFavourite) {
-            film.isFavourite = false
-            FilmsData.favouriteFilms.remove(film)
-//            showToastWithText(requireActivity(), resources.getString(R.string.film_removed_from_favourites, filmName))
-        } else {
-            film.isFavourite = true
-            FilmsData.favouriteFilms.add(film)
-//            showToastWithText(requireActivity(), resources.getString(R.string.film_added_to_favourites, filmName))
-        }
+        if (film.isFavourite)
+            removeFromFavourite(film)
+        else
+            addToFavourite(film)
 
-        _favouritesFilms.value = FilmsData.favouriteFilms
-        onFavouriteToggleChanged(film.isFavourite)
+        film.isFavourite = !film.isFavourite
+        _filmChanged.value = film
     }
 
-    fun onFavouriteToggleChanged(isFavourite: Boolean) {
-        val selectedItem = _selectedItem.value
 
-        selectedItem?.let {
-            selectedItem.isFavourite = isFavourite
+    private fun addToFavourite(filmItem: FilmItem) {
+        viewModelScope.launch(job) {
+            _favouriteRepository.addFilmToFavourite(filmItem)
+        }
+    }
 
-            if (isFavourite)
-                FilmsData.favouriteFilms.add(it)
-            else
-                FilmsData.favouriteFilms.remove(it)
-
-            _favouriteToggleIsChanged.value = it
+    private fun removeFromFavourite(filmItem: FilmItem) {
+        viewModelScope.launch(job) {
+            _favouriteRepository.removeFilmFromFavourite(filmItem)
         }
     }
 }

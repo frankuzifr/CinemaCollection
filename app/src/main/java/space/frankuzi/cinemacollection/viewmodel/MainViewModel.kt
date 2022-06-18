@@ -5,34 +5,41 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.data.FilmsData
 import space.frankuzi.cinemacollection.network.FilmsApi
+import space.frankuzi.cinemacollection.repository.FavouriteRepository
 import space.frankuzi.cinemacollection.repository.LoadFilmsCallback
 import space.frankuzi.cinemacollection.repository.MainRepository
 import space.frankuzi.cinemacollection.room.AppDatabase
-import space.frankuzi.cinemacollection.room.FilmsDao
+import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 
 class MainViewModel(
     private val api: FilmsApi,
-    private val database: FilmsDao
+    private val database: AppDatabase
     ) : ViewModel() {
 
     private var _isLoading = false
+    private val _mainRepository = MainRepository(api, database)
+    private val _favouriteRepository = FavouriteRepository(database)
 
     private val _films = MutableLiveData<List<FilmItem>>()
-    private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
-    private val _filmItemChanged = MutableLiveData<FilmItem>()
-    private val _mainRepository = MainRepository(api, database)
-    private val _isLastFilmsPages = MutableLiveData<Boolean>()
-    private val _loadError = MutableLiveData<String>()
+    private val _filmItemChanged = SingleLiveEvent<Int>()
+    private val _isLastFilmsPages = SingleLiveEvent<Boolean>()
+    private val _loadError = SingleLiveEvent<String>()
 
     val films: LiveData<List<FilmItem>> = _films
-    val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
-    val filmItemChanged: LiveData<FilmItem> = _filmItemChanged
+    val filmItemChanged: LiveData<Int> = _filmItemChanged
     val isLastFilmsPages: LiveData<Boolean> = _isLastFilmsPages
     val loadError: LiveData<String> = _loadError
+
+    private var job = Job()
+        get() {
+            if (field.isCancelled)
+                field = Job()
+            return field
+        }
 
     fun loadFilms() {
         if (_isLoading)
@@ -40,18 +47,12 @@ class MainViewModel(
 
         _isLoading = true
 
-        viewModelScope.launch {
+        viewModelScope.launch(job) {
             _mainRepository.loadFilms(object : LoadFilmsCallback{
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
-                    if (_films.value == null)
-                        _films.value = films
-                    else {
-                        _films.value?.let {
-                            val filmsValue = it.toMutableList()
-                            filmsValue.addAll(films)
-                            _films.value = filmsValue
-                        }
-                    }
+
+                    _films.value = films
+
                     _isLoading = false
 
                     _isLastFilmsPages.value = isLastPages
@@ -66,9 +67,10 @@ class MainViewModel(
     }
 
     fun refreshFilms() {
-        val rer = viewModelScope.launch {
 
-            _mainRepository.refreshFilms(object : LoadFilmsCallback{
+        viewModelScope.launch(job) {
+
+            _mainRepository.refreshFilms(object : LoadFilmsCallback {
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                     _films.value = films
                     _isLoading = false
@@ -81,6 +83,30 @@ class MainViewModel(
                     _isLoading = false
                 }
             })
+        }
+    }
+
+    fun updateFilm(film: FilmItem) {
+        val films = films.value
+
+        val index = films?.indexOfFirst {
+            it.id == film.id
+        }
+
+        index?.let {
+            _filmItemChanged.value = it
+        }
+    }
+
+    fun addToFavourite(filmItem: FilmItem) {
+        viewModelScope.launch(job) {
+            _favouriteRepository.addFilmToFavourite(filmItem)
+        }
+    }
+
+    fun removeFromFavourite(filmItem: FilmItem) {
+        viewModelScope.launch(job) {
+            _favouriteRepository.removeFilmFromFavourite(filmItem)
         }
     }
 
@@ -104,8 +130,6 @@ class MainViewModel(
                 _isLoading = false
             }
         })
-
-        //_films.value = FilmsData.films
     }
 
     fun retryLoadCurrentPage() {
@@ -116,15 +140,7 @@ class MainViewModel(
 
         _mainRepository.retryLoadCurrentPage(object : LoadFilmsCallback{
             override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
-                if (_films.value == null)
-                    _films.value = films
-                else {
-                    _films.value?.let {
-                        val filmsValue = it.toMutableList()
-                        filmsValue.addAll(films)
-                        _films.value = filmsValue
-                    }
-                }
+                _films.value = films
                 _isLoading = false
 
                 _isLastFilmsPages.value = isLastPages
@@ -132,28 +148,22 @@ class MainViewModel(
 
             override fun onError(message: String) {
                 _loadError.value = message
-                Log.i("EROOOOR", message)
                 _isLoading = false
             }
         })
     }
 
     fun onClickFavourite(film: FilmItem) {
-//        val filmName = resources.getString(film.nameIdRes)
-        if (film.isFavourite) {
-            film.isFavourite = false
-            FilmsData.favouriteFilms.remove(film)
-//            showToastWithText(requireActivity(), resources.getString(R.string.film_removed_from_favourites, filmName))
-        } else {
-            film.isFavourite = true
-            FilmsData.favouriteFilms.add(film)
-//            showToastWithText(requireActivity(), resources.getString(R.string.film_added_to_favourites, filmName))
-        }
+        if (film.isFavourite)
+            removeFromFavourite(film)
+         else
+            addToFavourite(film)
 
-        _favouritesFilms.value = FilmsData.favouriteFilms
+        film.isFavourite = !film.isFavourite
     }
 
-    fun onFilmItemChanged(filmItem: FilmItem) {
-        _filmItemChanged.value = filmItem
+    override fun onCleared() {
+        super.onCleared()
+        job.cancel()
     }
 }

@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import space.frankuzi.cinemacollection.custombackstack.CustomBackStack
+import space.frankuzi.cinemacollection.utils.custombackstack.CustomBackStack
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.fragments.FragmentFavourites
@@ -34,12 +34,11 @@ class MainActivity : AppCompatActivity() {
                     val api = application.filmsApi
                     val database = application.database
 
-                    DetailsViewModel(api, database.getFilmsDao()) as T
+                    DetailsViewModel(api, database) as T
                 } else {
                     throw ClassNotFoundException()
                 }
             }
-
         }
     })
 
@@ -48,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private val _fragmentMain = FragmentMain()
     private var _fragmentFavourites = FragmentFavourites()
     private lateinit var _bottomSheetBehavior: BottomSheetBehavior<CoordinatorLayout>
-    private var _filmItem: FilmItem? = null
+    private lateinit var _filmItem: FilmItem
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,36 +68,6 @@ class MainActivity : AppCompatActivity() {
         val bottomSheet = _binding.bottomSheet
         _bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet.designBottomSheet)
         _bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-        setFavouriteState()
-
-        bottomSheet.toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.share -> {
-                    _filmItem?.let { filmItem ->
-                        onShareButtonClick(filmItem.name)
-                    }
-                }
-                R.id.favourite -> {
-
-                    _filmItem?.let { filmItem ->
-                        _detailViewModel.onClickFavourite(filmItem)
-
-                        val filmName = filmItem.name
-                        showToastWithText(
-                            this,
-                            if (it.isChecked)
-                                getString(R.string.film_added_to_favourites, filmName)
-                            else
-                                getString(R.string.film_removed_from_favourites, filmName)
-                        )
-                    }
-
-                    it.isChecked = !it.isChecked
-                }
-            }
-            true
-        }
 
         bottomSheet.toolbar.setNavigationOnClickListener {
             closeDetail()
@@ -124,20 +93,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setFavouriteState() {
-        _filmItem?.let {
-
-            val favouriteItem = _binding.bottomSheet.toolbar.menu.getItem(0)
-            favouriteItem.isChecked = it.isFavourite
-
-            if (it.isFavourite) {
-                favouriteItem.setIcon(R.drawable.ic_baseline_favorite_24)
-                favouriteItem.setTitle(R.string.no_liked)
-
-            } else {
-                favouriteItem.setIcon(R.drawable.ic_baseline_favorite_border_24)
-                favouriteItem.setTitle(R.string.liked)
-            }
-        }
+        val favouriteItem = _binding.bottomSheet.toolbar.menu.getItem(0)
+        favouriteItem.isChecked = _filmItem.isFavourite
+        favouriteItem.setIcon(_filmItem.favouriteIconId)
+        favouriteItem.setTitle(_filmItem.favouriteLabelId)
     }
 
     private fun initSubscribers() {
@@ -154,14 +113,35 @@ class MainActivity : AppCompatActivity() {
                     .error(R.drawable.ic_baseline_error_outline_24)
                     .centerCrop()
                     .into(it.filmImage)
-                //it.filmImage.setImageResource(filmItem.imageIdRes)
             }
-            setFavouriteState()
-            _bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
 
-        _detailViewModel.favouriteToggleIsChanged.observe(this) {
             setFavouriteState()
+
+            _binding.bottomSheet.toolbar.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.share -> {
+                        onShareButtonClick(_filmItem.name)
+                    }
+                    R.id.favourite -> {
+
+                        _detailViewModel.onClickFavourite(_filmItem)
+
+                        val filmName = _filmItem.name
+                        showToastWithText(
+                            this,
+                            if (it.isChecked)
+                                getString(R.string.film_added_to_favourites, filmName)
+                            else
+                                getString(R.string.film_removed_from_favourites, filmName)
+                        )
+
+                        setFavouriteState()
+                    }
+                }
+                true
+            }
+
+            _bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
         _detailViewModel.loadError.observe(this) {

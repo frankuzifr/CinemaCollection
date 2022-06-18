@@ -9,40 +9,39 @@ import retrofit2.Response
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.network.FilmsApi
 import space.frankuzi.cinemacollection.network.response.GetFilmsResponse
-import space.frankuzi.cinemacollection.room.FilmsDao
+import space.frankuzi.cinemacollection.room.AppDatabase
 import space.frankuzi.cinemacollection.room.entity.FilmDbEntity
 
 class MainRepository(
     private val filmsApi: FilmsApi,
-    private val database: FilmsDao
+    private val database: AppDatabase
 ) {
-    private var _currentPage = 0
+    private var _currentPage = 1
     private var _lastPage = 0
 
     fun loadNextPageFilms(loadFilmsCallback: LoadFilmsCallback) {
         _currentPage++
-        Log.i("page", _currentPage.toString())
 
         loadFilmsByApi(loadFilmsCallback)
     }
 
     suspend fun refreshFilms(loadFilmsCallback: LoadFilmsCallback) {
+        Log.i("", "repRefresh")
         _currentPage = 1
-        database.clearFilms()
+        database.getFilmsDao().clearFilms()
         loadFilmsByApi(loadFilmsCallback)
     }
 
     suspend fun loadFilms(loadFilmsCallback: LoadFilmsCallback) {
-        val films = database.getFilms()
+        val films = database.getFilmsDao().getFilms()
 
         if (films != null && films.isNotEmpty()) {
-            val filmItems = films.map { film ->
-                film.toFilmItem()
-            }
 
-            setPagesInfo(filmItems.size)
+            //setPagesInfo(filmItems.size)
 
-            loadFilmsCallback.onSuccess(filmItems, _currentPage == _lastPage)
+            getFilmsFromDatabase(loadFilmsCallback)
+            //todo
+            //loadFilmsCallback.onSuccess(filmItems, _currentPage == _lastPage)
         } else {
             _currentPage = 1
             loadFilmsByApi(loadFilmsCallback)
@@ -50,10 +49,12 @@ class MainRepository(
     }
 
     fun retryLoadCurrentPage(loadFilmsCallback: LoadFilmsCallback) {
+        Log.i("", _currentPage.toString())
         loadFilmsByApi(loadFilmsCallback)
     }
 
     private fun loadFilmsByApi(loadFilmsCallback: LoadFilmsCallback) {
+        Log.i("", "loadByAPI")
         filmsApi.getFilms(_currentPage)
             .enqueue(object : Callback<GetFilmsResponse> {
                 override fun onResponse(
@@ -98,10 +99,16 @@ class MainRepository(
 
     private fun getFilmsFromDatabase(loadFilmsCallback: LoadFilmsCallback) = runBlocking {
         launch {
-            var filmsEntities = database.getFilms()
+            var filmsEntities = database.getFilmsDao().getFilms()
 
             val films = filmsEntities?.map {
-                it.toFilmItem()
+                val favouriteFilmById =
+                    database.getFavouritesDao().getFavouriteFilmById(it.kinopoiskId)
+
+                val filmItem = it.toFilmItem()
+                filmItem.isFavourite = favouriteFilmById != null
+
+                filmItem
             }
 
             if (films != null)
@@ -111,7 +118,7 @@ class MainRepository(
 
     private fun addFilmsToDatabase(filmsDbEntity: List<FilmDbEntity>) = runBlocking {
         launch {
-            database.addFilms(filmsDbEntity)
+            database.getFilmsDao().addFilms(filmsDbEntity)
         }
     }
 

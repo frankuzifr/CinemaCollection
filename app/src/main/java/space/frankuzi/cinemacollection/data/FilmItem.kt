@@ -18,6 +18,14 @@ data class FilmItem(
                 R.drawable.ic_baseline_favorite_border_24
         }
 
+    val favouriteLabelId: Int
+        get() {
+            return if (isFavourite)
+                R.string.no_liked
+            else
+                R.string.liked
+        }
+
     val titleColorId: Int
     get() {
         return if (isSelected)

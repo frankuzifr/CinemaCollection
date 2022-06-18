@@ -1,4 +1,4 @@
-package space.frankuzi.cinemacollection.custombackstack
+package space.frankuzi.cinemacollection.utils.custombackstack
 
 class CustomBackStack {
     private val backStack: MutableList<FragmentWithBarId> = mutableListOf()
