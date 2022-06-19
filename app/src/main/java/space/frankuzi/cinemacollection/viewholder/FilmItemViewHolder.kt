@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import space.frankuzi.cinemacollection.R
-import space.frankuzi.cinemacollection.adapter.FilmClickListener
+import space.frankuzi.cinemacollection.structs.FilmClickListener
 import space.frankuzi.cinemacollection.data.FilmItem
 import com.google.android.material.card.MaterialCardView as MaterialCard
 

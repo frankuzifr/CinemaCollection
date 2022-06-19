@@ -1,14 +1,13 @@
 package space.frankuzi.cinemacollection
 
 import android.app.Application
-import android.util.Log
 import androidx.room.Room
 import okhttp3.Headers
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import space.frankuzi.cinemacollection.network.FilmsApi
-import space.frankuzi.cinemacollection.room.AppDatabase
+import space.frankuzi.cinemacollection.data.network.FilmsApi
+import space.frankuzi.cinemacollection.data.room.AppDatabase
 
 
 class App : Application() {

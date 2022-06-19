@@ -13,12 +13,11 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import space.frankuzi.cinemacollection.utils.custombackstack.CustomBackStack
-import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
-import space.frankuzi.cinemacollection.fragments.FragmentFavourites
-import space.frankuzi.cinemacollection.fragments.FragmentMain
+import space.frankuzi.cinemacollection.favouritesScreen.view.FragmentFavourites
+import space.frankuzi.cinemacollection.mainScreen.view.FragmentMain
 import space.frankuzi.cinemacollection.structs.SnackBarAction
-import space.frankuzi.cinemacollection.viewmodel.DetailsViewModel
+import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 
 class MainActivity : AppCompatActivity() {
     private val _detailViewModel: DetailsViewModel by viewModels(factoryProducer = {
@@ -132,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                             val filmName = film.name
                             showToastWithText(
                                 this,
-                                if (it.isChecked)
+                                if (!it.isChecked)
                                     getString(R.string.film_added_to_favourites, filmName)
                                 else
                                     getString(R.string.film_removed_from_favourites, filmName)
