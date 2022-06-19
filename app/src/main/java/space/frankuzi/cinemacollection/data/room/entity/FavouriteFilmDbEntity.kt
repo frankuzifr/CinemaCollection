@@ -14,17 +14,18 @@ data class FavouriteFilmDbEntity(
     @ColumnInfo(name = "name_russian") val nameRussian: String?,
     val description: String?,
     val type: String?,
-    @ColumnInfo(name = "image_url") val imageUrl: String
+    @ColumnInfo(name = "image_url") val imageUrl: String?
 ) {
     fun toFilmItem(): FilmItem {
-        val language = Locale.getDefault().language
 
         return FilmItem(
             id = kinopoiskId,
-            name = if (language != "ru" && nameOriginal != null && nameOriginal != "") nameOriginal else nameRussian,
+            nameRu = nameRussian,
+            nameOriginal = nameOriginal,
             description = description,
             imageUrl = imageUrl,
-            isFavourite = true
+            isFavourite = true,
+            type = type
         )
     }
 }

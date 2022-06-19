@@ -49,4 +49,9 @@ class FavouritesFilmsAdapter(
         _items.add(index, filmItem)
         notifyItemInserted(index)
     }
+
+    fun addItem(filmItem: FilmItem) {
+        _items.add(filmItem)
+        notifyItemInserted(_items.size - 1)
+    }
 }

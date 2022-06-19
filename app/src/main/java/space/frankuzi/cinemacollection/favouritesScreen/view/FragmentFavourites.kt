@@ -114,12 +114,16 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
             _adapter.removeItem(it)
         }
 
+        favouritesViewModel.itemAdded.observe(viewLifecycleOwner) {
+            _adapter.addItem(it)
+        }
+
         favouritesViewModel.itemRemoveCanceled.observe(viewLifecycleOwner) {
             _adapter.addItem(it.filmItem, it.position)
         }
 
         detailViewModel.filmChanged.observe(viewLifecycleOwner) {
-            favouritesViewModel.onItemRemoveFromFavourite(it)
+            favouritesViewModel.changeFilmFavouriteState(it)
         }
     }
 

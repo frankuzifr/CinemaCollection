@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "988d3f2fc1c36b92d058059f2c11a929",
+    "identityHash": "0a272a2ec5f204db11629fedd179a059",
     "entities": [
       {
         "tableName": "films",
@@ -62,7 +62,7 @@
       },
       {
         "tableName": "favourite_films",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kinopoisk_id` INTEGER NOT NULL, `name_original` TEXT, `name_russian` TEXT, `description` TEXT, `type` TEXT, `image_url` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kinopoisk_id` INTEGER NOT NULL, `name_original` TEXT, `name_russian` TEXT, `description` TEXT, `type` TEXT, `image_url` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -104,7 +104,7 @@
             "fieldPath": "imageUrl",
             "columnName": "image_url",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -120,7 +120,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '988d3f2fc1c36b92d058059f2c11a929')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0a272a2ec5f204db11629fedd179a059')"
     ]
   }
 }

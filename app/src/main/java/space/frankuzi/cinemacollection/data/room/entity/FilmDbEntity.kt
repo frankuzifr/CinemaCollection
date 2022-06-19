@@ -17,13 +17,14 @@ data class FilmDbEntity(
     @ColumnInfo(name = "image_url") val imageUrl: String
 ) {
     fun toFilmItem(): FilmItem {
-        val language = Locale.getDefault().language
 
         return FilmItem(
             id = kinopoiskId,
-            name = if (language != "ru" && nameOriginal != null && nameOriginal != "") nameOriginal else nameRussian,
+            nameRu = nameRussian,
+            nameOriginal = nameOriginal,
             description = description,
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
+            type = type
         )
     }
 }

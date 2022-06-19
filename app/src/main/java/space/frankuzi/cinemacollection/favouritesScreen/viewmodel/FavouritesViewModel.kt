@@ -16,10 +16,12 @@ class FavouritesViewModel(
 ) : ViewModel() {
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
     private val _itemRemoved = SingleLiveEvent<FilmItem>()
+    private val _itemAdded = SingleLiveEvent<FilmItem>()
     private val _itemRemoveCanceled = SingleLiveEvent<FilmWithPosition>()
 
     val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
     val itemRemoved: LiveData<FilmItem> = _itemRemoved
+    val itemAdded: LiveData<FilmItem> = _itemAdded
     val itemRemoveCanceled: LiveData<FilmWithPosition> = _itemRemoveCanceled
 
     private val favouriteRepository = FavouriteRepository(database)
@@ -40,6 +42,14 @@ class FavouritesViewModel(
     fun onItemRemoveFromFavourite(filmItem: FilmItem) {
         viewModelScope.launch(job) {
             favouriteRepository.removeFilmFromFavourite(filmItem)
+            _itemRemoved.value = filmItem
+        }
+    }
+
+    fun changeFilmFavouriteState(filmItem: FilmItem) {
+        if (filmItem.isFavourite) {
+            _itemAdded.value = filmItem
+        } else {
             _itemRemoved.value = filmItem
         }
     }

@@ -1,15 +1,25 @@
 package space.frankuzi.cinemacollection.data
 
 import space.frankuzi.cinemacollection.R
+import java.util.*
 
 data class FilmItem(
     val id: Int,
-    val name: String?,
+    val nameRu: String?,
+    val nameOriginal: String?,
     var description: String?,
     val imageUrl: String?,
+    val type: String?,
     var isFavourite: Boolean = false,
     var isSelected: Boolean = false
 ){
+    val name: String?
+    get() {
+        val language = Locale.getDefault().language
+
+        return if (language != "ru" && nameOriginal != null && nameOriginal != "") nameOriginal else nameRu
+    }
+
     val favouriteIconId: Int
         get() {
             return if (isFavourite)
