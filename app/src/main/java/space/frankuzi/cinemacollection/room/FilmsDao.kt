@@ -3,10 +3,17 @@ package space.frankuzi.cinemacollection.room
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import space.frankuzi.cinemacollection.room.entity.FilmDbEntity
 
 @Dao
 interface FilmsDao {
+
+    @Transaction
+    suspend fun addFilmsWithClear(filmDbEntities: List<FilmDbEntity>) {
+        clearFilms()
+        addFilms(filmDbEntities)
+    }
 
     @Query("SELECT * FROM films")
     suspend fun getFilms(): List<FilmDbEntity>?

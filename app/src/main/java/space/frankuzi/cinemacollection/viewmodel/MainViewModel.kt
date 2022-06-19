@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,13 +25,15 @@ class MainViewModel(
 
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = SingleLiveEvent<Int>()
-    private val _isLastFilmsPages = SingleLiveEvent<Boolean>()
+    private val _isLastFilmsPages = MutableLiveData<Boolean>()
     private val _loadError = SingleLiveEvent<String>()
+    private val _refreshError = SingleLiveEvent<String>()
 
     val films: LiveData<List<FilmItem>> = _films
     val filmItemChanged: LiveData<Int> = _filmItemChanged
     val isLastFilmsPages: LiveData<Boolean> = _isLastFilmsPages
     val loadError: LiveData<String> = _loadError
+    val refreshError: LiveData<String> = _refreshError
 
     private var job = Job()
         get() {
@@ -67,10 +68,14 @@ class MainViewModel(
     }
 
     fun refreshFilms() {
+        if (_isLoading)
+            _mainRepository.cancelLoad()
+
+        _isLoading = true
 
         viewModelScope.launch(job) {
 
-            _mainRepository.refreshFilms(object : LoadFilmsCallback {
+            _mainRepository.loadFirstPageFilms(object : LoadFilmsCallback {
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                     _films.value = films
                     _isLoading = false
@@ -79,7 +84,7 @@ class MainViewModel(
                 }
 
                 override fun onError(message: String) {
-                    _loadError.value = message
+                    _refreshError.value = message
                     _isLoading = false
                 }
             })
@@ -120,27 +125,6 @@ class MainViewModel(
             override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                 _films.value = films
 
-                _isLoading = false
-
-                _isLastFilmsPages.value = isLastPages
-            }
-
-            override fun onError(message: String) {
-                _loadError.value = message
-                _isLoading = false
-            }
-        })
-    }
-
-    fun retryLoadCurrentPage() {
-        if (_isLoading)
-            return
-
-        _isLoading = true
-
-        _mainRepository.retryLoadCurrentPage(object : LoadFilmsCallback{
-            override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
-                _films.value = films
                 _isLoading = false
 
                 _isLastFilmsPages.value = isLastPages

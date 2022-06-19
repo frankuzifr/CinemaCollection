@@ -1,12 +1,9 @@
 package space.frankuzi.cinemacollection.repository
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.room.AppDatabase
 import space.frankuzi.cinemacollection.room.entity.FavouriteFilmDbEntity
-import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 
 class FavouriteRepository(
     private val database: AppDatabase
@@ -15,12 +12,16 @@ class FavouriteRepository(
     private val _favouriteStateChanged = MutableLiveData<FilmItem>()
 
     suspend fun addFilmToFavourite(filmItem: FilmItem) {
+        val filmById = database.getFilmsDao().getFilmById(filmItem.id)
         database.getFavouritesDao().addToFavourite(FavouriteFilmDbEntity(
             id = 0,
-            kinopoiskId = filmItem.id
+            kinopoiskId = filmById.kinopoiskId,
+            nameOriginal = filmById.nameOriginal,
+            nameRussian = filmById.nameRussian,
+            description = filmById.description,
+            type = filmById.type,
+            imageUrl = filmById.imageUrl
         ))
-
-        Log.i("", "ADDDD")
 
         _favouriteStateChanged.value = filmItem
     }
@@ -34,9 +35,7 @@ class FavouriteRepository(
     suspend fun getFavourites(): List<FilmItem>? {
         val filmDbEntities = database.getFavouritesDao().getFavourites()
         val films = filmDbEntities?.map {
-            val filmDbEntity = database.getFilmsDao().getFilmById(it.kinopoiskId)
-            val filmItem = filmDbEntity.toFilmItem()
-            filmItem.isFavourite = true
+            val filmItem = it.toFilmItem()
             filmItem
         }
 

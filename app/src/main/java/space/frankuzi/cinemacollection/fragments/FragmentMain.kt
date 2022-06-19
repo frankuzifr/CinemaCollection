@@ -53,7 +53,6 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     })
     private val detailViewModel: DetailsViewModel by activityViewModels()
 
-    private lateinit var _recyclerView: RecyclerView
     private lateinit var _mainFragmentBinding: FragmentMainBinding
 
     private val _adapter = FilmItemsPaginationAdapter(object : FilmClickListener {
@@ -90,6 +89,10 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             mainViewModel.refreshFilms()
         }
 
+        _mainFragmentBinding.refresh.setColorSchemeResources(
+            R.color.orange
+        )
+
         mainViewModel.loadFilms()
     }
 
@@ -108,6 +111,17 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             _adapter.setError(it)
             val mainActivity = activity as MainActivity
             mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
+                retryLoadFilms()
+            })
+
+            _mainFragmentBinding.refresh.isRefreshing = false
+        }
+
+        mainViewModel.refreshError.observe(viewLifecycleOwner) {
+            _adapter.isLastPages = true
+            val mainActivity = activity as MainActivity
+            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
+                _mainFragmentBinding.refresh.isRefreshing = true
                 retryLoadFilms()
             })
 
@@ -142,17 +156,15 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             }
         }
 
-        _recyclerView = _mainFragmentBinding.itemsContainer
+        _mainFragmentBinding.itemsContainer.layoutManager = layoutManager
 
-        _recyclerView.layoutManager = layoutManager
+        _mainFragmentBinding.itemsContainer.adapter = _adapter
 
-        _recyclerView.adapter = _adapter
+        _mainFragmentBinding.itemsContainer.addItemDecoration(ViewHolderOffset(20))
 
-        _recyclerView.addItemDecoration(ViewHolderOffset(20))
+        _mainFragmentBinding.itemsContainer.itemAnimator = CustomItemAnimator()
 
-        _recyclerView.itemAnimator = CustomItemAnimator()
-
-        _recyclerView.addOnScrollListener(object : OnScrollListener(){
+        _mainFragmentBinding.itemsContainer.addOnScrollListener(object : OnScrollListener(){
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
@@ -173,7 +185,11 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     }
 
     private fun retryLoadFilms() {
-        mainViewModel.retryLoadCurrentPage()
+        mainViewModel.loadNextPage()
         _adapter.setLoading()
+    }
+
+    fun setRecycleViewOnStart() {
+        _mainFragmentBinding.itemsContainer.layoutManager?.scrollToPosition(0)
     }
 }

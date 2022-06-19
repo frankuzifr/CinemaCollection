@@ -134,4 +134,8 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
         val toolbar = _binding.include.toolbar
         toolbar.setTitle(R.string.favourites)
     }
+
+    fun setRecycleViewOnStart() {
+        _binding.itemsContainer.layoutManager?.scrollToPosition(0)
+    }
 }

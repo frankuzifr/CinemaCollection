@@ -12,23 +12,23 @@ import space.frankuzi.cinemacollection.repository.DetailRepository
 import space.frankuzi.cinemacollection.repository.FavouriteRepository
 import space.frankuzi.cinemacollection.repository.LoadFilmDescriptionCallback
 import space.frankuzi.cinemacollection.room.AppDatabase
+import space.frankuzi.cinemacollection.utils.ExtendedLiveData
 import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 
 class DetailsViewModel(
     private val api: FilmsApi,
     private val database: AppDatabase
 ) : ViewModel() {
-    private val _selectedItem = MutableLiveData<FilmItem>()
+    private val _selectedItem = ExtendedLiveData<FilmItem?>()
     private val _loadError = SingleLiveEvent<String>()
     private val _filmChanged = SingleLiveEvent<FilmItem>()
 
-    val selectedItem: LiveData<FilmItem> = _selectedItem
+    val selectedItem: LiveData<FilmItem?> = _selectedItem
     val loadError: LiveData<String> = _loadError
     val filmChanged: LiveData<FilmItem> = _filmChanged
 
     private val _detailRepository = DetailRepository(api, database.getFilmsDao())
     private val _favouriteRepository = FavouriteRepository(database)
-    private lateinit var _selectedFilmItem: FilmItem
 
     private var job = Job()
         get() {
@@ -38,31 +38,29 @@ class DetailsViewModel(
         }
 
     fun setItem(item: FilmItem) {
-        _selectedFilmItem = item
         item.isSelected = true
 
-        loadDescription()
+        loadDescription(item)
     }
 
-    fun retryLoadDescription() {
-        loadDescription()
-    }
+    private fun loadDescription(item: FilmItem) {
+        item.let {
+            if (it.description == null) {
+                _detailRepository.loadDescription(it.id, object : LoadFilmDescriptionCallback{
+                    override fun onSuccess(description: String?) {
+                        it.description = description
+                        _selectedItem.setValue(it)
+                    }
 
-    private fun loadDescription() {
-        if (_selectedFilmItem.description == null) {
-            _detailRepository.loadDescription(_selectedFilmItem.id, object : LoadFilmDescriptionCallback{
-                override fun onSuccess(description: String?) {
-                    _selectedFilmItem.description = description
-                    _selectedItem.value = _selectedFilmItem
-                }
-
-                override fun onError(message: String) {
-                    _loadError.value = message
-                }
-            })
-        } else {
-            _selectedItem.value = _selectedFilmItem
+                    override fun onError(message: String) {
+                        _loadError.value = message
+                    }
+                })
+            } else {
+                _selectedItem.setValue(it)
+            }
         }
+
     }
 
     fun onClickFavourite(film: FilmItem) {
@@ -86,5 +84,9 @@ class DetailsViewModel(
         viewModelScope.launch(job) {
             _favouriteRepository.removeFilmFromFavourite(filmItem)
         }
+    }
+
+    fun closeDetail() {
+        _selectedItem.setValueWithoutNotify(null)
     }
 }

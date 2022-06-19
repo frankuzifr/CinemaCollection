@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.repository
 
-import android.util.Log
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import retrofit2.Call
@@ -17,7 +16,8 @@ class MainRepository(
     private val database: AppDatabase
 ) {
     private var _currentPage = 1
-    private var _lastPage = 0
+    private var _lastPage = 20
+    private var _loadFilmsCallback: Call<GetFilmsResponse>? = null
 
     fun loadNextPageFilms(loadFilmsCallback: LoadFilmsCallback) {
         _currentPage++
@@ -25,38 +25,28 @@ class MainRepository(
         loadFilmsByApi(loadFilmsCallback)
     }
 
-    suspend fun refreshFilms(loadFilmsCallback: LoadFilmsCallback) {
-        Log.i("", "repRefresh")
+    fun loadFirstPageFilms(loadFilmsCallback: LoadFilmsCallback) {
         _currentPage = 1
-        database.getFilmsDao().clearFilms()
-        loadFilmsByApi(loadFilmsCallback)
+
+        loadFilmsByApi(loadFilmsCallback, true)
     }
 
     suspend fun loadFilms(loadFilmsCallback: LoadFilmsCallback) {
         val films = database.getFilmsDao().getFilms()
 
         if (films != null && films.isNotEmpty()) {
-
-            //setPagesInfo(filmItems.size)
-
+            setPagesInfo(films.size)
             getFilmsFromDatabase(loadFilmsCallback)
-            //todo
-            //loadFilmsCallback.onSuccess(filmItems, _currentPage == _lastPage)
+
         } else {
-            _currentPage = 1
-            loadFilmsByApi(loadFilmsCallback)
+            loadFirstPageFilms(loadFilmsCallback)
         }
     }
 
-    fun retryLoadCurrentPage(loadFilmsCallback: LoadFilmsCallback) {
-        Log.i("", _currentPage.toString())
-        loadFilmsByApi(loadFilmsCallback)
-    }
 
-    private fun loadFilmsByApi(loadFilmsCallback: LoadFilmsCallback) {
-        Log.i("", "loadByAPI")
-        filmsApi.getFilms(_currentPage)
-            .enqueue(object : Callback<GetFilmsResponse> {
+    private fun loadFilmsByApi(loadFilmsCallback: LoadFilmsCallback, isRefreshing: Boolean = false) {
+        _loadFilmsCallback = filmsApi.getFilms(_currentPage)
+        _loadFilmsCallback?.enqueue(object : Callback<GetFilmsResponse> {
                 override fun onResponse(
                     call: Call<GetFilmsResponse>,
                     response: Response<GetFilmsResponse>
@@ -68,9 +58,7 @@ class MainRepository(
                             _lastPage = it.totalPages
                         }
 
-                        val filmsDbEntity = mutableListOf<FilmDbEntity>()
-                        getFilmsResponse?.items?.forEach {
-                            filmsDbEntity.add(
+                        val filmsDbEntity = getFilmsResponse?.items?.map {
                                 FilmDbEntity(
                                     id = 0,
                                     kinopoiskId = it.kinopoiskId,
@@ -80,19 +68,29 @@ class MainRepository(
                                     type = null,
                                     imageUrl = it.posterUrl
                                 )
-                            )
                         }
 
-                        addFilmsToDatabase(filmsDbEntity)
+                        filmsDbEntity?.let {
+                            if (isRefreshing)
+                                addFilmsToDatabaseWithClear(filmsDbEntity)
+                            else
+                                addFilmsToDatabase(filmsDbEntity)
 
-                        getFilmsFromDatabase(loadFilmsCallback)
+                            getFilmsFromDatabase(loadFilmsCallback)
+                        }
                     } else {
                         loadFilmsCallback.onError("Код ошибки: ${response.code()}")
+                        _currentPage--
                     }
                 }
 
                 override fun onFailure(call: Call<GetFilmsResponse>, t: Throwable) {
+                    if (call.isCanceled)
+                        return
+
                     loadFilmsCallback.onError("Ошибка подключения...")
+
+                    _currentPage--
                 }
             })
     }
@@ -122,26 +120,18 @@ class MainRepository(
         }
     }
 
+    private fun addFilmsToDatabaseWithClear(filmsDbEntity: List<FilmDbEntity>) = runBlocking {
+        launch {
+            database.getFilmsDao().addFilmsWithClear(filmsDbEntity)
+        }
+    }
+
     private fun setPagesInfo(filmsCount: Int) {
-        filmsApi.getFilms(1)
-            .enqueue(object : Callback<GetFilmsResponse>{
-                override fun onResponse(
-                    call: Call<GetFilmsResponse>,
-                    response: Response<GetFilmsResponse>
-                ) {
-                    if (response.isSuccessful && response.body() != null) {
-                        val filmsResponse = response.body()
-                        filmsResponse?.let {
-                            _lastPage = filmsResponse.totalPages
-                            _currentPage = filmsCount / filmsResponse.items.size
-                        }
-                    }
-                }
+        _currentPage = filmsCount / 20
+    }
 
-                override fun onFailure(call: Call<GetFilmsResponse>, t: Throwable) {
-
-                }
-            })
+    fun cancelLoad() {
+        _loadFilmsCallback?.cancel()
     }
 }
 

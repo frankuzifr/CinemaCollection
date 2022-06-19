@@ -26,18 +26,4 @@ data class FilmDbEntity(
             imageUrl = imageUrl
         )
     }
-
-//    companion object {
-//        fun fromFilmResponse(filmDescriptionResponse: FilmDescriptionResponse): FilmDbEntity {
-//            return FilmDbEntity(
-//                id = 0,
-//                kinopoiskId = filmDescriptionResponse.kinopoiskId,
-//                nameOriginal = filmDescriptionResponse.nameOriginal,
-//                nameRussian = filmDescriptionResponse.nameRu,
-//                description = filmDescriptionResponse.description,
-//                type = filmDescriptionResponse.type,
-//                imageUrl = filmDescriptionResponse.posterUrl
-//            )
-//        }
-//    }
 }
