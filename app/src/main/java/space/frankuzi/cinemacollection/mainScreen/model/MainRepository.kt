@@ -10,6 +10,8 @@ import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.network.response.GetFilmsResponse
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.data.room.entity.FilmDbEntity
+import space.frankuzi.cinemacollection.structs.ErrorType
+import space.frankuzi.cinemacollection.structs.LoadingError
 
 class MainRepository(
     private val filmsApi: FilmsApi,
@@ -79,7 +81,7 @@ class MainRepository(
                             getFilmsFromDatabase(loadFilmsCallback)
                         }
                     } else {
-                        loadFilmsCallback.onError("Код ошибки: ${response.code()}")
+                        loadFilmsCallback.onError(LoadingError(ErrorType.RequestError, response.code()))
                         _currentPage--
                     }
                 }
@@ -88,7 +90,7 @@ class MainRepository(
                     if (call.isCanceled)
                         return
 
-                    loadFilmsCallback.onError("Ошибка подключения...")
+                    loadFilmsCallback.onError(LoadingError(ErrorType.ConnectionError))
 
                     _currentPage--
                 }
@@ -137,5 +139,5 @@ class MainRepository(
 
 interface LoadFilmsCallback {
     fun onSuccess(films: List<FilmItem>, isLastPage: Boolean)
-    fun onError(message: String)
+    fun onError(error: LoadingError)
 }

@@ -28,6 +28,7 @@ import space.frankuzi.cinemacollection.viewholder.viewholderanim.CustomItemAnima
 import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffset
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.mainScreen.viewmodel.MainViewModel
+import space.frankuzi.cinemacollection.structs.ErrorType
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
     private val mainViewModel: MainViewModel by viewModels(factoryProducer = {
@@ -115,9 +116,15 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         }
 
         mainViewModel.loadError.observe(viewLifecycleOwner) {
-            _adapter.setError(it)
+            val errorMessage =
+                if (it.errorType == ErrorType.ConnectionError)
+                    getString(R.string.network_error)
+                else
+                    getString(R.string.error_code, it.errorCode.toString())
+
+            _adapter.setError(errorMessage)
             val mainActivity = activity as MainActivity
-            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
+            mainActivity.showSnackBar(errorMessage, SnackBarAction(R.string.retry) {
                 retryLoadFilms()
             })
 
@@ -127,7 +134,14 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         mainViewModel.refreshError.observe(viewLifecycleOwner) {
             _adapter.isLastPages = true
             val mainActivity = activity as MainActivity
-            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
+            val errorMessage =
+                if (it.errorType == ErrorType.ConnectionError)
+                    getString(R.string.network_error)
+                else
+                    getString(R.string.error_code, it.errorCode.toString())
+
+
+            mainActivity.showSnackBar(errorMessage, SnackBarAction(R.string.retry) {
                 _mainFragmentBinding.refresh.isRefreshing = true
                 retryLoadFilms()
             })

@@ -12,6 +12,7 @@ import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepositor
 import space.frankuzi.cinemacollection.mainScreen.model.LoadFilmsCallback
 import space.frankuzi.cinemacollection.mainScreen.model.MainRepository
 import space.frankuzi.cinemacollection.data.room.AppDatabase
+import space.frankuzi.cinemacollection.structs.LoadingError
 import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 
 class MainViewModel(
@@ -26,14 +27,14 @@ class MainViewModel(
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = SingleLiveEvent<Int>()
     private val _isLastFilmsPages = MutableLiveData<Boolean>()
-    private val _loadError = SingleLiveEvent<String>()
-    private val _refreshError = SingleLiveEvent<String>()
+    private val _loadError = SingleLiveEvent<LoadingError>()
+    private val _refreshError = SingleLiveEvent<LoadingError>()
 
     val films: LiveData<List<FilmItem>> = _films
     val filmItemChanged: LiveData<Int> = _filmItemChanged
     val isLastFilmsPages: LiveData<Boolean> = _isLastFilmsPages
-    val loadError: LiveData<String> = _loadError
-    val refreshError: LiveData<String> = _refreshError
+    val loadError: LiveData<LoadingError> = _loadError
+    val refreshError: LiveData<LoadingError> = _refreshError
 
     private var job = Job()
         get() {
@@ -59,8 +60,8 @@ class MainViewModel(
                     _isLastFilmsPages.value = isLastPages
                 }
 
-                override fun onError(message: String) {
-                    _loadError.value = message
+                override fun onError(error: LoadingError) {
+                    _loadError.value = error
                     _isLoading = false
                 }
             })
@@ -83,8 +84,8 @@ class MainViewModel(
                     _isLastFilmsPages.value = isLastPages
                 }
 
-                override fun onError(message: String) {
-                    _refreshError.value = message
+                override fun onError(error: LoadingError) {
+                    _refreshError.value = error
                     _isLoading = false
                 }
             })
@@ -130,8 +131,8 @@ class MainViewModel(
                 _isLastFilmsPages.value = isLastPages
             }
 
-            override fun onError(message: String) {
-                _loadError.value = message
+            override fun onError(error: LoadingError) {
+                _loadError.value = error
                 _isLoading = false
             }
         })
