@@ -1,4 +1,4 @@
-package space.frankuzi.cinemacollection.details.repository
+package space.frankuzi.cinemacollection.mainScreen.model
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

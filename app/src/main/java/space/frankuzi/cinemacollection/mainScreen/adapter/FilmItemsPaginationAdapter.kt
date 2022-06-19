@@ -1,4 +1,4 @@
-package space.frankuzi.cinemacollection.adapter
+package space.frankuzi.cinemacollection.mainScreen.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -2,7 +2,6 @@ package space.frankuzi.cinemacollection
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -18,6 +17,8 @@ import space.frankuzi.cinemacollection.favouritesScreen.view.FragmentFavourites
 import space.frankuzi.cinemacollection.mainScreen.view.FragmentMain
 import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
+import space.frankuzi.cinemacollection.utils.cancelToast
+import space.frankuzi.cinemacollection.utils.showToastWithText
 
 class MainActivity : AppCompatActivity() {
     private val _detailViewModel: DetailsViewModel by viewModels(factoryProducer = {
@@ -182,7 +183,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         bottomNavigation.setOnItemReselectedListener {
-            Log.i("", "resel")
             when (it.itemId){
                 R.id.main -> {
                     _fragmentMain.setRecycleViewOnStart()

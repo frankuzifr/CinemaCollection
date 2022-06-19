@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.favouritesScreen.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,7 +32,6 @@ class FavouritesViewModel(
         }
 
     fun loadFavouritesFilms() {
-        Log.i("", "LOAAD")
         viewModelScope.launch(job) {
             _favouritesFilms.value = favouriteRepository.getFavourites()
         }

@@ -21,5 +21,7 @@
     <color name="refresh_progress_1">?attr/colorAccent</color>
     <color name="refresh_progress_2">@color/red</color>
     <color name="refresh_progress_3">@color/blue</color>
+    <color name="refreshBackground">#FFFFFF</color>
+    <color name="refreshArrow">@color/orange</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#474747</color>
 </resources>

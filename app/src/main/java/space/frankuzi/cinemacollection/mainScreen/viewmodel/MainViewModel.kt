@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
-import space.frankuzi.cinemacollection.details.repository.LoadFilmsCallback
-import space.frankuzi.cinemacollection.details.repository.MainRepository
+import space.frankuzi.cinemacollection.mainScreen.model.LoadFilmsCallback
+import space.frankuzi.cinemacollection.mainScreen.model.MainRepository
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 
@@ -49,7 +49,7 @@ class MainViewModel(
         _isLoading = true
 
         viewModelScope.launch(job) {
-            _mainRepository.loadFilms(object : LoadFilmsCallback{
+            _mainRepository.loadFilms(object : LoadFilmsCallback {
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
 
                     _films.value = films
@@ -121,7 +121,7 @@ class MainViewModel(
 
         _isLoading = true
 
-        _mainRepository.loadNextPageFilms(object : LoadFilmsCallback{
+        _mainRepository.loadNextPageFilms(object : LoadFilmsCallback {
             override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                 _films.value = films
 

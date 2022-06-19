@@ -1,4 +1,4 @@
-package space.frankuzi.cinemacollection
+package space.frankuzi.cinemacollection.utils
 
 import android.content.Context
 import android.widget.Toast

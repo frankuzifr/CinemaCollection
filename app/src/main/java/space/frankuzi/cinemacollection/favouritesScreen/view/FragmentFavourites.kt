@@ -2,7 +2,6 @@ package space.frankuzi.cinemacollection.favouritesScreen.view
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,13 +99,9 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
         val layoutManager = GridLayoutManager(requireActivity(), spanCount)
 
         _itemContainer = _binding.itemsContainer
-
         _itemContainer.layoutManager = layoutManager
-
         _itemContainer.adapter = _adapter
-
         _itemContainer.addItemDecoration(ViewHolderOffset(20))
-
         _itemContainer.itemAnimator = CustomItemAnimator()
     }
 
@@ -124,7 +119,6 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
         }
 
         detailViewModel.filmChanged.observe(viewLifecycleOwner) {
-            Log.i("", "KOKO")
             favouritesViewModel.onItemRemoveFromFavourite(it)
         }
     }

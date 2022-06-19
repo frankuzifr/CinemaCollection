@@ -2,6 +2,7 @@ package space.frankuzi.cinemacollection.mainScreen.view
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +19,8 @@ import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.structs.FilmClickListener
-import space.frankuzi.cinemacollection.adapter.FilmItemsPaginationAdapter
-import space.frankuzi.cinemacollection.adapter.RetryLoadListener
+import space.frankuzi.cinemacollection.mainScreen.adapter.FilmItemsPaginationAdapter
+import space.frankuzi.cinemacollection.mainScreen.adapter.RetryLoadListener
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.databinding.FragmentMainBinding
 import space.frankuzi.cinemacollection.structs.SnackBarAction
@@ -83,16 +84,23 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         initRecycleView()
         initToolbar()
         initSubscribers()
+        initSwipeToRefresh()
 
+        mainViewModel.loadFilms()
+    }
+
+    private fun initSwipeToRefresh() {
         _mainFragmentBinding.refresh.setOnRefreshListener {
             mainViewModel.refreshFilms()
         }
 
         _mainFragmentBinding.refresh.setColorSchemeResources(
-            R.color.orange
+            R.color.refreshArrow
         )
 
-        mainViewModel.loadFilms()
+        _mainFragmentBinding.refresh.setProgressBackgroundColorSchemeResource(
+            R.color.refreshBackground
+        )
     }
 
     private fun initSubscribers() {
@@ -156,11 +164,8 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         }
 
         _mainFragmentBinding.itemsContainer.layoutManager = layoutManager
-
         _mainFragmentBinding.itemsContainer.adapter = _adapter
-
         _mainFragmentBinding.itemsContainer.addItemDecoration(ViewHolderOffset(20))
-
         _mainFragmentBinding.itemsContainer.itemAnimator = CustomItemAnimator()
 
         _mainFragmentBinding.itemsContainer.addOnScrollListener(object : OnScrollListener(){
