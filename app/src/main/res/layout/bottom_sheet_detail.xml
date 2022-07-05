@@ -54,7 +54,7 @@
                android:background="?attr/colorOnSurface"
                app:titleTextColor="@color/white"
                app:navigationIcon="@drawable/ic_baseline_close_24"
-               app:menu="@menu/activity_film_toolbar_menu"
+               app:menu="@menu/film_detail_toolbar_menu"
                />
 
        </com.google.android.material.appbar.CollapsingToolbarLayout>

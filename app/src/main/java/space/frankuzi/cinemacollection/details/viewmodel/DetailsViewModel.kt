@@ -1,5 +1,6 @@
 package space.frankuzi.cinemacollection.details.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +14,7 @@ import space.frankuzi.cinemacollection.details.repository.LoadFilmDescriptionCal
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.utils.ExtendedLiveData
 import space.frankuzi.cinemacollection.utils.SingleLiveEvent
+import space.frankuzi.cinemacollection.watchlater.DateTime
 
 class DetailsViewModel(
     private val api: FilmsApi,
@@ -72,6 +74,9 @@ class DetailsViewModel(
         _filmChanged.value = film
     }
 
+    fun setDateTime(dateTime: DateTime) {
+        Log.i("ZBS", "ZBS")
+    }
 
     private fun addToFavourite(filmItem: FilmItem) {
         viewModelScope.launch(job) {

@@ -11,12 +11,17 @@
         android:title="@string/liked"
         app:showAsAction="ifRoom"
         />
-
     <item
         android:id="@+id/share"
         android:icon="@drawable/ic_baseline_share_24"
         android:title="@string/share"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/watch_later"
+        android:icon="@drawable/ic_baseline_watch_later_24"
+        android:title="@string/schedule_viewing"
+        app:showAsAction="never"
         />
 
 </menu>

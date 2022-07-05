@@ -20,4 +20,6 @@
     <string name="network_error">Network error probably...</string>
     <string name="error_code">Error code: %1$s</string>
     <string name="retry">Retry</string>
+    <string name="watch_later">Watch later</string>
+    <string name="schedule_viewing">Schedule a viewing</string>
 </resources>

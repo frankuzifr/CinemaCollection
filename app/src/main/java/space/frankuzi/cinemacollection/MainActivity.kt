@@ -19,6 +19,7 @@ import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.utils.cancelToast
 import space.frankuzi.cinemacollection.utils.showToastWithText
+import space.frankuzi.cinemacollection.watchlater.*
 
 class MainActivity : AppCompatActivity() {
     private val _detailViewModel: DetailsViewModel by viewModels(factoryProducer = {
@@ -140,6 +141,9 @@ class MainActivity : AppCompatActivity() {
 
                             setFavouriteState()
                         }
+                        R.id.watch_later -> {
+                            openDateTimePicker()
+                        }
                     }
                     true
                 }
@@ -152,6 +156,26 @@ class MainActivity : AppCompatActivity() {
 
             showToastWithText(this, it)
         }
+    }
+
+    private fun openDateTimePicker() {
+        DatePickerFragment(object : DateSelectHandler{
+            override fun onDateSelected(dayOfMonth: Int, month: Int, year: Int) {
+                TimePickerFragment(object : TimeSelectHandler{
+                    override fun onTimeSelected(hourOfDay: Int, minute: Int) {
+                        _detailViewModel.setDateTime(DateTime(
+                            dayOfMonth = dayOfMonth,
+                            month = month,
+                            year = year,
+                            hour = hourOfDay,
+                            minute = minute
+                        ))
+                    }
+
+                }).show(supportFragmentManager, "timePicker")
+            }
+
+        }).show(supportFragmentManager, "datePicker")
     }
 
     fun showSnackBar(snackBarText: String, snackBarAction: SnackBarAction) {

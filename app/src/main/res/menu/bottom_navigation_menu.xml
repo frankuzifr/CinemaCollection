@@ -13,4 +13,10 @@
         app:showAsAction="ifRoom"
         android:title="@string/favourites"
         />
+    <item
+        android:id="@+id/watch_later"
+        android:icon="@drawable/ic_baseline_watch_later_24"
+        app:showAsAction="ifRoom"
+        android:title="@string/watch_later"
+        />
 </menu>

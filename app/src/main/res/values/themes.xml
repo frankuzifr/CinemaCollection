@@ -21,6 +21,10 @@
         <item name="snackbarStyle">@style/snackbar_style</item>
         <item name="snackbarButtonStyle">@style/snackbar_button</item>
         <item name="snackbarTextViewStyle">@style/snackbar_text</item>
+        <item name="android:actionOverflowButtonStyle">@style/CustomOverflow</item>
+    </style>
 
+    <style name="CustomOverflow" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_baseline_more_vert_24</item>
     </style>
 </resources>

@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/drawable/bottom_navigation_selector.xml" value="0.181" />
         <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/layout/activity_main.xml" value="0.20199275362318841" />
         <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/layout/bottom_sheet_detail.xml" value="0.20199275362318841" />
         <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/layout/film_view_card.xml" value="0.30052083333333335" />
@@ -12,6 +13,9 @@
         <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/layout/recycler_vew_footer.xml" value="0.2994791666666667" />
         <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/layout/recycler_view_footer.xml" value="0.14427083333333332" />
         <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/layout/toolbar.xml" value="0.14427083333333332" />
+        <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/menu/acivity_main_toolbar_menu.xml" value="0.2864583333333333" />
+        <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/menu/activity_film_toolbar_menu.xml" value="0.2864583333333333" />
+        <entry key="..\:/AndroidProjects/CinemaCollection/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.2864583333333333" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/button_background.xml" value="0.196" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/favourite_checkbox.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/CinemaCollection/app/src/main/res/drawable/favourite_checkbox_background.xml" value="0.237" />

@@ -20,4 +20,6 @@
     <string name="network_error">Ошибка подключения...</string>
     <string name="error_code">Код ошибки: %1$s</string>
     <string name="retry">Повторить</string>
+    <string name="watch_later">Смотреть позже</string>
+    <string name="schedule_viewing">Запланировать просмотр</string>
 </resources>
