@@ -9,8 +9,6 @@ class FavouriteRepository(
     private val database: AppDatabase
 ) {
 
-    private val _favouriteStateChanged = MutableLiveData<FilmItem>()
-
     suspend fun addFilmToFavourite(filmItem: FilmItem) {
         database.getFavouritesDao().addToFavourite(FavouriteFilmDbEntity(
             id = 0,
@@ -21,14 +19,10 @@ class FavouriteRepository(
             type = filmItem.type,
             imageUrl = filmItem.imageUrl
         ))
-
-        _favouriteStateChanged.value = filmItem
     }
 
     suspend fun removeFilmFromFavourite(filmItem: FilmItem) {
         database.getFavouritesDao().removeFromFavourite(filmItem.id)
-
-        _favouriteStateChanged.value = filmItem
     }
 
     suspend fun getFavourites(): List<FilmItem>? {

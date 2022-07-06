@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0a272a2ec5f204db11629fedd179a059",
+    "identityHash": "7b7d4080642a75a91bc1bcbbc159073e",
     "entities": [
       {
         "tableName": "films",
@@ -115,12 +115,74 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "watch_later_films",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kinopoisk_id` INTEGER NOT NULL, `name_original` TEXT, `name_russian` TEXT, `description` TEXT, `type` TEXT, `image_url` TEXT, `watch_later_date` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kinopoiskId",
+            "columnName": "kinopoisk_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameOriginal",
+            "columnName": "name_original",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nameRussian",
+            "columnName": "name_russian",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "imageUrl",
+            "columnName": "image_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "watchLaterDate",
+            "columnName": "watch_later_date",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0a272a2ec5f204db11629fedd179a059')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b7d4080642a75a91bc1bcbbc159073e')"
     ]
   }
 }

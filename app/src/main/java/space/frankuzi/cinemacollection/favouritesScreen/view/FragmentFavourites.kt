@@ -134,6 +134,7 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
     }
 
     fun setRecycleViewOnStart() {
+        _binding.itemsContainer.stopScroll()
         _binding.itemsContainer.layoutManager?.scrollToPosition(0)
     }
 }

@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.mainScreen.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +14,6 @@ import space.frankuzi.cinemacollection.mainScreen.model.LoadFilmsCallback
 import space.frankuzi.cinemacollection.mainScreen.model.MainRepository
 import space.frankuzi.cinemacollection.structs.LoadingError
 import space.frankuzi.cinemacollection.utils.SingleLiveEvent
-import space.frankuzi.cinemacollection.watchlater.DateTime
 
 class MainViewModel(
     private val api: FilmsApi,

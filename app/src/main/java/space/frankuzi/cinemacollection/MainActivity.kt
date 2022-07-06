@@ -19,7 +19,8 @@ import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.utils.cancelToast
 import space.frankuzi.cinemacollection.utils.showToastWithText
-import space.frankuzi.cinemacollection.watchlater.*
+import space.frankuzi.cinemacollection.watchlater.datetime.*
+import space.frankuzi.cinemacollection.watchlater.view.FragmentWatchLater
 
 class MainActivity : AppCompatActivity() {
     private val _detailViewModel: DetailsViewModel by viewModels(factoryProducer = {
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
     private val _fragmentMain = FragmentMain()
     private val _fragmentFavourites = FragmentFavourites()
+    private val _fragmentWatchLater = FragmentWatchLater()
     private lateinit var _bottomSheetBehavior: BottomSheetBehavior<CoordinatorLayout>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -159,7 +161,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openDateTimePicker() {
-        DatePickerFragment(object : DateSelectHandler{
+        DatePickerFragment(object : DateSelectHandler {
             override fun onDateSelected(dayOfMonth: Int, month: Int, year: Int) {
                 TimePickerFragment(object : TimeSelectHandler{
                     override fun onTimeSelected(hourOfDay: Int, minute: Int) {
@@ -202,6 +204,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.favourites -> {
                     setFavouritesFragment()
                 }
+                R.id.watch_later -> {
+                    setWatchLaterFragment()
+                }
             }
             true
         }
@@ -213,6 +218,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.favourites -> {
                     _fragmentFavourites.setRecycleViewOnStart()
+                }
+                R.id.watch_later -> {
+                    _fragmentWatchLater.setRecycleViewOnStart()
                 }
             }
             true
@@ -238,6 +246,16 @@ class MainActivity : AppCompatActivity() {
             .commit()
 
         _customBackStack.addToBackStack("Favourites", R.id.favourites)
+    }
+
+    private fun setWatchLaterFragment() {
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.items_container, _fragmentWatchLater)
+            .commit()
+
+        _customBackStack.addToBackStack("WatchLater", R.id.watch_later)
     }
 
     override fun onBackPressed() {

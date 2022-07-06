@@ -1,6 +1,7 @@
 package space.frankuzi.cinemacollection.data
 
 import space.frankuzi.cinemacollection.R
+import java.text.SimpleDateFormat
 import java.util.*
 
 data class FilmItem(
@@ -10,6 +11,7 @@ data class FilmItem(
     var description: String?,
     val imageUrl: String?,
     val type: String?,
+    val date: Date? = null,
     var isFavourite: Boolean = false,
     var isSelected: Boolean = false
 ){
@@ -42,5 +44,11 @@ data class FilmItem(
             R.color.purple
         else
             R.color.orange
+    }
+
+    fun getDateString(): String? {
+        return date?.let {
+            SimpleDateFormat("dd.MM.yyyy HH:mm").format(date.time)
+        }
     }
 }

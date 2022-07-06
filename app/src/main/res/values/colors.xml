@@ -8,9 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="light_black">#272727</color>
     <color name="black_50">#80000000</color>
+    <color name="black_75">#BF000000</color>
     <color name="grey">#6E6D6D</color>
     <color name="light_grey">#DDDDDD</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="white_75">#BFFFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="orange">#DF8F03</color>
     <color name="orange_50">#86DF8F03</color>
@@ -23,5 +25,6 @@
     <color name="refresh_progress_3">@color/blue</color>
     <color name="refreshBackground">#FFFFFF</color>
     <color name="refreshArrow">@color/orange</color>
+    <color name="watch_later_background">@color/white_75</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#474747</color>
 </resources>

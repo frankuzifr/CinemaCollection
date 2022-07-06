@@ -208,6 +208,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     }
 
     fun setRecycleViewOnStart() {
+        _mainFragmentBinding.itemsContainer.stopScroll()
         _mainFragmentBinding.itemsContainer.layoutManager?.scrollToPosition(0)
     }
 }

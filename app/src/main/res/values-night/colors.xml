@@ -2,4 +2,5 @@
 <resources>
     <color name="refreshBackground">@color/black</color>
     <color name="refreshArrow">@color/white</color>
+    <color name="watch_later_background">@color/black_75</color>
 </resources>
