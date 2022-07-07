@@ -23,4 +23,7 @@
     <string name="watch_later">Watch later</string>
     <string name="schedule_viewing">Schedule a viewing</string>
     <string name="viewing_sheduled_for">The viewing is scheduled for %1$s</string>
+    <string name="no_viewing_time">"No viewing time"</string>
+    <string name="change">Change</string>
+    <string name="delete">Delete</string>
 </resources>

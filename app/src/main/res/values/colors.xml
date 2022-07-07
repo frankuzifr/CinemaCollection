@@ -18,6 +18,7 @@
     <color name="orange_50">#86DF8F03</color>
     <color name="light_orange">#EDC073</color>
     <color name="blue">#062EF1</color>
+    <color name="light_blue">#088CB5</color>
     <color name="purple">#B206F1</color>
     <color name="red">#F10606</color>
     <color name="refresh_progress_1">?attr/colorAccent</color>

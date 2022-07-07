@@ -1,7 +1,9 @@
 package space.frankuzi.cinemacollection.data
 
+import android.util.Log
 import space.frankuzi.cinemacollection.R
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 data class FilmItem(
@@ -11,7 +13,7 @@ data class FilmItem(
     var description: String?,
     val imageUrl: String?,
     val type: String?,
-    val date: Date? = null,
+    var date: Date? = null,
     var isFavourite: Boolean = false,
     var isSelected: Boolean = false
 ){
@@ -47,8 +49,9 @@ data class FilmItem(
     }
 
     fun getDateString(): String? {
+        Log.i("", date.toString())
         return date?.let {
-            SimpleDateFormat("dd.MM.yyyy HH:mm").format(date.time)
+            SimpleDateFormat("dd.MM.yyyy HH:mm").format(it.time)
         }
     }
 }

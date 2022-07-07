@@ -23,4 +23,7 @@
     <string name="watch_later">Смотреть позже</string>
     <string name="schedule_viewing">Запланировать просмотр</string>
     <string name="viewing_sheduled_for">Просмотр запланирован на %1$s</string>
+    <string name="no_viewing_time">"Время для просмотра не назначено"</string>
+    <string name="change">Изменить</string>
+    <string name="delete">Удалить</string>
 </resources>

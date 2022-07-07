@@ -15,6 +15,7 @@ import space.frankuzi.cinemacollection.utils.ExtendedLiveData
 import space.frankuzi.cinemacollection.utils.SingleLiveEvent
 import space.frankuzi.cinemacollection.watchlater.datetime.DateTime
 import space.frankuzi.cinemacollection.watchlater.model.WatchLaterRepository
+import java.sql.Date
 
 class DetailsViewModel(
     private val api: FilmsApi,
@@ -23,10 +24,12 @@ class DetailsViewModel(
     private val _selectedItem = ExtendedLiveData<FilmItem?>()
     private val _loadError = SingleLiveEvent<String>()
     private val _filmChanged = SingleLiveEvent<FilmItem>()
+    private val _watchLaterChanged = SingleLiveEvent<FilmItem>()
 
     val selectedItem: LiveData<FilmItem?> = _selectedItem
     val loadError: LiveData<String> = _loadError
     val filmChanged: LiveData<FilmItem> = _filmChanged
+    val watchLaterChanged: LiveData<FilmItem> = _watchLaterChanged
 
     private val _detailRepository = DetailRepository(api, database.getFilmsDao())
     private val _favouriteRepository = FavouriteRepository(database)
@@ -42,7 +45,28 @@ class DetailsViewModel(
     fun setItem(item: FilmItem) {
         item.isSelected = true
 
+        viewModelScope.launch(job) {
+            val filmItem = _watchLaterRepository.getFilmById(item.id)
+            filmItem?.date?.also {
+                item.date = it
+            }
+        }
         loadDescription(item)
+    }
+
+    fun setItemByWatchLater(id: Int) {
+
+        viewModelScope.launch(job) {
+            val item = _watchLaterRepository.getFilmById(id)
+            item?.let {
+                val filmItem = _watchLaterRepository.getFilmById(item.id)
+                filmItem?.date?.also {
+                    item.date = it
+                }
+                item.isSelected = true
+                loadDescription(item)
+            }
+        }
     }
 
     private fun loadDescription(item: FilmItem) {
@@ -79,6 +103,28 @@ class DetailsViewModel(
         selectedItem.value?.let {
             viewModelScope.launch(job) {
                 _watchLaterRepository.addFilmToWatchLater(it, dateTime)
+                it.date = Date(dateTime.getDate().time)
+                _watchLaterChanged.value = it
+            }
+        }
+    }
+
+    fun changeDateTime(dateTime: DateTime) {
+        selectedItem.value?.let {
+            viewModelScope.launch(job) {
+                _watchLaterRepository.changeDate(it, dateTime)
+                it.date = Date(dateTime.getDate().time)
+                _watchLaterChanged.value = it
+            }
+        }
+    }
+
+    fun removeDateTime() {
+        selectedItem.value?.let {
+            viewModelScope.launch(job) {
+                _watchLaterRepository.removeFilmFromWatchLater(it)
+                it.date = null
+                _watchLaterChanged.value = it
             }
         }
     }

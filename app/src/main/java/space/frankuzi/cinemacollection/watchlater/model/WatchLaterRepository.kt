@@ -40,4 +40,9 @@ class WatchLaterRepository(
     suspend fun changeDate(filmItem: FilmItem, dateTime: DateTime) {
         database.getWatchLaterDao().changeDate(filmItem.id, Date(dateTime.getDate().time))
     }
+
+    suspend fun getFilmById(kinopoiskId: Int): FilmItem? {
+        val watchLaterFilmById = database.getWatchLaterDao().getWatchLaterFilmById(kinopoiskId)
+        return watchLaterFilmById?.toFilmItem()
+    }
 }
