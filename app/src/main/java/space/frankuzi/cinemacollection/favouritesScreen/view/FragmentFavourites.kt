@@ -122,7 +122,7 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
             _adapter.addItem(it.filmItem, it.position)
         }
 
-        detailViewModel.filmChanged.observe(viewLifecycleOwner) {
+        detailViewModel.favouriteStateChanged.observe(viewLifecycleOwner) {
             favouritesViewModel.changeFilmFavouriteState(it)
         }
     }

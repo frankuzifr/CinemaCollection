@@ -2,7 +2,6 @@ package space.frankuzi.cinemacollection.mainScreen.view
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -153,7 +152,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             _adapter.notifyItemChanged(it)
         }
 
-        detailViewModel.filmChanged.observe(viewLifecycleOwner) {
+        detailViewModel.favouriteStateChanged.observe(viewLifecycleOwner) {
             mainViewModel.updateFilm(it)
         }
     }

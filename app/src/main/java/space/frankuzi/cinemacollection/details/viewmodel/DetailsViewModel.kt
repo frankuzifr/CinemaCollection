@@ -1,6 +1,7 @@
 package space.frankuzi.cinemacollection.details.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -23,12 +24,14 @@ class DetailsViewModel(
 ) : ViewModel() {
     private val _selectedItem = ExtendedLiveData<FilmItem?>()
     private val _loadError = SingleLiveEvent<String>()
-    private val _filmChanged = SingleLiveEvent<FilmItem>()
-    private val _watchLaterChanged = SingleLiveEvent<FilmItem>()
+    private val _favouriteStateChanged = SingleLiveEvent<FilmItem>()
+    private val _descriptionLoaded = SingleLiveEvent<FilmItem>()
+    private val _watchLaterChanged = MutableLiveData<FilmItem>()
 
     val selectedItem: LiveData<FilmItem?> = _selectedItem
     val loadError: LiveData<String> = _loadError
-    val filmChanged: LiveData<FilmItem> = _filmChanged
+    val favouriteStateChanged: LiveData<FilmItem> = _favouriteStateChanged
+    val descriptionLoaded: LiveData<FilmItem> = _descriptionLoaded
     val watchLaterChanged: LiveData<FilmItem> = _watchLaterChanged
 
     private val _detailRepository = DetailRepository(api, database.getFilmsDao())
@@ -50,8 +53,10 @@ class DetailsViewModel(
             filmItem?.date?.also {
                 item.date = it
             }
+
+            _selectedItem.setValue(item)
+            loadDescription()
         }
-        loadDescription(item)
     }
 
     fun setItemByWatchLater(id: Int) {
@@ -64,18 +69,19 @@ class DetailsViewModel(
                     item.date = it
                 }
                 item.isSelected = true
-                loadDescription(item)
+                _selectedItem.setValue(item)
+                loadDescription()
             }
         }
     }
 
-    private fun loadDescription(item: FilmItem) {
-        item.let {
+    fun loadDescription() {
+        selectedItem.value?.let {
             if (it.description == null) {
                 _detailRepository.loadDescription(it.id, object : LoadFilmDescriptionCallback{
                     override fun onSuccess(description: String?) {
                         it.description = description
-                        _selectedItem.setValue(it)
+                        _descriptionLoaded.value = it
                     }
 
                     override fun onError(message: String) {
@@ -83,10 +89,9 @@ class DetailsViewModel(
                     }
                 })
             } else {
-                _selectedItem.setValue(it)
+                _descriptionLoaded.value = it
             }
         }
-
     }
 
     fun onClickFavourite(film: FilmItem) {
@@ -96,7 +101,7 @@ class DetailsViewModel(
             addToFavourite(film)
 
         film.isFavourite = !film.isFavourite
-        _filmChanged.value = film
+        _favouriteStateChanged.value = film
     }
 
     fun setDateTime(dateTime: DateTime) {

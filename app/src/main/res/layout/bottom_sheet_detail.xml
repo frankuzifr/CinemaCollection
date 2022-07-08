@@ -90,6 +90,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="Description"
+                android:visibility="invisible"
+                />
+
+            <include layout="@layout/recycler_view_footer"
+                android:id="@+id/loaded_status"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/watch_later_date_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
 
             <TextView

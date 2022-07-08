@@ -1,5 +1,6 @@
 package space.frankuzi.cinemacollection.watchlater.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -35,5 +36,19 @@ class WatchLaterFilmsAdapter(
         _items.clear()
         _items.addAll(films)
         notifyDataSetChanged()
+    }
+
+    fun changeItem(item: FilmItem) {
+        val index = _items.indexOfFirst {
+            it.id == item.id
+        }
+
+        if (item.date == null) {
+            _items.removeAt(index)
+            notifyItemRemoved(index)
+        } else {
+            _items[index].date = item.date
+            notifyItemChanged(index)
+        }
     }
 }

@@ -104,13 +104,13 @@ class MainViewModel(
         }
     }
 
-    fun addToFavourite(filmItem: FilmItem) {
+    private fun addToFavourite(filmItem: FilmItem) {
         viewModelScope.launch(job) {
             _favouriteRepository.addFilmToFavourite(filmItem)
         }
     }
 
-    fun removeFromFavourite(filmItem: FilmItem) {
+    private fun removeFromFavourite(filmItem: FilmItem) {
         viewModelScope.launch(job) {
             _favouriteRepository.removeFilmFromFavourite(filmItem)
         }

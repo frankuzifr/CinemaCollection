@@ -17,8 +17,6 @@ import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.databinding.FragmentWatchLaterBinding
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
-import space.frankuzi.cinemacollection.favouritesScreen.adapter.FavouritesFilmsAdapter
-import space.frankuzi.cinemacollection.favouritesScreen.viewmodel.FavouritesViewModel
 import space.frankuzi.cinemacollection.structs.FilmClickListener
 import space.frankuzi.cinemacollection.viewholder.viewholderanim.CustomItemAnimator
 import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffset
@@ -52,7 +50,7 @@ class FragmentWatchLater: Fragment(R.layout.fragment_watch_later) {
         }
 
         override fun onFilmFavouriteClickListener(film: FilmItem, position: Int) {
-
+            watchLaterViewModel.onClickFavourite(film)
         }
     })
 
@@ -81,6 +79,14 @@ class FragmentWatchLater: Fragment(R.layout.fragment_watch_later) {
     private fun initSubscribers() {
         watchLaterViewModel.watchLaterFilms.observe(viewLifecycleOwner) {
             _adapter.setItems(it)
+        }
+
+        detailViewModel.watchLaterChanged.observe(viewLifecycleOwner) {
+            _adapter.changeItem(it)
+        }
+
+        detailViewModel.favouriteStateChanged.observe(viewLifecycleOwner) {
+            _adapter.changeItem(it)
         }
     }
 

@@ -30,7 +30,12 @@ class WatchLaterRepository(
         val watchLaterFilmsEntities = database.getWatchLaterDao().getWatchLaterFilms()
 
         val films = watchLaterFilmsEntities?.map {
+            val favouriteFilmById =
+                database.getFavouritesDao().getFavouriteFilmById(it.kinopoiskId)
+
             val filmItem = it.toFilmItem()
+            filmItem.isFavourite = favouriteFilmById != null
+
             filmItem
         }
 

@@ -49,7 +49,6 @@ data class FilmItem(
     }
 
     fun getDateString(): String? {
-        Log.i("", date.toString())
         return date?.let {
             SimpleDateFormat("dd.MM.yyyy HH:mm").format(it.time)
         }

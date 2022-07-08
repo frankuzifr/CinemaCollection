@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -55,12 +54,15 @@ class MainActivity : AppCompatActivity() {
         }
     })
 
-    private val _customBackStack = CustomBackStack()
     private lateinit var _binding: ActivityMainBinding
+    private lateinit var _bottomSheetBehavior: BottomSheetBehavior<CoordinatorLayout>
+
+    private val _customBackStack = CustomBackStack()
     private val _fragmentMain = FragmentMain()
     private val _fragmentFavourites = FragmentFavourites()
     private val _fragmentWatchLater = FragmentWatchLater()
-    private lateinit var _bottomSheetBehavior: BottomSheetBehavior<CoordinatorLayout>
+
+    private val _alarmManager: AlarmManager by lazy { getSystemService(ALARM_SERVICE) as AlarmManager }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,15 +74,15 @@ class MainActivity : AppCompatActivity() {
         setMainFragment()
         initBottomNavigationBar()
         initBottomSheet()
-
         initSubscribers()
-
         createNotificationChannel()
 
         if (intent == null)
             return
 
-        val filmId = intent.getIntExtra("filmId", 0)
+        val filmId = intent.getIntExtra(WatchLaterTimeComeInBroadcast.FILM_ID, 0)
+
+        intent = null
 
         if (filmId == 0)
             return
@@ -90,10 +92,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Проверка"
-            val descriptionText = "Работает?"
+            val name = getString(R.string.scheduled_viewing)
+            val descriptionText = getString(R.string.schedule_reminder)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel("CHANNEL_ID", name, importance).apply {
+            val channel = NotificationChannel(WatchLaterTimeComeInBroadcast.WATCH_LATER_CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
 
@@ -111,12 +113,35 @@ class MainActivity : AppCompatActivity() {
         bottomSheet.toolbar.setNavigationOnClickListener {
             closeDetail()
         }
+
+        bottomSheet.loadedStatus.retryButton.setOnClickListener {
+            _binding.bottomSheet.loadedStatus.progressBar.visibility = View.VISIBLE
+            _binding.bottomSheet.loadedStatus.errorText.visibility = View.INVISIBLE
+            _binding.bottomSheet.loadedStatus.retryButton.visibility = View.INVISIBLE
+
+            _detailViewModel.loadDescription()
+        }
+
+        _bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        _detailViewModel.closeDetail()
+                        _binding.bottomSheet.appBar.setExpanded(true)
+                        _binding.bottomSheet.filmDescription.text = ""
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+
+        })
     }
 
     private fun closeDetail() {
         _bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        _detailViewModel.closeDetail()
-        _binding.bottomSheet.appBar.setExpanded(true)
     }
 
     private fun onShareButtonClick(filmName: String?) {
@@ -147,17 +172,17 @@ class MainActivity : AppCompatActivity() {
         _detailViewModel.watchLaterChanged.observe(this) { filmItem ->
             setWatchLaterDate(filmItem)
 
-                filmItem.date?.let {
-                    val intent = Intent(this, WatchLaterTimeComeInBroadcast::class.java)
-                    intent.putExtra("filmId", filmItem.id)
-                    intent.putExtra("filmName", filmItem.name)
-                    val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
+            val intent = Intent(filmItem.id.toString(), null, this, WatchLaterTimeComeInBroadcast::class.java)
+            intent.putExtra(WatchLaterTimeComeInBroadcast.FILM_ID, filmItem.id)
+            intent.putExtra(WatchLaterTimeComeInBroadcast.FILM_NAME, filmItem.name)
 
-                    val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+            val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
 
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, it.time, pendingIntent)
+            _alarmManager.cancel(pendingIntent)
+
+            filmItem.date?.let {
+                _alarmManager.set(AlarmManager.RTC_WAKEUP, it.time, pendingIntent)
             }
-
         }
 
         _detailViewModel.selectedItem.observe(this) { filmItem ->
@@ -166,15 +191,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        _detailViewModel.loadError.observe(this) {
+        _detailViewModel.descriptionLoaded.observe(this) { filmItem ->
+            filmItem?.let {
+                _binding.bottomSheet.filmDescription.visibility = View.VISIBLE
+                _binding.bottomSheet.filmDescription.text = filmItem.description
+                _binding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
+                _binding.bottomSheet.loadedStatus.errorText.visibility = View.INVISIBLE
+                _binding.bottomSheet.loadedStatus.retryButton.visibility = View.INVISIBLE
+            }
+        }
 
-            showToastWithText(this, it)
+        _detailViewModel.loadError.observe(this) {
+            _binding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
+            _binding.bottomSheet.loadedStatus.errorText.visibility = View.VISIBLE
+            _binding.bottomSheet.loadedStatus.errorText.text = it
+            _binding.bottomSheet.loadedStatus.retryButton.visibility = View.VISIBLE
+            //showToastWithText(this, it)
         }
     }
 
     private fun openFilmDetail(film: FilmItem) {
         _binding.bottomSheet.let {
-            it.filmDescription.text = film.description
+            it.filmDescription.visibility = View.INVISIBLE
+            _binding.bottomSheet.loadedStatus.progressBar.visibility = View.VISIBLE
+            _binding.bottomSheet.loadedStatus.errorText.visibility = View.INVISIBLE
+            _binding.bottomSheet.loadedStatus.retryButton.visibility = View.INVISIBLE
 
             setWatchLaterDate(film)
 
@@ -186,35 +227,36 @@ class MainActivity : AppCompatActivity() {
                 .error(R.drawable.ic_baseline_error_outline_24)
                 .centerCrop()
                 .into(it.filmImage)
-        }
 
-        setFavouriteState()
 
-        _binding.bottomSheet.toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.share -> {
-                    onShareButtonClick(film.name)
+            setFavouriteState()
+
+            it.toolbar.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.share -> {
+                        onShareButtonClick(film.name)
+                    }
+                    R.id.favourite -> {
+
+                        _detailViewModel.onClickFavourite(film)
+
+                        val filmName = film.name
+                        showToastWithText(
+                            this,
+                            if (!menuItem.isChecked)
+                                getString(R.string.film_added_to_favourites, filmName)
+                            else
+                                getString(R.string.film_removed_from_favourites, filmName)
+                        )
+
+                        setFavouriteState()
+                    }
+                    R.id.watch_later -> {
+                        openDateTimePicker()
+                    }
                 }
-                R.id.favourite -> {
-
-                    _detailViewModel.onClickFavourite(film)
-
-                    val filmName = film.name
-                    showToastWithText(
-                        this,
-                        if (!it.isChecked)
-                            getString(R.string.film_added_to_favourites, filmName)
-                        else
-                            getString(R.string.film_removed_from_favourites, filmName)
-                    )
-
-                    setFavouriteState()
-                }
-                R.id.watch_later -> {
-                    openDateTimePicker()
-                }
+                true
             }
-            true
         }
 
         _bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -225,7 +267,7 @@ class MainActivity : AppCompatActivity() {
         val bottomSheet = _binding.bottomSheet
         if (filmItem.date != null) {
             bottomSheet.watchLaterDateLabel.visibility = View.VISIBLE
-            bottomSheet.watchLaterDateLabel.text = getString(R.string.viewing_sheduled_for, filmItem.date)
+            bottomSheet.watchLaterDateLabel.text = getString(R.string.viewing_sheduled_for, filmItem.getDateString())
         } else {
             bottomSheet.watchLaterDateLabel.visibility = View.INVISIBLE
         }
@@ -252,10 +294,15 @@ class MainActivity : AppCompatActivity() {
                                             minute = minute
                                         )
 
-                                        if (it.date == null)
+                                        if (it.date == null) {
                                             _detailViewModel.setDateTime(dateTime)
-                                        else
+                                            it.date = dateTime.getDate()
+                                            showToastWithText(baseContext, getString(R.string.film_added_to_sheduker_viewing, filmItem.name, filmItem.getDateString()))
+                                        } else {
                                             _detailViewModel.changeDateTime(dateTime)
+                                            it.date = dateTime.getDate()
+                                            showToastWithText(baseContext, getString(R.string.changes_time_sheduler_viewing, filmItem.name, filmItem.getDateString()))
+                                        }
                                     }
 
                                 }).show(supportFragmentManager, "timePicker")
@@ -266,6 +313,7 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onDeleteTimeClick() {
                         _detailViewModel.removeDateTime()
+                        showToastWithText(baseContext, getString(R.string.film_remove_from_watch_later, filmItem.name))
                     }
                 },
                 withDelete = it.date != null
