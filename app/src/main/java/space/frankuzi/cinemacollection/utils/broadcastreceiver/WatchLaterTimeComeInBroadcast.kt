@@ -18,12 +18,12 @@ class WatchLaterTimeComeInBroadcast : BroadcastReceiver() {
         val filmName = intent.getStringExtra(FILM_NAME)
 
         val intent = Intent(context, MainActivity::class.java)
+        intent.putExtra(FILM_ID, id.toString())
+        intent.action = context.getString(R.string.notification)
 
         val stackBuilder = TaskStackBuilder.create(context)
         stackBuilder.addParentStack(MainActivity::class.java)
         stackBuilder.addNextIntent(intent)
-
-        intent.putExtra(FILM_ID, id)
 
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
 

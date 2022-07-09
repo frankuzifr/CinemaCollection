@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,19 +19,23 @@ import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.utils.custombackstack.CustomBackStack
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
+import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.favouritesScreen.view.FragmentFavourites
 import space.frankuzi.cinemacollection.mainScreen.view.FragmentMain
+import space.frankuzi.cinemacollection.structs.ErrorType
 import space.frankuzi.cinemacollection.structs.SnackBarAction
-import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.utils.broadcastreceiver.WatchLaterTimeComeInBroadcast
 import space.frankuzi.cinemacollection.utils.cancelToast
+import space.frankuzi.cinemacollection.utils.custombackstack.CustomBackStack
 import space.frankuzi.cinemacollection.utils.showToastWithText
 import space.frankuzi.cinemacollection.watchlater.datetime.*
 import space.frankuzi.cinemacollection.watchlater.view.FragmentWatchLater
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private val _detailViewModel: DetailsViewModel by viewModels(factoryProducer = {
@@ -56,6 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var _binding: ActivityMainBinding
     private lateinit var _bottomSheetBehavior: BottomSheetBehavior<CoordinatorLayout>
+    private lateinit var _firebaseAnalytics: FirebaseAnalytics
 
     private val _customBackStack = CustomBackStack()
     private val _fragmentMain = FragmentMain()
@@ -71,23 +77,37 @@ class MainActivity : AppCompatActivity() {
         val view = _binding.root
         setContentView(view)
 
+        _firebaseAnalytics = Firebase.analytics
+
         setMainFragment()
         initBottomNavigationBar()
         initBottomSheet()
         initSubscribers()
         createNotificationChannel()
+        createNotificationChannel2()
+        tryOpenFromNotification()
+    }
+
+    private fun tryOpenFromNotification() {
 
         if (intent == null)
             return
 
-        val filmId = intent.getIntExtra(WatchLaterTimeComeInBroadcast.FILM_ID, 0)
+        val value = intent.getStringExtra(WatchLaterTimeComeInBroadcast.FILM_ID)
+        val filmId = value?.toIntOrNull()
+
+        filmId?.let {
+            _detailViewModel.setItemById(filmId)
+        }
 
         intent = null
+    }
 
-        if (filmId == 0)
-            return
-
-        _detailViewModel.setItemByWatchLater(filmId)
+    private fun sendAnalytics(filmItem: FilmItem) {
+        _firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
+            param(FirebaseAnalytics.Param.ITEM_ID, filmItem.id.toString())
+            param(FirebaseAnalytics.Param.ITEM_NAME, filmItem.name.toString())
+        }
     }
 
     private fun createNotificationChannel() {
@@ -96,6 +116,21 @@ class MainActivity : AppCompatActivity() {
             val descriptionText = getString(R.string.schedule_reminder)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(WatchLaterTimeComeInBroadcast.WATCH_LATER_CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun createNotificationChannel2() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.offers)
+            val descriptionText = getString(R.string.schedule_reminder)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(getString(R.string.offers), name, importance).apply {
                 description = descriptionText
             }
 
@@ -187,27 +222,41 @@ class MainActivity : AppCompatActivity() {
 
         _detailViewModel.selectedItem.observe(this) { filmItem ->
             filmItem?.let { film ->
+                sendAnalytics(film)
                 openFilmDetail(film)
             }
         }
 
         _detailViewModel.descriptionLoaded.observe(this) { filmItem ->
             filmItem?.let {
-                _binding.bottomSheet.filmDescription.visibility = View.VISIBLE
-                _binding.bottomSheet.filmDescription.text = filmItem.description
-                _binding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
-                _binding.bottomSheet.loadedStatus.errorText.visibility = View.INVISIBLE
-                _binding.bottomSheet.loadedStatus.retryButton.visibility = View.INVISIBLE
+                setDescription(it)
             }
         }
 
         _detailViewModel.loadError.observe(this) {
             _binding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
             _binding.bottomSheet.loadedStatus.errorText.visibility = View.VISIBLE
-            _binding.bottomSheet.loadedStatus.errorText.text = it
+
+            val errorMessage =
+                if (it.errorType == ErrorType.ConnectionError)
+                    getString(R.string.network_error)
+                else
+                    getString(R.string.error_code, it.errorCode.toString())
+
+            _binding.bottomSheet.loadedStatus.errorText.text = errorMessage
             _binding.bottomSheet.loadedStatus.retryButton.visibility = View.VISIBLE
-            //showToastWithText(this, it)
         }
+    }
+
+    private fun setDescription(filmItem: FilmItem) {
+        if (filmItem.description == null)
+            return
+
+        _binding.bottomSheet.filmDescription.visibility = View.VISIBLE
+        _binding.bottomSheet.filmDescription.text = filmItem.description
+        _binding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
+        _binding.bottomSheet.loadedStatus.errorText.visibility = View.INVISIBLE
+        _binding.bottomSheet.loadedStatus.retryButton.visibility = View.INVISIBLE
     }
 
     private fun openFilmDetail(film: FilmItem) {
@@ -228,7 +277,7 @@ class MainActivity : AppCompatActivity() {
                 .centerCrop()
                 .into(it.filmImage)
 
-
+            setDescription(film)
             setFavouriteState()
 
             it.toolbar.setOnMenuItemClickListener { menuItem ->

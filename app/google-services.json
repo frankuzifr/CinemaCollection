@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "940787730243",
+    "project_id": "cinema-collection-8e6a4",
+    "storage_bucket": "cinema-collection-8e6a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940787730243:android:543a4fe5d5aa1d238d51f6",
+        "android_client_info": {
+          "package_name": "space.frankuzi.cinemacollection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "940787730243-cmd3cmmg2qh7sljd5dgrsfmqdc0jmfq8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8j4cWsfXuuGJITTC22BaMYbWRoBE8l7M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "940787730243-cmd3cmmg2qh7sljd5dgrsfmqdc0jmfq8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

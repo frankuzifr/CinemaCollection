@@ -29,6 +29,7 @@
     <string name="scheduled_viewing">Scheduled viewing</string>
     <string name="schedule_reminder">Movie/series schedule reminder</string>
     <string name="notification">Notification</string>
+    <string name="offers">Offers</string>
     <string name="notification_text">You have scheduled a viewing %1$s</string>
     <string name="film_remove_from_watch_later">Movie \"%1$s\" removed from scheduled viewing</string>
     <string name="film_added_to_sheduker_viewing">You have scheduled a movie \"%1$s\" for %2$s</string>

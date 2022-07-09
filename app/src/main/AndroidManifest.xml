@@ -12,6 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_cinema_collection_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CinemaCollection">
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher_cinema_collection_round" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/offers" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -26,6 +34,14 @@
             android:exported="false">
 
         </receiver>
+
+        <service
+            android:name=".utils.service.FirebaseCloudMessageService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

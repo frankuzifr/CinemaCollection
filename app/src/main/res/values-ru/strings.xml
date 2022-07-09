@@ -29,6 +29,7 @@
     <string name="scheduled_viewing">Запланированный просмотр</string>
     <string name="schedule_reminder">Напоминание о запланированном просмотре фильма/сериала</string>
     <string name="notification">Напоминание</string>
+    <string name="offers">Предложения</string>
     <string name="notification_text">Вы запланировали просмотр %1$s</string>
     <string name="film_remove_from_watch_later">Фильм \"%1$s\" удален из запланированного просмотра</string>
     <string name="film_added_to_sheduker_viewing">Вы запланировали просмотр фильма \"%1$s\" на %2$s</string>
