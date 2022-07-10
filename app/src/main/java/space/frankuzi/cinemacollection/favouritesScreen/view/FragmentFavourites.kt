@@ -2,6 +2,7 @@ package space.frankuzi.cinemacollection.favouritesScreen.view
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -90,7 +91,6 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
 
         favouritesViewModel.loadFavouritesFilms()
     }
-
 
     private fun initRecycleView() {
 

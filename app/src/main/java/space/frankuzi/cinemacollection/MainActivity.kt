@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -80,13 +81,19 @@ class MainActivity : AppCompatActivity() {
 
         _firebaseAnalytics = Firebase.analytics
 
-        setMainFragment()
+        if (savedInstanceState == null)
+            setMainFragment()
+
         initBottomNavigationBar()
         initBottomSheet()
         initSubscribers()
-        createNotificationChannel()
-        createNotificationChannel2()
+        createNotificationChannelWatchLater()
+        createNotificationChannelForFirebase()
         tryOpenFromNotification()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
     }
 
     private fun tryOpenFromNotification() {
@@ -111,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createNotificationChannel() {
+    private fun createNotificationChannelWatchLater() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.scheduled_viewing)
             val descriptionText = getString(R.string.schedule_reminder)
@@ -126,7 +133,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createNotificationChannel2() {
+    private fun createNotificationChannelForFirebase() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.offers)
             val descriptionText = getString(R.string.schedule_reminder)

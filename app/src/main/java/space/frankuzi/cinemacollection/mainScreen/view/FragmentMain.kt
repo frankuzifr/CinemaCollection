@@ -163,6 +163,9 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         val spanCount = if (orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 3
         val layoutManager = GridLayoutManager(requireActivity(), spanCount)
 
+//        if (mainViewModel.listState != null)
+//            layoutManager.onRestoreInstanceState(mainViewModel.listState)
+
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup()
         {
             override fun getSpanSize(p0: Int): Int

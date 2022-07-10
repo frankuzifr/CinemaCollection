@@ -38,8 +38,8 @@ class FirebaseConfig {
                 if (it.isSuccessful) {
                     minRate = if (firebaseRemoteConfig.getLong(MIN_RATE).toInt() == 0) null else firebaseRemoteConfig.getLong(MIN_RATE).toInt()
                     maxRate = if (firebaseRemoteConfig.getLong(MAX_RATE).toInt() == 0) null else firebaseRemoteConfig.getLong(MAX_RATE).toInt()
-                    minYear = if (firebaseRemoteConfig.getLong(MAX_YEAR).toInt() == 0) null else firebaseRemoteConfig.getLong(MAX_YEAR).toInt()
-                    maxYear = if (firebaseRemoteConfig.getLong(MIN_YEAR).toInt() == 0) null else firebaseRemoteConfig.getLong(MIN_YEAR).toInt()
+                    minYear = if (firebaseRemoteConfig.getLong(MIN_YEAR).toInt() == 0) null else firebaseRemoteConfig.getLong(MIN_YEAR).toInt()
+                    maxYear = if (firebaseRemoteConfig.getLong(MAX_YEAR).toInt() == 0) null else firebaseRemoteConfig.getLong(MAX_YEAR).toInt()
 
                 } else {
                     Log.e("Fetch", "Firebase fetch failed")
