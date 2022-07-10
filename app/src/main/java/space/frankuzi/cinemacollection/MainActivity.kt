@@ -30,6 +30,7 @@ import space.frankuzi.cinemacollection.favouritesScreen.view.FragmentFavourites
 import space.frankuzi.cinemacollection.mainScreen.view.FragmentMain
 import space.frankuzi.cinemacollection.structs.ErrorType
 import space.frankuzi.cinemacollection.structs.SnackBarAction
+import space.frankuzi.cinemacollection.utils.FirebaseConfig
 import space.frankuzi.cinemacollection.utils.broadcastreceiver.WatchLaterTimeComeInBroadcast
 import space.frankuzi.cinemacollection.utils.cancelToast
 import space.frankuzi.cinemacollection.utils.custombackstack.CustomBackStack
@@ -467,5 +468,9 @@ class MainActivity : AppCompatActivity() {
                 super.onBackPressed()
             }.show(supportFragmentManager, "dialog")
         }
+    }
+
+    companion object {
+        val FIREBASE_CONFIG = FirebaseConfig()
     }
 }

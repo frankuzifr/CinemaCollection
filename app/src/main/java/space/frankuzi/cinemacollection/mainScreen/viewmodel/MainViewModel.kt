@@ -13,7 +13,7 @@ import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepositor
 import space.frankuzi.cinemacollection.mainScreen.model.LoadFilmsCallback
 import space.frankuzi.cinemacollection.mainScreen.model.MainRepository
 import space.frankuzi.cinemacollection.structs.LoadingError
-import space.frankuzi.cinemacollection.utils.SingleLiveEvent
+import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 
 class MainViewModel(
     private val api: FilmsApi,

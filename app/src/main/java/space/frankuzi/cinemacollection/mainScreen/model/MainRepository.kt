@@ -47,7 +47,7 @@ class MainRepository(
 
 
     private fun loadFilmsByApi(loadFilmsCallback: LoadFilmsCallback, isRefreshing: Boolean = false) {
-        _loadFilmsCallback = filmsApi.getFilms(_currentPage)
+        _loadFilmsCallback = filmsApi.getFilms(pageNumber = _currentPage)
         _loadFilmsCallback?.enqueue(object : Callback<GetFilmsResponse> {
                 override fun onResponse(
                     call: Call<GetFilmsResponse>,

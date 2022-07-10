@@ -13,8 +13,8 @@ import space.frankuzi.cinemacollection.details.repository.LoadFilmDescriptionCal
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.details.repository.LoadFilmByIdCallback
 import space.frankuzi.cinemacollection.structs.LoadingError
-import space.frankuzi.cinemacollection.utils.ExtendedLiveData
-import space.frankuzi.cinemacollection.utils.SingleLiveEvent
+import space.frankuzi.cinemacollection.utils.livedatavariations.ExtendedLiveData
+import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 import space.frankuzi.cinemacollection.watchlater.datetime.DateTime
 import space.frankuzi.cinemacollection.watchlater.model.WatchLaterRepository
 import java.sql.Date

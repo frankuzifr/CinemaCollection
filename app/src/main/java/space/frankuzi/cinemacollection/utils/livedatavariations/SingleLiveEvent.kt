@@ -1,4 +1,4 @@
-package space.frankuzi.cinemacollection.utils
+package space.frankuzi.cinemacollection.utils.livedatavariations
 
 import androidx.annotation.MainThread
 import androidx.annotation.Nullable

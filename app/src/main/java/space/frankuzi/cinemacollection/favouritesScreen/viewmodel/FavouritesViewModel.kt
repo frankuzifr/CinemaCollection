@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
 import space.frankuzi.cinemacollection.data.room.AppDatabase
-import space.frankuzi.cinemacollection.utils.SingleLiveEvent
+import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 
 class FavouritesViewModel(
     private val database: AppDatabase
