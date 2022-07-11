@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.favouritesScreen.model
 
-import androidx.lifecycle.MutableLiveData
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.data.room.entity.FavouriteFilmDbEntity

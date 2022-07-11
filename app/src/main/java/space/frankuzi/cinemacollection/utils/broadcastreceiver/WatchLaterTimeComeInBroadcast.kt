@@ -5,12 +5,10 @@ import android.app.TaskStackBuilder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings.Global.getString
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
-
 
 class WatchLaterTimeComeInBroadcast : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -19,17 +17,18 @@ class WatchLaterTimeComeInBroadcast : BroadcastReceiver() {
 
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra(FILM_ID, id.toString())
-        intent.action = context.getString(R.string.notification)
+        intent.action = id.toString()
 
         val stackBuilder = TaskStackBuilder.create(context)
         stackBuilder.addParentStack(MainActivity::class.java)
         stackBuilder.addNextIntent(intent)
 
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT)
 
         val builder = NotificationCompat.Builder(context, WATCH_LATER_CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher_cinema_collection_round)
+            .setSmallIcon(R.drawable.cinemacollection_notification)
             .setContentTitle(context.getString(R.string.notification))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notification_text, filmName)))
             .setContentText(context.getString(R.string.notification_text, filmName))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)

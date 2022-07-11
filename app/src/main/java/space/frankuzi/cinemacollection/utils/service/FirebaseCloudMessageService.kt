@@ -3,7 +3,6 @@ package space.frankuzi.cinemacollection.utils.service
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -25,11 +24,12 @@ class FirebaseCloudMessageService : FirebaseMessagingService() {
         stackBuilder.addParentStack(MainActivity::class.java)
         stackBuilder.addNextIntent(intent)
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
 
         val builder = NotificationCompat.Builder(this, WatchLaterTimeComeInBroadcast.WATCH_LATER_CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher_cinema_collection_round)
+            .setSmallIcon(R.drawable.cinemacollection_notification)
             .setContentTitle(remoteMessage.notification?.title)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(remoteMessage.notification?.body))
             .setContentText(remoteMessage.notification?.body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
