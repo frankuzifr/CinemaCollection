@@ -1,5 +1,6 @@
 package space.frankuzi.cinemacollection.mainScreen.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,8 @@ class MainViewModel(
     ) : ViewModel() {
 
     private var _isLoading = false
+    var isRefreshing = false
+    private set
     private val _mainRepository = MainRepository(api, database)
     private val _favouriteRepository = FavouriteRepository(database)
 
@@ -73,6 +76,7 @@ class MainViewModel(
             _mainRepository.cancelLoad()
 
         _isLoading = true
+        isRefreshing = true
 
         viewModelScope.launch(job) {
 
@@ -80,6 +84,7 @@ class MainViewModel(
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                     _films.value = films
                     _isLoading = false
+                    isRefreshing = false
 
                     _isLastFilmsPages.value = isLastPages
                 }
@@ -87,6 +92,7 @@ class MainViewModel(
                 override fun onError(error: LoadingError) {
                     _refreshError.value = error
                     _isLoading = false
+                    isRefreshing = false
                 }
             })
         }

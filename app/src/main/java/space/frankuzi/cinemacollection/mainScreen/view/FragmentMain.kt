@@ -101,6 +101,8 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         _mainFragmentBinding.refresh.setProgressBackgroundColorSchemeResource(
             R.color.refreshBackground
         )
+
+        _mainFragmentBinding.refresh.isRefreshing = mainViewModel.isRefreshing
     }
 
     private fun initSubscribers() {

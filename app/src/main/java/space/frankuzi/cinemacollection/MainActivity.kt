@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     private val _fragmentMain = FragmentMain()
     private val _fragmentFavourites = FragmentFavourites()
     private val _fragmentWatchLater = FragmentWatchLater()
+    private var _snackbar: Snackbar? = null
 
     private val _alarmManager: AlarmManager by lazy { getSystemService(ALARM_SERVICE) as AlarmManager }
 
@@ -381,13 +382,13 @@ class MainActivity : AppCompatActivity() {
     fun showSnackBar(snackBarText: String, snackBarAction: SnackBarAction) {
         cancelToast()
 
-        Snackbar.make(_binding.root, snackBarText, Snackbar.LENGTH_LONG)
+        _snackbar = Snackbar.make(_binding.root, snackBarText, Snackbar.LENGTH_LONG)
             .setAction(getString(snackBarAction.actionNameId)) {
                 snackBarAction.action.invoke()
             }
             .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .setAnchorView(_binding.bottomNavigation)
-            .show()
+        _snackbar?.show()
     }
 
     private fun initBottomNavigationBar() {
@@ -397,12 +398,15 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener {
             when (it.itemId){
                 R.id.main -> {
+                    _snackbar?.dismiss()
                     setMainFragment()
                 }
                 R.id.favourites -> {
+                    _snackbar?.dismiss()
                     setFavouritesFragment()
                 }
                 R.id.watch_later -> {
+                    _snackbar?.dismiss()
                     setWatchLaterFragment()
                 }
             }
