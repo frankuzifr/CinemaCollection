@@ -22,8 +22,7 @@ class MainViewModel(
     ) : ViewModel() {
 
     private var _isLoading = false
-    var isRefreshing = false
-    private set
+
     private val _mainRepository = MainRepository(api, database)
     private val _favouriteRepository = FavouriteRepository(database)
 
@@ -32,12 +31,14 @@ class MainViewModel(
     private val _isLastFilmsPages = MutableLiveData<Boolean>()
     private val _loadError = SingleLiveEvent<LoadingError>()
     private val _refreshError = SingleLiveEvent<LoadingError>()
+    private val _isRefreshing = MutableLiveData<Boolean>()
 
     val films: LiveData<List<FilmItem>> = _films
     val filmItemChanged: LiveData<Int> = _filmItemChanged
     val isLastFilmsPages: LiveData<Boolean> = _isLastFilmsPages
     val loadError: LiveData<LoadingError> = _loadError
     val refreshError: LiveData<LoadingError> = _refreshError
+    val isRefreshing: LiveData<Boolean> = _isRefreshing
 
     private var job = Job()
         get() {
@@ -48,6 +49,9 @@ class MainViewModel(
 
     fun loadFilms() {
         if (_isLoading)
+            return
+
+        if (films.value != null)
             return
 
         _isLoading = true
@@ -76,7 +80,7 @@ class MainViewModel(
             _mainRepository.cancelLoad()
 
         _isLoading = true
-        isRefreshing = true
+        _isRefreshing.value = true
 
         viewModelScope.launch(job) {
 
@@ -84,7 +88,7 @@ class MainViewModel(
                 override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
                     _films.value = films
                     _isLoading = false
-                    isRefreshing = false
+                    _isRefreshing.value = false
 
                     _isLastFilmsPages.value = isLastPages
                 }
@@ -92,7 +96,7 @@ class MainViewModel(
                 override fun onError(error: LoadingError) {
                     _refreshError.value = error
                     _isLoading = false
-                    isRefreshing = false
+                    _isRefreshing.value = false
                 }
             })
         }
@@ -155,6 +159,7 @@ class MainViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        Log.i("", "cleared")
         job.cancel()
     }
 }

@@ -101,15 +101,15 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         _mainFragmentBinding.refresh.setProgressBackgroundColorSchemeResource(
             R.color.refreshBackground
         )
-
-        _mainFragmentBinding.refresh.isRefreshing = mainViewModel.isRefreshing
     }
 
     private fun initSubscribers() {
         mainViewModel.films.observe(viewLifecycleOwner) {
             _adapter.setItems(it)
+        }
 
-            _mainFragmentBinding.refresh.isRefreshing = false
+        mainViewModel.isRefreshing.observe(viewLifecycleOwner) {
+            _mainFragmentBinding.refresh.isRefreshing = it
         }
 
         mainViewModel.isLastFilmsPages.observe(viewLifecycleOwner) {
