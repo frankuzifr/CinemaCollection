@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -28,29 +25,13 @@ import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffs
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.mainScreen.viewmodel.MainViewModel
 import space.frankuzi.cinemacollection.structs.ErrorType
+import javax.inject.Inject
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
-    private val mainViewModel: MainViewModel by viewModels(factoryProducer = {
-        object : AbstractSavedStateViewModelFactory(this, null){
-            override fun <T : ViewModel?> create(
-                key: String,
-                modelClass: Class<T>,
-                handle: SavedStateHandle
-            ): T {
-                return if (modelClass == MainViewModel::class.java) {
-                    val application = activity?.application as App
+    @Inject lateinit var _mainViewModelFactory: MainViewModel.MainViewModelFactory
 
-                    val api = application.filmsApi
-                    val database = application.database
+    private val mainViewModel: MainViewModel by viewModels { _mainViewModelFactory }
 
-                    MainViewModel(api, database) as T
-                } else {
-                    throw ClassNotFoundException()
-                }
-            }
-
-        }
-    })
     private val detailViewModel: DetailsViewModel by activityViewModels()
 
     private lateinit var _mainFragmentBinding: FragmentMainBinding
@@ -80,6 +61,11 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        App._applicationComponentInstance?.let {
+
+            it.mainActivityComponentFactory().create().mainFragmentComponentFactory().create().inject(this)
+        }
 
         initRecycleView()
         initToolbar()

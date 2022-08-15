@@ -2,9 +2,11 @@ package space.frankuzi.cinemacollection.details.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.details.repository.DetailRepository
@@ -18,6 +20,7 @@ import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 import space.frankuzi.cinemacollection.watchlater.datetime.DateTime
 import space.frankuzi.cinemacollection.watchlater.model.WatchLaterRepository
 import java.sql.Date
+import javax.inject.Inject
 
 class DetailsViewModel(
     private val api: FilmsApi,
@@ -145,5 +148,20 @@ class DetailsViewModel(
 
     fun closeDetail() {
         _selectedItem.setValueWithoutNotify(null)
+    }
+
+    class DetailViewModelFactory @Inject constructor(
+        private val api: FilmsApi,
+        private val database: AppDatabase
+    ): ViewModelProvider.Factory{
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return if (modelClass == DetailsViewModel::class.java) {
+
+                DetailsViewModel(api, database) as T
+            } else {
+                throw ClassNotFoundException()
+            }
+        }
+
     }
 }

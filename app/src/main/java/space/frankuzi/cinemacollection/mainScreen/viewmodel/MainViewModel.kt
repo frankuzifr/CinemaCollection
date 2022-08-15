@@ -1,12 +1,10 @@
 package space.frankuzi.cinemacollection.mainScreen.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.room.AppDatabase
@@ -15,6 +13,7 @@ import space.frankuzi.cinemacollection.mainScreen.model.LoadFilmsCallback
 import space.frankuzi.cinemacollection.mainScreen.model.MainRepository
 import space.frankuzi.cinemacollection.structs.LoadingError
 import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
+import javax.inject.Inject
 
 class MainViewModel(
     private val api: FilmsApi,
@@ -161,5 +160,20 @@ class MainViewModel(
         super.onCleared()
         Log.i("", "cleared")
         job.cancel()
+    }
+
+    class MainViewModelFactory @Inject constructor(
+        private val api: FilmsApi,
+        private val database: AppDatabase
+    ): ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return if (modelClass == MainViewModel::class.java) {
+
+                MainViewModel(api, database) as T
+            } else {
+                throw ClassNotFoundException()
+            }
+        }
+
     }
 }

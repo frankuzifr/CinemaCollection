@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import space.frankuzi.cinemacollection.App
@@ -25,26 +22,13 @@ import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffs
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.favouritesScreen.adapter.FavouritesFilmsAdapter
 import space.frankuzi.cinemacollection.favouritesScreen.viewmodel.FavouritesViewModel
+import javax.inject.Inject
 
 class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
-    private val favouritesViewModel: FavouritesViewModel by viewModels(factoryProducer = {
-        object : AbstractSavedStateViewModelFactory(this, null){
-            override fun <T : ViewModel?> create(
-                key: String,
-                modelClass: Class<T>,
-                handle: SavedStateHandle
-            ): T {
-                return if (modelClass == FavouritesViewModel::class.java) {
-                    val application = activity?.application as App
-                    val database = application.database
 
-                    FavouritesViewModel(database) as T
-                } else {
-                    throw ClassNotFoundException()
-                }
-            }
-        }
-    })
+    @Inject lateinit var _favouritesViewModelFactory: FavouritesViewModel.FavouritesViewModelFactory
+
+    private val favouritesViewModel: FavouritesViewModel by viewModels { _favouritesViewModelFactory }
 
     private val detailViewModel: DetailsViewModel by activityViewModels()
     private lateinit var _itemContainer: RecyclerView
@@ -83,6 +67,11 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        App._applicationComponentInstance?.let {
+
+            it.mainActivityComponentFactory().create().favouritesComponentFactory().create().inject(this)
+        }
 
         initSubscribers()
         initRecycleView()

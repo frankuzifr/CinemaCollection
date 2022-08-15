@@ -12,16 +12,11 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
-import com.google.firebase.ktx.Firebase
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
@@ -36,49 +31,38 @@ import space.frankuzi.cinemacollection.utils.custombackstack.CustomBackStack
 import space.frankuzi.cinemacollection.utils.showToastWithText
 import space.frankuzi.cinemacollection.watchlater.datetime.*
 import space.frankuzi.cinemacollection.watchlater.view.FragmentWatchLater
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    private val _detailViewModel: DetailsViewModel by viewModels(factoryProducer = {
-        object : AbstractSavedStateViewModelFactory(this, null){
-            override fun <T : ViewModel?> create(
-                key: String,
-                modelClass: Class<T>,
-                handle: SavedStateHandle
-            ): T {
-                return if (modelClass == DetailsViewModel::class.java) {
-                    val application = application as App
+    @Inject lateinit var _detailViewModelFactory: DetailsViewModel.DetailViewModelFactory
+    @Inject lateinit var _customBackStack: CustomBackStack
+    @Inject lateinit var _firebaseAnalytics: FirebaseAnalytics
+    @Inject lateinit var _alarmManager: AlarmManager
 
-                    val api = application.filmsApi
-                    val database = application.database
-
-                    DetailsViewModel(api, database) as T
-                } else {
-                    throw ClassNotFoundException()
-                }
-            }
-        }
-    })
+    private val _detailViewModel: DetailsViewModel by viewModels { _detailViewModelFactory }
 
     private lateinit var _binding: ActivityMainBinding
     private lateinit var _bottomSheetBehavior: BottomSheetBehavior<CoordinatorLayout>
-    private lateinit var _firebaseAnalytics: FirebaseAnalytics
 
-    private val _customBackStack = CustomBackStack()
     private val _fragmentMain = FragmentMain()
     private val _fragmentFavourites = FragmentFavourites()
     private val _fragmentWatchLater = FragmentWatchLater()
     private var _snackbar: Snackbar? = null
 
-    private val _alarmManager: AlarmManager by lazy { getSystemService(ALARM_SERVICE) as AlarmManager }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        App._applicationComponentInstance?.let {
+
+            it.mainActivityComponentFactory().create().inject(this)
+        }
 
         _binding = ActivityMainBinding.inflate(layoutInflater)
         val view = _binding.root
         setContentView(view)
 
-        _firebaseAnalytics = Firebase.analytics
+//        _firebaseAnalytics = Firebase.analytics
 
         if (savedInstanceState == null)
             setMainFragment()

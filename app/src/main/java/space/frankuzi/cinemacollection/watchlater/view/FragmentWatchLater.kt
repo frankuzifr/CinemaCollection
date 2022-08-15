@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.R
@@ -22,27 +19,13 @@ import space.frankuzi.cinemacollection.viewholder.viewholderanim.CustomItemAnima
 import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffset
 import space.frankuzi.cinemacollection.watchlater.adapter.WatchLaterFilmsAdapter
 import space.frankuzi.cinemacollection.watchlater.viewmodel.WatchLaterViewModel
+import javax.inject.Inject
 
 class FragmentWatchLater: Fragment(R.layout.fragment_watch_later) {
 
-    private val watchLaterViewModel: WatchLaterViewModel by viewModels(factoryProducer = {
-        object : AbstractSavedStateViewModelFactory(this, null){
-            override fun <T : ViewModel?> create(
-                key: String,
-                modelClass: Class<T>,
-                handle: SavedStateHandle
-            ): T {
-                return if (modelClass == WatchLaterViewModel::class.java) {
-                    val application = activity?.application as App
-                    val database = application.database
+    @Inject lateinit var _watchLaterViewModelFactory: WatchLaterViewModel.WatchLaterViewModelFactory
 
-                    WatchLaterViewModel(database) as T
-                } else {
-                    throw ClassNotFoundException()
-                }
-            }
-        }
-    })
+    private val watchLaterViewModel: WatchLaterViewModel by viewModels { _watchLaterViewModelFactory }
 
     private val _adapter = WatchLaterFilmsAdapter(object : FilmClickListener {
         override fun onFilmClickListener(film: FilmItem, position: Int) {
@@ -68,6 +51,12 @@ class FragmentWatchLater: Fragment(R.layout.fragment_watch_later) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        App._applicationComponentInstance?.let {
+
+            it.mainActivityComponentFactory().create().watchLaterComponentFactory()
+                .create().inject(this)
+        }
 
         initRecycleView()
         initToolbar()

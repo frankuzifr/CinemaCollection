@@ -1,6 +1,9 @@
 package space.frankuzi.cinemacollection.utils.custombackstack
 
-class CustomBackStack {
+import javax.inject.Inject
+
+class CustomBackStack @Inject constructor(){
+
     private val backStack: MutableList<FragmentWithBarId> = mutableListOf()
 
     fun addToBackStack(name: String, navigationBarId: Int) {

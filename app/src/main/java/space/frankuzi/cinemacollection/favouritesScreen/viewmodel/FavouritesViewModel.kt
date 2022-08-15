@@ -1,15 +1,13 @@
 package space.frankuzi.cinemacollection.favouritesScreen.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
+import javax.inject.Inject
 
 class FavouritesViewModel(
     private val database: AppDatabase
@@ -73,4 +71,18 @@ class FavouritesViewModel(
         val position: Int,
         val filmItem: FilmItem
     )
+
+    class FavouritesViewModelFactory @Inject constructor(
+        private val database: AppDatabase
+    ): ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return if (modelClass == FavouritesViewModel::class.java) {
+
+                FavouritesViewModel(database) as T
+            } else {
+                throw ClassNotFoundException()
+            }
+        }
+
+    }
 }

@@ -1,15 +1,14 @@
 package space.frankuzi.cinemacollection.watchlater.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
 import space.frankuzi.cinemacollection.watchlater.model.WatchLaterRepository
+import javax.inject.Inject
 
 class WatchLaterViewModel(
     private val database: AppDatabase
@@ -63,20 +62,34 @@ class WatchLaterViewModel(
         }
     }
 
-//    fun changeWatchLaterFilm(filmItem: FilmItem) {
-//        val films = watchLaterFilms.value
-//
-//        films?.let {
-//            val isAny = films?.any {
-//                it.id == filmItem.id
-//            }
-//
-//            if (!isAny) {
-//                _watchLaterFilmAdded.value = filmItem
-//                return
-//            }
-//
-//            filmItem
-//        }
-//    }
+    fun changeWatchLaterFilm(filmItem: FilmItem) {
+        val films = watchLaterFilms.value
+
+        films?.let {
+            val isAny = films?.any {
+                it.id == filmItem.id
+            }
+
+            if (!isAny) {
+                _watchLaterFilmAdded.value = filmItem
+                return
+            }
+
+            filmItem
+        }
+    }
+
+    class WatchLaterViewModelFactory @Inject constructor(
+        private val database: AppDatabase
+    ): ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return if (modelClass == WatchLaterViewModel::class.java) {
+
+                WatchLaterViewModel(database) as T
+            } else {
+                throw ClassNotFoundException()
+            }
+        }
+
+    }
 }
