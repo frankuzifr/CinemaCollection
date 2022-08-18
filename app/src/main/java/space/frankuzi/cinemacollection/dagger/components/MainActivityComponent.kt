@@ -1,5 +1,7 @@
 package space.frankuzi.cinemacollection.dagger.components
 
+import android.content.Context
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -11,6 +13,7 @@ import javax.inject.Scope
 @MainActivityScope
 @Subcomponent(modules = [
     FilmsApiModule::class,
+    //ContextModule::class,
     MainActivitySubComponentsModule::class
 ])
 interface MainActivityComponent {
@@ -40,6 +43,12 @@ object FilmsApiModule {
     fun provideFilmsApi(retrofit: Retrofit): FilmsApi {
         return retrofit.create(FilmsApi::class.java)
     }
+}
+
+@Module
+interface ContextModule {
+    @Binds
+    fun bindContext(context: Context): Context
 }
 
 @Scope

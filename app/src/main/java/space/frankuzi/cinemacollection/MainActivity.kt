@@ -223,14 +223,7 @@ class MainActivity : AppCompatActivity() {
         _detailViewModel.loadError.observe(this) {
             _binding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
             _binding.bottomSheet.loadedStatus.errorText.visibility = View.VISIBLE
-
-            val errorMessage =
-                if (it.errorType == ErrorType.ConnectionError)
-                    getString(R.string.network_error)
-                else
-                    getString(R.string.error_code, it.errorCode.toString())
-
-            _binding.bottomSheet.loadedStatus.errorText.text = errorMessage
+            _binding.bottomSheet.loadedStatus.errorText.text = it
             _binding.bottomSheet.loadedStatus.retryButton.visibility = View.VISIBLE
         }
     }

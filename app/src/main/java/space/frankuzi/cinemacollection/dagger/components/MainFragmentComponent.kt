@@ -12,5 +12,4 @@ interface MainFragmentComponent {
     interface Factory {
         fun create(): MainFragmentComponent
     }
-
 }

@@ -12,17 +12,17 @@ import javax.inject.Inject
 class FavouritesViewModel(
     private val database: AppDatabase
 ) : ViewModel() {
+    private val favouriteRepository = FavouriteRepository(database)
+
     private val _favouritesFilms = MutableLiveData<List<FilmItem>>()
     private val _itemRemoved = SingleLiveEvent<FilmItem>()
     private val _itemAdded = SingleLiveEvent<FilmItem>()
     private val _itemRemoveCanceled = SingleLiveEvent<FilmWithPosition>()
 
-    val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
+    val favouritesFilms: LiveData<List<FilmItem>> = favouriteRepository.films
     val itemRemoved: LiveData<FilmItem> = _itemRemoved
     val itemAdded: LiveData<FilmItem> = _itemAdded
     val itemRemoveCanceled: LiveData<FilmWithPosition> = _itemRemoveCanceled
-
-    private val favouriteRepository = FavouriteRepository(database)
 
     private var job = Job()
         get() {
@@ -32,9 +32,7 @@ class FavouritesViewModel(
         }
 
     fun loadFavouritesFilms() {
-        viewModelScope.launch(job) {
-            _favouritesFilms.value = favouriteRepository.getFavourites()
-        }
+        favouriteRepository.getFavourites()
     }
 
     fun onItemRemoveFromFavourite(filmItem: FilmItem) {

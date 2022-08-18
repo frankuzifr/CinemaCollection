@@ -1,118 +1,168 @@
 package space.frankuzi.cinemacollection.mainScreen.model
 
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import retrofit2.HttpException
+import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.network.response.GetFilmsResponse
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.data.room.entity.FilmDbEntity
-import space.frankuzi.cinemacollection.structs.ErrorType
-import space.frankuzi.cinemacollection.structs.LoadingError
+import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 
 class MainRepository(
     private val filmsApi: FilmsApi,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val context: Context
 ) {
+    private val _films = MutableLiveData<List<FilmItem>>()
+    private val _error = SingleLiveEvent<String>()
+    private val _isLastPages = MutableLiveData<Boolean>()
+
+    val films: LiveData<List<FilmItem>> = _films
+    val error: LiveData<String> = _error
+    val isLastPages: LiveData<Boolean> = _isLastPages
+
     private var _currentPage = 1
     private var _lastPage = 20
     private var _loadFilmsCallback: Call<GetFilmsResponse>? = null
 
-    fun loadNextPageFilms(loadFilmsCallback: LoadFilmsCallback) {
+    fun loadNextPageFilms() {
         _currentPage++
 
-        loadFilmsByApi(loadFilmsCallback)
+        loadFilmsByApi()
     }
 
-    fun loadFirstPageFilms(loadFilmsCallback: LoadFilmsCallback) {
+    fun loadFirstPageFilms() {
         _currentPage = 1
 
-        loadFilmsByApi(loadFilmsCallback, true)
+        loadFilmsByApi(true)
     }
 
-    suspend fun loadFilms(loadFilmsCallback: LoadFilmsCallback) {
-        val films = database.getFilmsDao().getFilms()
+    fun loadFilms() {
+        database.getFilmsDao().getFilms()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<FilmDbEntity>?>{
+                override fun onSubscribe(d: Disposable) {
+                }
 
-        if (films != null && films.isNotEmpty()) {
-            setPagesInfo(films.size)
-            getFilmsFromDatabase(loadFilmsCallback)
+                override fun onSuccess(films: List<FilmDbEntity>) {
+                    if (films.isNotEmpty()) {
+                        setPagesInfo(films.size)
+                        getFilmsFromDatabase()
 
-        } else {
-            loadFirstPageFilms(loadFilmsCallback)
-        }
-    }
-
-
-    private fun loadFilmsByApi(loadFilmsCallback: LoadFilmsCallback, isRefreshing: Boolean = false) {
-        _loadFilmsCallback = filmsApi.getFilms(pageNumber = _currentPage)
-        _loadFilmsCallback?.enqueue(object : Callback<GetFilmsResponse> {
-                override fun onResponse(
-                    call: Call<GetFilmsResponse>,
-                    response: Response<GetFilmsResponse>
-                ) {
-                    if (response.isSuccessful && response.body() != null) {
-
-                        val getFilmsResponse = response.body()
-                        getFilmsResponse?.let {
-                            _lastPage = it.totalPages
-                        }
-
-                        val filmsDbEntity = getFilmsResponse?.items?.map {
-                                FilmDbEntity(
-                                    id = 0,
-                                    kinopoiskId = it.kinopoiskId,
-                                    nameOriginal = it.nameOriginal,
-                                    nameRussian = it.nameRu,
-                                    description = null,
-                                    type = null,
-                                    imageUrl = it.posterUrl
-                                )
-                        }
-
-                        filmsDbEntity?.let {
-                            if (isRefreshing)
-                                addFilmsToDatabaseWithClear(filmsDbEntity)
-                            else
-                                addFilmsToDatabase(filmsDbEntity)
-
-                            getFilmsFromDatabase(loadFilmsCallback)
-                        }
                     } else {
-                        loadFilmsCallback.onError(LoadingError(ErrorType.RequestError, response.code()))
-                        _currentPage--
+                        loadFirstPageFilms()
                     }
                 }
 
-                override fun onFailure(call: Call<GetFilmsResponse>, t: Throwable) {
-                    if (call.isCanceled)
-                        return
-
-                    loadFilmsCallback.onError(LoadingError(ErrorType.ConnectionError))
-
-                    _currentPage--
+                override fun onError(e: Throwable) {
+                    loadFirstPageFilms()
                 }
             })
     }
 
-    private fun getFilmsFromDatabase(loadFilmsCallback: LoadFilmsCallback) = runBlocking {
-        launch {
-            var filmsEntities = database.getFilmsDao().getFilms()
-
-            val films = filmsEntities?.map {
-                val favouriteFilmById =
-                    database.getFavouritesDao().getFavouriteFilmById(it.kinopoiskId)
-
-                val filmItem = it.toFilmItem()
-                filmItem.isFavourite = favouriteFilmById != null
-
-                filmItem
+    private fun loadFilmsByApi(isRefreshing: Boolean = false) {
+        filmsApi.getFilms(pageNumber = _currentPage)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { response ->
+                _lastPage = response.totalPages
+                response.items.map {
+                    FilmDbEntity(
+                        id = 0,
+                        kinopoiskId = it.kinopoiskId,
+                        nameOriginal = it.nameOriginal,
+                        nameRussian = it.nameRu,
+                        description = null,
+                        type = null,
+                        imageUrl = it.posterUrl
+                    )
+                }
             }
+            .subscribe(
+                object : SingleObserver<List<FilmDbEntity>>{
+                    override fun onSubscribe(d: Disposable) {
 
-            if (films != null)
-                loadFilmsCallback.onSuccess(films, _currentPage == _lastPage)
+                    }
+
+                    override fun onSuccess(items: List<FilmDbEntity>) {
+
+                        if (isRefreshing)
+                            addFilmsToDatabaseWithClear(items)
+                        else
+                            addFilmsToDatabase(items)
+
+                        getFilmsFromDatabase()
+                    }
+
+                    override fun onError(e: Throwable) {
+                        when (e) {
+                            is HttpException -> {
+                                val errorText = context.getString(R.string.error_code, e.code().toString())
+                                _error.value = errorText
+                            }
+                            else -> {
+                                val errorText = context.getString(R.string.network_error)
+                                _error.value = errorText
+                            }
+                        }
+
+                        _currentPage--
+                    }
+                }
+            )
+    }
+
+    private fun getFilmsFromDatabase(){
+
+        database.getFilmsDao().getFilms()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map {
+                it.map { film ->
+                    film.toFilmItem()
+                }
+            }
+            .subscribe(
+                object : SingleObserver<List<FilmItem>?>{
+                    override fun onSubscribe(d: Disposable) {
+
+                    }
+
+                    override fun onSuccess(filmItems: List<FilmItem>) {
+                        checkFilmsInFavourites(filmItems)
+                    }
+
+                    override fun onError(e: Throwable) {
+
+                    }
+                }
+            )
+    }
+
+    private fun checkFilmsInFavourites(films: List<FilmItem>) {
+        runBlocking {
+            launch {
+                films.forEach { film ->
+
+                    val favouriteFilm = database.getFavouritesDao().getFavouriteFilmById(film.id)
+
+                    film.isFavourite = favouriteFilm != null
+                }
+
+                _films.value = films
+            }
         }
     }
 
@@ -135,9 +185,4 @@ class MainRepository(
     fun cancelLoad() {
         _loadFilmsCallback?.cancel()
     }
-}
-
-interface LoadFilmsCallback {
-    fun onSuccess(films: List<FilmItem>, isLastPage: Boolean)
-    fun onError(error: LoadingError)
 }

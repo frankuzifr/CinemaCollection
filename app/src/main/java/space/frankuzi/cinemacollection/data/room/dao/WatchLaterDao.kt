@@ -3,6 +3,7 @@ package space.frankuzi.cinemacollection.data.room.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import io.reactivex.Single
 import space.frankuzi.cinemacollection.data.room.entity.WatchLaterFilmDbEntity
 import java.sql.Date
 
@@ -10,7 +11,7 @@ import java.sql.Date
 interface WatchLaterDao {
 
     @Query("SELECT * FROM watch_later_films")
-    suspend fun getWatchLaterFilms(): List<WatchLaterFilmDbEntity>?
+    fun getWatchLaterFilms(): Single<List<WatchLaterFilmDbEntity>?>
 
     @Query("SELECT * FROM watch_later_films WHERE kinopoisk_id = :kinopoiskId")
     suspend fun getWatchLaterFilmById(kinopoiskId: Int): WatchLaterFilmDbEntity?

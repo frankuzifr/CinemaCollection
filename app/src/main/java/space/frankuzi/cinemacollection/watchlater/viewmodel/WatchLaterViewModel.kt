@@ -22,7 +22,7 @@ class WatchLaterViewModel(
     private var _watchLaterFilmRemoved = MutableLiveData<FilmItem>()
     private var _watchLaterFilmChanged = MutableLiveData<FilmItem>()
 
-    val watchLaterFilms: LiveData<List<FilmItem>> = _watchLaterFilms
+    val watchLaterFilms: LiveData<List<FilmItem>> = watchLaterRepository.films
     val watchLaterFilmAdded: LiveData<FilmItem> = _watchLaterFilmAdded
     val watchLaterFilmRemoved: LiveData<FilmItem> = _watchLaterFilmRemoved
     val watchLaterFilmChanged: LiveData<FilmItem> = _watchLaterFilmChanged
@@ -35,11 +35,8 @@ class WatchLaterViewModel(
         }
 
     fun loadWatchLaterFilms() {
-        viewModelScope.launch(job) {
-            _watchLaterFilms.value = watchLaterRepository.getWatchLaterFilms()
-        }
+        watchLaterRepository.getWatchLaterFilms()
     }
-
 
     fun onClickFavourite(film: FilmItem) {
         if (film.isFavourite)

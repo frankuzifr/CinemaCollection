@@ -1,42 +1,43 @@
 package space.frankuzi.cinemacollection.mainScreen.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import space.frankuzi.cinemacollection.App
+import retrofit2.HttpException
+import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
-import space.frankuzi.cinemacollection.mainScreen.model.LoadFilmsCallback
 import space.frankuzi.cinemacollection.mainScreen.model.MainRepository
-import space.frankuzi.cinemacollection.structs.LoadingError
 import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 import javax.inject.Inject
 
 class MainViewModel(
     private val api: FilmsApi,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val context: Context
     ) : ViewModel() {
 
     private var _isLoading = false
 
-    private val _mainRepository = MainRepository(api, database)
+    private val _mainRepository = MainRepository(api, database, context)
     private val _favouriteRepository = FavouriteRepository(database)
 
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = SingleLiveEvent<Int>()
     private val _isLastFilmsPages = MutableLiveData<Boolean>()
-    private val _loadError = SingleLiveEvent<LoadingError>()
-    private val _refreshError = SingleLiveEvent<LoadingError>()
+    private val _loadError = SingleLiveEvent<String>()
+    private val _refreshError = SingleLiveEvent<String>()
     private val _isRefreshing = MutableLiveData<Boolean>()
 
-    val films: LiveData<List<FilmItem>> = _films
+    val films: LiveData<List<FilmItem>> = _mainRepository.films
     val filmItemChanged: LiveData<Int> = _filmItemChanged
-    val isLastFilmsPages: LiveData<Boolean> = _isLastFilmsPages
-    val loadError: LiveData<LoadingError> = _loadError
-    val refreshError: LiveData<LoadingError> = _refreshError
+    val isLastFilmsPages: LiveData<Boolean> = _mainRepository.isLastPages
+    val loadError: LiveData<String> = _mainRepository.error
+    val refreshError: LiveData<String> = _refreshError
     val isRefreshing: LiveData<Boolean> = _isRefreshing
 
     private var job = Job()
@@ -56,21 +57,8 @@ class MainViewModel(
         _isLoading = true
 
         viewModelScope.launch(job) {
-            _mainRepository.loadFilms(object : LoadFilmsCallback {
-                override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
-
-                    _films.value = films
-
-                    _isLoading = false
-
-                    _isLastFilmsPages.value = isLastPages
-                }
-
-                override fun onError(error: LoadingError) {
-                    _loadError.value = error
-                    _isLoading = false
-                }
-            })
+            _mainRepository.loadFilms()
+            _isLoading = false
         }
     }
 
@@ -83,21 +71,9 @@ class MainViewModel(
 
         viewModelScope.launch(job) {
 
-            _mainRepository.loadFirstPageFilms(object : LoadFilmsCallback {
-                override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
-                    _films.value = films
-                    _isLoading = false
-                    _isRefreshing.value = false
-
-                    _isLastFilmsPages.value = isLastPages
-                }
-
-                override fun onError(error: LoadingError) {
-                    _refreshError.value = error
-                    _isLoading = false
-                    _isRefreshing.value = false
-                }
-            })
+            _mainRepository.loadFirstPageFilms()
+            _isLoading = false
+            _isRefreshing.value = false
         }
     }
 
@@ -126,25 +102,17 @@ class MainViewModel(
     }
 
     fun loadNextPage() {
+        Log.i("", _isLoading.toString())
         if (_isLoading)
             return
 
+
         _isLoading = true
 
-        _mainRepository.loadNextPageFilms(object : LoadFilmsCallback {
-            override fun onSuccess(films: List<FilmItem>, isLastPages: Boolean) {
-                _films.value = films
-
-                _isLoading = false
-
-                _isLastFilmsPages.value = isLastPages
-            }
-
-            override fun onError(error: LoadingError) {
-                _loadError.value = error
-                _isLoading = false
-            }
-        })
+        viewModelScope.launch {
+            _mainRepository.loadNextPageFilms()
+            _isLoading = false
+        }
     }
 
     fun onClickFavourite(film: FilmItem) {
@@ -158,22 +126,21 @@ class MainViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        Log.i("", "cleared")
         job.cancel()
     }
 
     class MainViewModelFactory @Inject constructor(
         private val api: FilmsApi,
-        private val database: AppDatabase
+        private val database: AppDatabase,
+        private val context: Context
     ): ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return if (modelClass == MainViewModel::class.java) {
 
-                MainViewModel(api, database) as T
+                MainViewModel(api, database, context) as T
             } else {
                 throw ClassNotFoundException()
             }
         }
-
     }
 }

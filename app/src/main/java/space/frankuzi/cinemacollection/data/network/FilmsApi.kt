@@ -1,5 +1,6 @@
 package space.frankuzi.cinemacollection.data.network
 
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -16,8 +17,8 @@ interface FilmsApi {
         @Query("ratingTo") maxRating: Int? = MainActivity.FIREBASE_CONFIG.minRate,
         @Query("yearFrom") minYear: Int? = MainActivity.FIREBASE_CONFIG.minYear,
         @Query("yearTo") maxYear: Int? = MainActivity.FIREBASE_CONFIG.maxYear
-    ): Call<GetFilmsResponse>
+    ): Single<GetFilmsResponse>
 
     @GET("films/{id}")
-    fun getFilmById(@Path("id") filmId: Int): Call<FilmWithDescriptionResponse>
+    fun getFilmById(@Path("id") filmId: Int): Single<FilmWithDescriptionResponse>
 }

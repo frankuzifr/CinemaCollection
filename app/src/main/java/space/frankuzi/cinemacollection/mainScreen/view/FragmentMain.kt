@@ -2,6 +2,7 @@ package space.frankuzi.cinemacollection.mainScreen.view
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -103,15 +104,9 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         }
 
         mainViewModel.loadError.observe(viewLifecycleOwner) {
-            val errorMessage =
-                if (it.errorType == ErrorType.ConnectionError)
-                    getString(R.string.network_error)
-                else
-                    getString(R.string.error_code, it.errorCode.toString())
-
-            _adapter.setError(errorMessage)
+            _adapter.setError(it)
             val mainActivity = activity as MainActivity
-            mainActivity.showSnackBar(errorMessage, SnackBarAction(R.string.retry) {
+            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
                 retryLoadFilms()
             })
 
@@ -121,14 +116,8 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         mainViewModel.refreshError.observe(viewLifecycleOwner) {
             _adapter.isLastPages = true
             val mainActivity = activity as MainActivity
-            val errorMessage =
-                if (it.errorType == ErrorType.ConnectionError)
-                    getString(R.string.network_error)
-                else
-                    getString(R.string.error_code, it.errorCode.toString())
 
-
-            mainActivity.showSnackBar(errorMessage, SnackBarAction(R.string.retry) {
+            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
                 _mainFragmentBinding.refresh.isRefreshing = true
                 retryLoadFilms()
             })
@@ -150,9 +139,6 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         val orientation = this.resources.configuration.orientation
         val spanCount = if (orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 3
         val layoutManager = GridLayoutManager(requireActivity(), spanCount)
-
-//        if (mainViewModel.listState != null)
-//            layoutManager.onRestoreInstanceState(mainViewModel.listState)
 
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup()
         {
@@ -179,7 +165,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
                 if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastFilmsPages.value == false) {
-
+                    Log.i("", "DASDASDASDSD")
                     mainViewModel.loadNextPage()
                 }
             }
