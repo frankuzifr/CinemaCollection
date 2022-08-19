@@ -15,6 +15,7 @@
     <string name="close_dialog">Вернуться</string>
     <string name="share">Поделиться</string>
     <string name="liked">Понравилось</string>
+    <string name="search">Поиск</string>
     <string name="no_liked">Не понравилось</string>
     <string name="cancel">Отменить</string>
     <string name="network_error">Ошибка подключения…</string>

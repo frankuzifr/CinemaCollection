@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.mainScreen.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -80,11 +79,14 @@ class FilmItemsPaginationAdapter(
 
     fun setError(errorMessage: String) {
         _footerViewHolder?.enableErrorLabel(errorMessage)
-        Log.i("", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     }
 
-    fun setLoading() {
+    fun enableLoading() {
         _footerViewHolder?.enableLoading()
+    }
+
+    fun disableAll() {
+        _footerViewHolder?.disableAll()
     }
 
     companion object {

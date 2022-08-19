@@ -2,10 +2,10 @@ package space.frankuzi.cinemacollection.mainScreen.view
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -15,27 +15,26 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.MainActivity
 import space.frankuzi.cinemacollection.R
-import space.frankuzi.cinemacollection.structs.FilmClickListener
-import space.frankuzi.cinemacollection.mainScreen.adapter.FilmItemsPaginationAdapter
-import space.frankuzi.cinemacollection.mainScreen.adapter.RetryLoadListener
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.databinding.FragmentMainBinding
+import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
+import space.frankuzi.cinemacollection.mainScreen.adapter.FilmItemsPaginationAdapter
+import space.frankuzi.cinemacollection.mainScreen.adapter.RetryLoadListener
+import space.frankuzi.cinemacollection.mainScreen.viewmodel.MainViewModel
+import space.frankuzi.cinemacollection.structs.FilmClickListener
 import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.viewholder.viewholderanim.CustomItemAnimator
 import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffset
-import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
-import space.frankuzi.cinemacollection.mainScreen.viewmodel.MainViewModel
-import space.frankuzi.cinemacollection.structs.ErrorType
 import javax.inject.Inject
+
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
     @Inject lateinit var _mainViewModelFactory: MainViewModel.MainViewModelFactory
 
     private val mainViewModel: MainViewModel by viewModels { _mainViewModelFactory }
-
     private val detailViewModel: DetailsViewModel by activityViewModels()
-
     private lateinit var _mainFragmentBinding: FragmentMainBinding
+    private lateinit var _searchView: SearchView
 
     private val _adapter = FilmItemsPaginationAdapter(object : FilmClickListener {
         override fun onFilmClickListener(film: FilmItem, position: Int) {
@@ -97,6 +96,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
         mainViewModel.isRefreshing.observe(viewLifecycleOwner) {
             _mainFragmentBinding.refresh.isRefreshing = it
+            _searchView.isIconified = true;
         }
 
         mainViewModel.isLastFilmsPages.observe(viewLifecycleOwner) {
@@ -165,7 +165,6 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
                 if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastFilmsPages.value == false) {
-                    Log.i("", "DASDASDASDSD")
                     mainViewModel.loadNextPage()
                 }
             }
@@ -174,13 +173,40 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
     private fun initToolbar() {
 
-        val toolbar = _mainFragmentBinding.include.toolbar
+        val toolbar = _mainFragmentBinding.toolbar
         toolbar.setTitle(R.string.general)
+
+        _searchView = toolbar.menu.findItem(R.id.search)?.actionView as SearchView
+
+        _searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                   mainViewModel.searchFilmsByName(it)
+                }
+                return false
+            }
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    mainViewModel.searchFilmsByName(it)
+                }
+                return false
+            }
+        })
+
+        _searchView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View?) {
+
+            }
+
+            override fun onViewDetachedFromWindow(v: View?) {
+                mainViewModel.checkIsLastPages()
+            }
+        })
     }
 
     private fun retryLoadFilms() {
         mainViewModel.loadNextPage()
-        _adapter.setLoading()
+        _adapter.enableLoading()
     }
 
     fun setRecycleViewOnStart() {

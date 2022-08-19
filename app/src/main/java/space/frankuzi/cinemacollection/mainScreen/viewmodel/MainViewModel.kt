@@ -26,10 +26,7 @@ class MainViewModel(
     private val _mainRepository = MainRepository(api, database, context)
     private val _favouriteRepository = FavouriteRepository(database)
 
-    private val _films = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = SingleLiveEvent<Int>()
-    private val _isLastFilmsPages = MutableLiveData<Boolean>()
-    private val _loadError = SingleLiveEvent<String>()
     private val _refreshError = SingleLiveEvent<String>()
     private val _isRefreshing = MutableLiveData<Boolean>()
 
@@ -38,7 +35,7 @@ class MainViewModel(
     val isLastFilmsPages: LiveData<Boolean> = _mainRepository.isLastPages
     val loadError: LiveData<String> = _mainRepository.error
     val refreshError: LiveData<String> = _refreshError
-    val isRefreshing: LiveData<Boolean> = _isRefreshing
+    val isRefreshing: LiveData<Boolean> = _mainRepository.isRefreshing
 
     private var job = Job()
         get() {
@@ -67,13 +64,13 @@ class MainViewModel(
             _mainRepository.cancelLoad()
 
         _isLoading = true
-        _isRefreshing.value = true
+        //_isRefreshing.value = true
 
         viewModelScope.launch(job) {
 
             _mainRepository.loadFirstPageFilms()
             _isLoading = false
-            _isRefreshing.value = false
+           // _isRefreshing.value = false
         }
     }
 
@@ -122,6 +119,14 @@ class MainViewModel(
             addToFavourite(film)
 
         film.isFavourite = !film.isFavourite
+    }
+
+    fun searchFilmsByName(name: String) {
+        _mainRepository.searchFilmsByName(name)
+    }
+
+    fun checkIsLastPages() {
+        _mainRepository.checkIsLastPage()
     }
 
     override fun onCleared() {

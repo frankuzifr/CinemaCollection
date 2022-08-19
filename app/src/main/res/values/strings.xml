@@ -15,6 +15,7 @@
     <string name="close_dialog">Return</string>
     <string name="share">Share</string>
     <string name="liked">Liked</string>
+    <string name="search">Search</string>
     <string name="no_liked">No liked</string>
     <string name="cancel">Cancel</string>
     <string name="network_error">Network error probably…</string>

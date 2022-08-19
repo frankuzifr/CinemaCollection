@@ -1,6 +1,7 @@
 package space.frankuzi.cinemacollection.mainScreen.model
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.SingleObserver
@@ -27,10 +28,12 @@ class MainRepository(
     private val _films = MutableLiveData<List<FilmItem>>()
     private val _error = SingleLiveEvent<String>()
     private val _isLastPages = MutableLiveData<Boolean>()
+    private val _isRefreshing = MutableLiveData<Boolean>()
 
     val films: LiveData<List<FilmItem>> = _films
     val error: LiveData<String> = _error
     val isLastPages: LiveData<Boolean> = _isLastPages
+    val isRefreshing: LiveData<Boolean> = _isRefreshing
 
     private var _currentPage = 1
     private var _lastPage = 20
@@ -46,6 +49,7 @@ class MainRepository(
         _currentPage = 1
 
         loadFilmsByApi(true)
+        _isRefreshing.value = true
     }
 
     fun loadFilms() {
@@ -68,6 +72,32 @@ class MainRepository(
 
                 override fun onError(e: Throwable) {
                     loadFirstPageFilms()
+                }
+            })
+    }
+
+    fun searchFilmsByName(name: String) {
+        _isLastPages.value = true
+
+        database.getFilmsDao().findFilms("${name.lowercase().trim()}%")
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map {
+                it.map { film ->
+                    film.toFilmItem()
+                }
+            }
+            .subscribe(object : SingleObserver<List<FilmItem>>{
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onSuccess(films: List<FilmItem>) {
+                    checkFilmsInFavourites(films)
+                }
+
+                override fun onError(e: Throwable) {
+                    _films.value = emptyList()
                 }
             })
     }
@@ -98,10 +128,13 @@ class MainRepository(
 
                     override fun onSuccess(items: List<FilmDbEntity>) {
 
-                        if (isRefreshing)
+                        if (isRefreshing) {
                             addFilmsToDatabaseWithClear(items)
-                        else
+                            _isRefreshing.value = false
+                        }
+                        else {
                             addFilmsToDatabase(items)
+                        }
 
                         getFilmsFromDatabase()
                     }
@@ -145,7 +178,7 @@ class MainRepository(
                     }
 
                     override fun onError(e: Throwable) {
-
+                        _films.value = emptyList()
                     }
                 }
             )
@@ -180,6 +213,11 @@ class MainRepository(
 
     private fun setPagesInfo(filmsCount: Int) {
         _currentPage = filmsCount / 20
+        checkIsLastPage()
+    }
+
+    fun checkIsLastPage() {
+        _isLastPages.value = _currentPage == _lastPage
     }
 
     fun cancelLoad() {

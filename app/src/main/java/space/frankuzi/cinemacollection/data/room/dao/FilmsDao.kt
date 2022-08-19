@@ -33,4 +33,7 @@ interface FilmsDao {
 
     @Query("SELECT * FROM films WHERE kinopoisk_id = :kinopoiskId")
     fun getFilmById(kinopoiskId: Int): Single<FilmDbEntity>
+
+    @Query("SELECT * FROM films WHERE name_original LIKE :name")
+    fun findFilms(name: String): Single<List<FilmDbEntity>>
 }
