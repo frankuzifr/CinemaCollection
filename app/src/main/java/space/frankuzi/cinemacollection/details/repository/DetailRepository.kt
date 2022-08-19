@@ -22,11 +22,11 @@ class DetailRepository(
     private val context: Context
 ) {
     private val _description = SingleLiveEvent<FilmItem>()
-    private val _item = MutableLiveData<FilmItem>()
+    private val _item = MutableLiveData<FilmItem?>()
     private val _error = SingleLiveEvent<String>()
 
     val description: LiveData<FilmItem> = _description
-    val item: LiveData<FilmItem> = _item
+    val item: LiveData<FilmItem?> = _item
     val error: LiveData<String> = _error
 
     fun loadDescription(id: Int){
@@ -128,8 +128,6 @@ class DetailRepository(
             watchLaterFilmById?.let {
                 filmItem.date = it.watchLaterDate
             }
-
-            _item.value = filmItem
         }
     }
 

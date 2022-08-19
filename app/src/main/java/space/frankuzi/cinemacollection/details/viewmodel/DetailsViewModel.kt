@@ -62,7 +62,12 @@ class DetailsViewModel(
     }
 
     fun setItemById(id: Int) {
-        _detailRepository.loadFilmById(id)
+        viewModelScope.launch(job) {
+            val filmItem = _watchLaterRepository.getFilmById(id)
+
+            _selectedItem.setValue(filmItem)
+            loadDescription()
+        }
     }
 
     fun loadDescription() {
