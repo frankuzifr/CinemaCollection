@@ -79,7 +79,7 @@ class MainRepository(
     fun searchFilmsByName(name: String) {
         _isLastPages.value = true
 
-        database.getFilmsDao().findFilms("${name.lowercase().trim()}%")
+        database.getFilmsDao().findFilms("%${name.lowercase().trim()}%")
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map {
