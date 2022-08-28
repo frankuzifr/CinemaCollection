@@ -19,7 +19,7 @@ class FavouritesViewModel(
     private val _itemAdded = SingleLiveEvent<FilmItem>()
     private val _itemRemoveCanceled = SingleLiveEvent<FilmWithPosition>()
 
-    val favouritesFilms: LiveData<List<FilmItem>> = favouriteRepository.films
+    val favouritesFilms: LiveData<List<FilmItem>> = _favouritesFilms
     val itemRemoved: LiveData<FilmItem> = _itemRemoved
     val itemAdded: LiveData<FilmItem> = _itemAdded
     val itemRemoveCanceled: LiveData<FilmWithPosition> = _itemRemoveCanceled
@@ -32,7 +32,9 @@ class FavouritesViewModel(
         }
 
     fun loadFavouritesFilms() {
-        favouriteRepository.getFavourites()
+        viewModelScope.launch(job) {
+            _favouritesFilms.value = favouriteRepository.getFavouritesFilms()
+        }
     }
 
     fun onItemRemoveFromFavourite(filmItem: FilmItem) {

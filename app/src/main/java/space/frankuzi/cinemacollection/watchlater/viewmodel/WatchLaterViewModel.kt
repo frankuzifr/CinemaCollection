@@ -3,7 +3,6 @@ package space.frankuzi.cinemacollection.watchlater.viewmodel
 import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
@@ -18,14 +17,8 @@ class WatchLaterViewModel(
     private val _favouriteRepository = FavouriteRepository(database)
 
     private var _watchLaterFilms = MutableLiveData<List<FilmItem>>()
-    private var _watchLaterFilmAdded = MutableLiveData<FilmItem>()
-    private var _watchLaterFilmRemoved = MutableLiveData<FilmItem>()
-    private var _watchLaterFilmChanged = MutableLiveData<FilmItem>()
 
-    val watchLaterFilms: LiveData<List<FilmItem>> = watchLaterRepository.films
-    val watchLaterFilmAdded: LiveData<FilmItem> = _watchLaterFilmAdded
-    val watchLaterFilmRemoved: LiveData<FilmItem> = _watchLaterFilmRemoved
-    val watchLaterFilmChanged: LiveData<FilmItem> = _watchLaterFilmChanged
+    val watchLaterFilms: LiveData<List<FilmItem>> = _watchLaterFilms
 
     private var job = Job()
         get() {
@@ -35,7 +28,9 @@ class WatchLaterViewModel(
         }
 
     fun loadWatchLaterFilms() {
-        watchLaterRepository.getWatchLaterFilms()
+        viewModelScope.launch(job) {
+            _watchLaterFilms.value = watchLaterRepository.getWatchLaterFilms()
+        }
     }
 
     fun onClickFavourite(film: FilmItem) {
@@ -59,23 +54,6 @@ class WatchLaterViewModel(
         }
     }
 
-    fun changeWatchLaterFilm(filmItem: FilmItem) {
-        val films = watchLaterFilms.value
-
-        films?.let {
-            val isAny = films?.any {
-                it.id == filmItem.id
-            }
-
-            if (!isAny) {
-                _watchLaterFilmAdded.value = filmItem
-                return
-            }
-
-            filmItem
-        }
-    }
-
     class WatchLaterViewModelFactory @Inject constructor(
         private val database: AppDatabase
     ): ViewModelProvider.Factory {
@@ -87,6 +65,5 @@ class WatchLaterViewModel(
                 throw ClassNotFoundException()
             }
         }
-
     }
 }

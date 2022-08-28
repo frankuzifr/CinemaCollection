@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import io.reactivex.Single
 import space.frankuzi.cinemacollection.data.room.entity.FilmDbEntity
 
 @Dao
@@ -17,7 +16,7 @@ interface FilmsDao {
     }
 
     @Query("SELECT * FROM films")
-    fun getFilms(): Single<List<FilmDbEntity>?>
+    suspend fun getFilms(): List<FilmDbEntity>
 
     @Insert
     suspend fun addFilms(filmDbEntities: List<FilmDbEntity>)
@@ -32,8 +31,8 @@ interface FilmsDao {
     suspend fun setFilmDescription(kinopoiskId: Int, description: String?)
 
     @Query("SELECT * FROM films WHERE kinopoisk_id = :kinopoiskId")
-    fun getFilmById(kinopoiskId: Int): Single<FilmDbEntity>
+    suspend fun getFilmById(kinopoiskId: Int): FilmDbEntity
 
     @Query("SELECT * FROM films WHERE name_original LIKE :name OR name_russian LIKE :name")
-    fun findFilms(name: String): Single<List<FilmDbEntity>>
+    suspend fun findFilms(name: String): List<FilmDbEntity>
 }

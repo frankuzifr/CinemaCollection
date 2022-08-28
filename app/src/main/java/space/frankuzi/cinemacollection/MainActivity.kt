@@ -22,7 +22,6 @@ import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.favouritesScreen.view.FragmentFavourites
 import space.frankuzi.cinemacollection.mainScreen.view.FragmentMain
-import space.frankuzi.cinemacollection.structs.ErrorType
 import space.frankuzi.cinemacollection.structs.SnackBarAction
 import space.frankuzi.cinemacollection.utils.FirebaseConfig
 import space.frankuzi.cinemacollection.utils.broadcastreceiver.WatchLaterTimeComeInBroadcast
@@ -34,12 +33,12 @@ import space.frankuzi.cinemacollection.watchlater.view.FragmentWatchLater
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    @Inject lateinit var _detailViewModelFactory: DetailsViewModel.DetailViewModelFactory
-    @Inject lateinit var _customBackStack: CustomBackStack
-    @Inject lateinit var _firebaseAnalytics: FirebaseAnalytics
-    @Inject lateinit var _alarmManager: AlarmManager
+    @Inject lateinit var detailViewModelFactory: DetailsViewModel.DetailViewModelFactory
+    @Inject lateinit var customBackStack: CustomBackStack
+    @Inject lateinit var firebaseAnalytics: FirebaseAnalytics
+    @Inject lateinit var alarmManager: AlarmManager
 
-    private val _detailViewModel: DetailsViewModel by viewModels { _detailViewModelFactory }
+    private val _detailViewModel: DetailsViewModel by viewModels { detailViewModelFactory }
 
     private lateinit var _binding: ActivityMainBinding
     private lateinit var _bottomSheetBehavior: BottomSheetBehavior<CoordinatorLayout>
@@ -53,16 +52,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        App._applicationComponentInstance?.let {
-
-            it.mainActivityComponentFactory().create().inject(this)
-        }
+        App._applicationComponentInstance?.mainActivityComponentFactory()?.create()?.inject(this)
 
         _binding = ActivityMainBinding.inflate(layoutInflater)
         val view = _binding.root
         setContentView(view)
-
-//        _firebaseAnalytics = Firebase.analytics
 
         if (savedInstanceState == null)
             setMainFragment()
@@ -91,7 +85,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendAnalytics(filmItem: FilmItem) {
-        _firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
             param(FirebaseAnalytics.Param.ITEM_ID, filmItem.id.toString())
             param(FirebaseAnalytics.Param.ITEM_NAME, filmItem.name.toString())
         }
@@ -102,7 +96,8 @@ class MainActivity : AppCompatActivity() {
             val name = getString(R.string.scheduled_viewing)
             val descriptionText = getString(R.string.schedule_reminder)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(WatchLaterTimeComeInBroadcast.WATCH_LATER_CHANNEL_ID, name, importance).apply {
+            val channel = NotificationChannel(WatchLaterTimeComeInBroadcast.WATCH_LATER_CHANNEL_ID, name, importance)
+                .apply {
                 description = descriptionText
             }
 
@@ -152,6 +147,9 @@ class MainActivity : AppCompatActivity() {
                         _binding.bottomSheet.appBar.setExpanded(true)
                         _binding.bottomSheet.filmDescription.text = ""
                     }
+                    else -> {
+
+                    }
                 }
             }
 
@@ -200,10 +198,10 @@ class MainActivity : AppCompatActivity() {
 
             val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
 
-            _alarmManager.cancel(pendingIntent)
+            alarmManager.cancel(pendingIntent)
 
             filmItem.date?.let {
-                _alarmManager.set(AlarmManager.RTC_WAKEUP, it.time, pendingIntent)
+                alarmManager.set(AlarmManager.RTC_WAKEUP, it.time, pendingIntent)
             }
         }
 
@@ -214,10 +212,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        _detailViewModel.descriptionLoaded.observe(this) { filmItem ->
-            filmItem?.let {
-                setDescription(it)
-            }
+        _detailViewModel.descriptionLoaded.observe(this) { description->
+            setDescription(description)
         }
 
         _detailViewModel.loadError.observe(this) {
@@ -228,12 +224,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setDescription(filmItem: FilmItem) {
-        if (filmItem.description == null)
+    private fun setDescription(description: String?) {
+        if (description == null)
             return
 
         _binding.bottomSheet.filmDescription.visibility = View.VISIBLE
-        _binding.bottomSheet.filmDescription.text = filmItem.description
+        _binding.bottomSheet.filmDescription.text = description
         _binding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
         _binding.bottomSheet.loadedStatus.errorText.visibility = View.INVISIBLE
         _binding.bottomSheet.loadedStatus.retryButton.visibility = View.INVISIBLE
@@ -257,7 +253,6 @@ class MainActivity : AppCompatActivity() {
                 .centerCrop()
                 .into(it.filmImage)
 
-            setDescription(film)
             setFavouriteState()
 
             it.toolbar.setOnMenuItemClickListener { menuItem ->
@@ -407,7 +402,7 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.items_container, _fragmentMain)
             .commit()
 
-        _customBackStack.addToBackStack("Main", R.id.main)
+        customBackStack.addToBackStack("Main", R.id.main)
 
     }
 
@@ -418,7 +413,7 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.items_container, _fragmentFavourites)
             .commit()
 
-        _customBackStack.addToBackStack("Favourites", R.id.favourites)
+        customBackStack.addToBackStack("Favourites", R.id.favourites)
     }
 
     private fun setWatchLaterFragment() {
@@ -428,7 +423,7 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.items_container, _fragmentWatchLater)
             .commit()
 
-        _customBackStack.addToBackStack("WatchLater", R.id.watch_later)
+        customBackStack.addToBackStack("WatchLater", R.id.watch_later)
     }
 
     override fun onBackPressed() {
@@ -438,7 +433,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val popFromBackStack = _customBackStack.popFromBackStack()
+        val popFromBackStack = customBackStack.popFromBackStack()
 
         if (popFromBackStack != null) {
 

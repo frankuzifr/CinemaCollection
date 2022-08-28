@@ -1,6 +1,5 @@
 package space.frankuzi.cinemacollection.details.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -21,23 +20,22 @@ import javax.inject.Inject
 
 class DetailsViewModel(
     private val api: FilmsApi,
-    private val database: AppDatabase,
-    private val context: Context
+    private val database: AppDatabase
 ) : ViewModel() {
-    private val _detailRepository = DetailRepository(api, database, context)
+    private val _detailRepository = DetailRepository(api, database)
     private val _favouriteRepository = FavouriteRepository(database)
     private val _watchLaterRepository = WatchLaterRepository(database)
 
     private val _selectedItem = ExtendedLiveData<FilmItem?>()
     private val _loadError = SingleLiveEvent<String>()
     private val _favouriteStateChanged = SingleLiveEvent<FilmItem>()
-    private val _descriptionLoaded = SingleLiveEvent<FilmItem>()
+    private val _descriptionLoaded = SingleLiveEvent<String?>()
     private val _watchLaterChanged = SingleLiveEvent<FilmItem>()
 
     val selectedItem: LiveData<FilmItem?> = _selectedItem
     val loadError: LiveData<String> = _detailRepository.error
     val favouriteStateChanged: LiveData<FilmItem> = _favouriteStateChanged
-    val descriptionLoaded: LiveData<FilmItem> = _detailRepository.description
+    val descriptionLoaded: LiveData<String?> = _descriptionLoaded
     val watchLaterChanged: LiveData<FilmItem> = _watchLaterChanged
 
     private var job = Job()
@@ -51,8 +49,8 @@ class DetailsViewModel(
         item.isSelected = true
 
         viewModelScope.launch(job) {
-            val filmItem = _watchLaterRepository.getFilmById(item.id)
-            filmItem?.date?.let {
+            val filmItem = _detailRepository.getFilmById(item.id)
+            filmItem.date?.let {
                 item.date = it
             }
 
@@ -63,19 +61,22 @@ class DetailsViewModel(
 
     fun setItemById(id: Int) {
         viewModelScope.launch(job) {
-            val filmItem = _watchLaterRepository.getFilmById(id)
+            val filmItem = _detailRepository.getFilmById(id)
 
             _selectedItem.setValue(filmItem)
-            loadDescription()
+
+            if (filmItem.description != null)
+                _descriptionLoaded.value = filmItem.description
+            else
+                loadDescription()
         }
     }
 
     fun loadDescription() {
         selectedItem.value?.let {
-            if (it.description == null)
-                _detailRepository.loadDescription(it.id)
-            else
-                _descriptionLoaded.value = it
+            viewModelScope.launch {
+                _descriptionLoaded.value = _detailRepository.getDescriptionById(it.id)
+            }
         }
     }
 
@@ -137,13 +138,12 @@ class DetailsViewModel(
 
     class DetailViewModelFactory @Inject constructor(
         private val api: FilmsApi,
-        private val database: AppDatabase,
-        private val context: Context
+        private val database: AppDatabase
     ): ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return if (modelClass == DetailsViewModel::class.java) {
 
-                DetailsViewModel(api, database, context) as T
+                DetailsViewModel(api, database) as T
             } else {
                 throw ClassNotFoundException()
             }

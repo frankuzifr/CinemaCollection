@@ -1,7 +1,5 @@
 package space.frankuzi.cinemacollection.mainScreen.viewmodel
 
-import android.content.Context
-import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -17,25 +15,27 @@ import javax.inject.Inject
 
 class MainViewModel(
     private val api: FilmsApi,
-    private val database: AppDatabase,
-    private val context: Context
+    private val database: AppDatabase
     ) : ViewModel() {
 
     private var _isLoading = false
 
-    private val _mainRepository = MainRepository(api, database, context)
+    private val _mainRepository = MainRepository(api, database)
     private val _favouriteRepository = FavouriteRepository(database)
 
+    private val _films = MutableLiveData<List<FilmItem>>()
     private val _filmItemChanged = SingleLiveEvent<Int>()
-    private val _refreshError = SingleLiveEvent<String>()
+    private val _refreshError = SingleLiveEvent<ErrorMessage>()
     private val _isRefreshing = MutableLiveData<Boolean>()
+    private val _isLastPage = MutableLiveData<Boolean>()
+    private val _loadError = SingleLiveEvent<ErrorMessage>()
 
-    val films: LiveData<List<FilmItem>> = _mainRepository.films
+    val films: LiveData<List<FilmItem>> = _films
     val filmItemChanged: LiveData<Int> = _filmItemChanged
-    val isLastFilmsPages: LiveData<Boolean> = _mainRepository.isLastPages
-    val loadError: LiveData<String> = _mainRepository.error
-    val refreshError: LiveData<String> = _refreshError
-    val isRefreshing: LiveData<Boolean> = _mainRepository.isRefreshing
+    val loadError: LiveData<ErrorMessage> = _loadError
+    val refreshError: LiveData<ErrorMessage> = _refreshError
+    val isRefreshing: LiveData<Boolean> = _isRefreshing
+    val isLastPage: LiveData<Boolean> = _isLastPage
 
     private var job = Job()
         get() {
@@ -54,23 +54,50 @@ class MainViewModel(
         _isLoading = true
 
         viewModelScope.launch(job) {
-            _mainRepository.loadFilms()
-            _isLoading = false
+            try {
+                _films.value = _mainRepository.loadFilms()
+                _isLoading = false
+                _isLastPage.value = _mainRepository.isLastPage()
+            } catch (httpException: HttpException) {
+                _loadError.value = ErrorMessage(R.string.error_code, httpException.code().toString())
+            } catch (throwable: Throwable) {
+                _loadError.value = ErrorMessage(R.string.network_error)
+            }
+        }
+    }
+
+    fun retryLoadFilm() {
+        _isLoading = true;
+        viewModelScope.launch {
+            try {
+                _films.value = _mainRepository.getFilms()
+                _isLoading = false
+                _isLastPage.value = _mainRepository.isLastPage()
+            } catch (httpException: HttpException) {
+                _loadError.value = ErrorMessage(R.string.error_code, httpException.code().toString())
+            } catch (throwable: Throwable) {
+                _loadError.value = ErrorMessage(R.string.network_error)
+            }
         }
     }
 
     fun refreshFilms() {
         if (_isLoading)
-            _mainRepository.cancelLoad()
+            job.cancel()
 
         _isLoading = true
-        //_isRefreshing.value = true
+        _isRefreshing.value = true
 
         viewModelScope.launch(job) {
-
-            _mainRepository.loadFirstPageFilms()
-            _isLoading = false
-           // _isRefreshing.value = false
+            try {
+                _films.value = _mainRepository.getFirstPageFilms()
+                _isLoading = false
+                _isRefreshing.value = false
+            } catch (httpException: HttpException) {
+                _refreshError.value = ErrorMessage(R.string.error_code, httpException.code().toString())
+            } catch (throwable: Throwable) {
+                _refreshError.value = ErrorMessage(R.string.network_error)
+            }
         }
     }
 
@@ -99,16 +126,21 @@ class MainViewModel(
     }
 
     fun loadNextPage() {
-        Log.i("", _isLoading.toString())
         if (_isLoading)
             return
 
-
         _isLoading = true
 
-        viewModelScope.launch {
-            _mainRepository.loadNextPageFilms()
-            _isLoading = false
+        viewModelScope.launch(job) {
+            try {
+                _films.value = _mainRepository.getNextPageFilms()
+                _isLoading = false
+                _isLastPage.value = _mainRepository.isLastPage()
+            } catch (httpException: HttpException) {
+                _loadError.value = ErrorMessage(R.string.error_code, httpException.code().toString())
+            } catch (throwable: Throwable) {
+                _loadError.value = ErrorMessage(R.string.network_error)
+            }
         }
     }
 
@@ -122,11 +154,16 @@ class MainViewModel(
     }
 
     fun searchFilmsByName(name: String) {
-        _mainRepository.searchFilmsByName(name)
+        job.cancel()
+        _isLastPage.value = true
+
+        viewModelScope.launch(job) {
+            _films.value = _mainRepository.searchFilmsByName(name)
+        }
     }
 
     fun checkIsLastPages() {
-        _mainRepository.checkIsLastPage()
+        _isLastPage.value = _mainRepository.isLastPage()
     }
 
     override fun onCleared() {
@@ -137,15 +174,19 @@ class MainViewModel(
     class MainViewModelFactory @Inject constructor(
         private val api: FilmsApi,
         private val database: AppDatabase,
-        private val context: Context
     ): ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return if (modelClass == MainViewModel::class.java) {
 
-                MainViewModel(api, database, context) as T
+                MainViewModel(api, database) as T
             } else {
                 throw ClassNotFoundException()
             }
         }
     }
 }
+
+data class ErrorMessage(
+    val errorId: Int,
+    val parameters: String? = null
+)

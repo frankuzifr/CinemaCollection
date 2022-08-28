@@ -2,6 +2,7 @@ package space.frankuzi.cinemacollection.mainScreen.view
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -99,14 +100,22 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
             _searchView.isIconified = true;
         }
 
-        mainViewModel.isLastFilmsPages.observe(viewLifecycleOwner) {
+        mainViewModel.isLastPage.observe(viewLifecycleOwner) {
             _adapter.isLastPages = it
         }
 
         mainViewModel.loadError.observe(viewLifecycleOwner) {
-            _adapter.setError(it)
+            val errorText = when (it.errorId) {
+                R.string.error_code -> {
+                    getString(it.errorId, it.parameters)
+                }
+                else -> {
+                    getString(it.errorId)
+                }
+            }
+            _adapter.setError(errorText)
             val mainActivity = activity as MainActivity
-            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
+            mainActivity.showSnackBar(errorText, SnackBarAction(R.string.retry) {
                 retryLoadFilms()
             })
 
@@ -114,10 +123,18 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         }
 
         mainViewModel.refreshError.observe(viewLifecycleOwner) {
+            val errorText = when (it.errorId) {
+                R.string.error_code -> {
+                    getString(it.errorId, it.parameters)
+                }
+                else -> {
+                    getString(it.errorId)
+                }
+            }
             _adapter.isLastPages = true
             val mainActivity = activity as MainActivity
 
-            mainActivity.showSnackBar(it, SnackBarAction(R.string.retry) {
+            mainActivity.showSnackBar(errorText, SnackBarAction(R.string.retry) {
                 _mainFragmentBinding.refresh.isRefreshing = true
                 retryLoadFilms()
             })
@@ -164,7 +181,8 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
 
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
-                if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastFilmsPages.value == false) {
+                if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastPage.value == false) {
+                    Log.i("", "refresh")
                     mainViewModel.loadNextPage()
                 }
             }
@@ -194,9 +212,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         })
 
         _searchView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View?) {
-
-            }
+            override fun onViewAttachedToWindow(v: View?) = Unit
 
             override fun onViewDetachedFromWindow(v: View?) {
                 mainViewModel.checkIsLastPages()
@@ -205,7 +221,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     }
 
     private fun retryLoadFilms() {
-        mainViewModel.loadNextPage()
+        mainViewModel.retryLoadFilm()
         _adapter.enableLoading()
     }
 
