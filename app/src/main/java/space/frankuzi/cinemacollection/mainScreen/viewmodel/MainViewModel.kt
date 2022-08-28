@@ -155,9 +155,9 @@ class MainViewModel(
 
     fun searchFilmsByName(name: String) {
         job.cancel()
-        _isLastPage.value = true
 
         viewModelScope.launch(job) {
+            _isLastPage.value = true
             _films.value = _mainRepository.searchFilmsByName(name)
         }
     }

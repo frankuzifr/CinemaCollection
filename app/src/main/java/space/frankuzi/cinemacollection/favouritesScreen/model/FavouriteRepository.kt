@@ -29,28 +29,4 @@ class FavouriteRepository(
             favouriteFilmDbEntity.toFilmItem()
         }
     }
-
-//    fun loadFavourites() {
-//        database.getFavouritesDao().getFavourites()
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .map {
-//                it.map {film ->
-//                    film.toFilmItem()
-//                }
-//            }
-//            .subscribe(object : SingleObserver<List<FilmItem>> {
-//                override fun onSubscribe(d: Disposable) {
-//
-//                }
-//
-//                override fun onSuccess(items: List<FilmItem>) {
-//                    _films.value = items
-//                }
-//
-//                override fun onError(e: Throwable) {
-//
-//                }
-//            })
-//    }
 }
