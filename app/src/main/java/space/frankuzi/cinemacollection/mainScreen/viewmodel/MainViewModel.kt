@@ -10,12 +10,14 @@ import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
 import space.frankuzi.cinemacollection.mainScreen.model.MainRepository
+import space.frankuzi.cinemacollection.utils.LoadIdlingResource
 import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 import javax.inject.Inject
 
 class MainViewModel(
     private val api: FilmsApi,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val idlingResource: LoadIdlingResource
     ) : ViewModel() {
 
     private var _isLoading = false
@@ -55,9 +57,11 @@ class MainViewModel(
 
         viewModelScope.launch(job) {
             try {
+                idlingResource.setIdleState(false)
                 _films.value = _mainRepository.loadFilms()
                 _isLoading = false
                 _isLastPage.value = _mainRepository.isLastPage()
+                idlingResource.setIdleState(true)
             } catch (httpException: HttpException) {
                 _loadError.value = ErrorMessage(R.string.error_code, httpException.code().toString())
             } catch (throwable: Throwable) {
@@ -174,11 +178,12 @@ class MainViewModel(
     class MainViewModelFactory @Inject constructor(
         private val api: FilmsApi,
         private val database: AppDatabase,
+        private val idlingResource: LoadIdlingResource
     ): ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return if (modelClass == MainViewModel::class.java) {
 
-                MainViewModel(api, database) as T
+                MainViewModel(api, database, idlingResource) as T
             } else {
                 throw ClassNotFoundException()
             }

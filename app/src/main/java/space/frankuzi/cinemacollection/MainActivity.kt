@@ -48,11 +48,10 @@ class MainActivity : AppCompatActivity() {
     private val _fragmentWatchLater = FragmentWatchLater()
     private var _snackbar: Snackbar? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        App._applicationComponentInstance?.mainActivityComponentFactory()?.create()?.inject(this)
+        App.applicationComponentInstance?.mainActivityComponentFactory()?.create()?.inject(this)
 
         _binding = ActivityMainBinding.inflate(layoutInflater)
         val view = _binding.root

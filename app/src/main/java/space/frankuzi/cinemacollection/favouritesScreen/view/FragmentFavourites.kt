@@ -68,7 +68,7 @@ class FragmentFavourites : Fragment(R.layout.fragment_favourites) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App._applicationComponentInstance?.let {
+        App.applicationComponentInstance?.let {
 
             it.mainActivityComponentFactory().create().favouritesComponentFactory().create().inject(this)
         }

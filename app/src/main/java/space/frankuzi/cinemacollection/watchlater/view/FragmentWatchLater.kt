@@ -52,7 +52,7 @@ class FragmentWatchLater: Fragment(R.layout.fragment_watch_later) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App._applicationComponentInstance?.let {
+        App.applicationComponentInstance?.let {
 
             it.mainActivityComponentFactory().create().watchLaterComponentFactory()
                 .create().inject(this)

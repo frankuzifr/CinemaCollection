@@ -13,7 +13,6 @@ import javax.inject.Scope
 @MainActivityScope
 @Subcomponent(modules = [
     FilmsApiModule::class,
-    //ContextModule::class,
     MainActivitySubComponentsModule::class
 ])
 interface MainActivityComponent {

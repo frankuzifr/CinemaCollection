@@ -32,6 +32,7 @@ class MainRepository(
     }
 
     suspend fun loadFilms(): List<FilmItem> {
+
         val films = getFilmsFromDatabase()
 
         if (films.isNotEmpty()) {
@@ -41,7 +42,9 @@ class MainRepository(
 
         loadFilmsByApi()
 
-        return getFilmsFromDatabase()
+        val filmsFromDatabase = getFilmsFromDatabase()
+
+        return filmsFromDatabase
     }
 
     suspend fun searchFilmsByName(name: String): List<FilmItem> {

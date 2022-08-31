@@ -24,6 +24,7 @@ import space.frankuzi.cinemacollection.mainScreen.adapter.RetryLoadListener
 import space.frankuzi.cinemacollection.mainScreen.viewmodel.MainViewModel
 import space.frankuzi.cinemacollection.structs.FilmClickListener
 import space.frankuzi.cinemacollection.structs.SnackBarAction
+import space.frankuzi.cinemacollection.utils.LoadIdlingResource
 import space.frankuzi.cinemacollection.viewholder.viewholderanim.CustomItemAnimator
 import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffset
 import javax.inject.Inject
@@ -31,6 +32,7 @@ import javax.inject.Inject
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
     @Inject lateinit var _mainViewModelFactory: MainViewModel.MainViewModelFactory
+    @Inject lateinit var idlingResource: LoadIdlingResource
 
     private val mainViewModel: MainViewModel by viewModels { _mainViewModelFactory }
     private val detailViewModel: DetailsViewModel by activityViewModels()
@@ -63,7 +65,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App._applicationComponentInstance?.let {
+        App.applicationComponentInstance?.let {
 
             it.mainActivityComponentFactory().create().mainFragmentComponentFactory().create().inject(this)
         }
