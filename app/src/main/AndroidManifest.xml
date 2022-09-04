@@ -32,6 +32,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".TestActivity"
+            android:exported="false"
+            />
+
         <receiver android:name=".utils.broadcastreceiver.WatchLaterTimeComeInBroadcast"
             android:exported="false">
 

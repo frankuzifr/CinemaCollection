@@ -6,10 +6,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import junit.framework.TestCase
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.After
-import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +34,7 @@ class MainViewModelTest : TestCase() {
             .allowMainThreadQueries()
             .build()
         filmsApi = FilmsApiStub()
-        viewModel = MainViewModel(filmsApi, database, LoadIdlingResource())
+        viewModel = MainViewModel(filmsApi, database)
     }
 
     @After
@@ -58,7 +55,7 @@ class MainViewModelTest : TestCase() {
     fun errorLoadFilmsTest() = runBlocking {
         val filmsApiStub = FilmsApiStub()
         filmsApiStub.errorSimulate = true
-        val viewModel = MainViewModel(filmsApiStub, database, LoadIdlingResource())
+        val viewModel = MainViewModel(filmsApiStub, database)
         viewModel.loadFilms()
         Thread.sleep(100)
         assert(viewModel.films.value == null)

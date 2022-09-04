@@ -16,8 +16,7 @@ import javax.inject.Inject
 
 class MainViewModel(
     private val api: FilmsApi,
-    private val database: AppDatabase,
-    private val idlingResource: LoadIdlingResource
+    private val database: AppDatabase
     ) : ViewModel() {
 
     private var _isLoading = false
@@ -57,11 +56,11 @@ class MainViewModel(
 
         viewModelScope.launch(job) {
             try {
-                idlingResource.setIdleState(false)
+                LoadIdlingResource.increment()
                 _films.value = _mainRepository.loadFilms()
                 _isLoading = false
                 _isLastPage.value = _mainRepository.isLastPage()
-                idlingResource.setIdleState(true)
+                LoadIdlingResource.decrement()
             } catch (httpException: HttpException) {
                 _loadError.value = ErrorMessage(R.string.error_code, httpException.code().toString())
             } catch (throwable: Throwable) {
@@ -177,13 +176,12 @@ class MainViewModel(
 
     class MainViewModelFactory @Inject constructor(
         private val api: FilmsApi,
-        private val database: AppDatabase,
-        private val idlingResource: LoadIdlingResource
+        private val database: AppDatabase
     ): ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return if (modelClass == MainViewModel::class.java) {
 
-                MainViewModel(api, database, idlingResource) as T
+                MainViewModel(api, database) as T
             } else {
                 throw ClassNotFoundException()
             }

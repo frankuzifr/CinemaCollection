@@ -3,11 +3,8 @@ package space.frankuzi.cinemacollection
 import android.app.Application
 import space.frankuzi.cinemacollection.dagger.components.ApplicationComponent
 import space.frankuzi.cinemacollection.dagger.components.DaggerApplicationComponent
-import space.frankuzi.cinemacollection.utils.LoadIdlingResource
 
 class App : Application() {
-
-    val idlingResource = LoadIdlingResource()
 
     override fun onCreate() {
         super.onCreate()

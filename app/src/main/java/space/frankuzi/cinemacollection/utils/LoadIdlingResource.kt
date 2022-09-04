@@ -2,31 +2,22 @@
 package space.frankuzi.cinemacollection.utils
 
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.idling.CountingIdlingResource
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-class LoadIdlingResource @Inject constructor() : IdlingResource {
-    @Volatile
-    private var _callback: IdlingResource.ResourceCallback? = null
-    private val _isIdleNow =
-        AtomicBoolean(true)
+object LoadIdlingResource  {
 
-    override fun getName(): String {
-        return this.javaClass.name
+    private const val RESOURCE = "GLOBAL"
+
+    @JvmField val countingIdlingResource = CountingIdlingResource(RESOURCE)
+
+    fun increment() {
+        countingIdlingResource.increment()
     }
 
-    override fun isIdleNow(): Boolean {
-        return _isIdleNow.get()
-    }
-
-    override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback) {
-        _callback = callback
-    }
-
-    fun setIdleState(isIdleNow: Boolean) {
-        _isIdleNow.set(isIdleNow)
-        if (isIdleNow && _callback != null) {
-            _callback!!.onTransitionToIdle()
-        }
+    fun decrement() {
+        if (!countingIdlingResource.isIdleNow)
+            countingIdlingResource.decrement()
     }
 }

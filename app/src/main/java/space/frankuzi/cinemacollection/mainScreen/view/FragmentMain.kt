@@ -32,7 +32,6 @@ import javax.inject.Inject
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
     @Inject lateinit var _mainViewModelFactory: MainViewModel.MainViewModelFactory
-    @Inject lateinit var idlingResource: LoadIdlingResource
 
     private val mainViewModel: MainViewModel by viewModels { _mainViewModelFactory }
     private val detailViewModel: DetailsViewModel by activityViewModels()
