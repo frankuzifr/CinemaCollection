@@ -12,11 +12,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.data.room.entity.FilmDbEntity
 import space.frankuzi.cinemacollection.stubs.FilmsApiStub
-import space.frankuzi.cinemacollection.utils.LoadIdlingResource
+import space.frankuzi.cinemacollection.utils.getOrAwaitValueTest
 
 @RunWith(JUnit4::class)
 class MainViewModelTest : TestCase() {
@@ -25,7 +26,7 @@ class MainViewModelTest : TestCase() {
     private lateinit var viewModel: MainViewModel
 
     @get:Rule
-    val instantTaskRule = InstantTaskExecutorRule()
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Before
     public override fun setUp() {
@@ -45,10 +46,8 @@ class MainViewModelTest : TestCase() {
     @Test
     fun successLoadFilmsTest() = runBlocking {
         viewModel.loadFilms()
-        Thread.sleep(100)
-        val value = viewModel.films.value
-        assert(value!!.isNotEmpty())
-        assert(viewModel.loadError.value == null)
+        val value = viewModel.films.getOrAwaitValueTest()
+        assert(value.isNotEmpty())
     }
 
     @Test
@@ -57,9 +56,8 @@ class MainViewModelTest : TestCase() {
         filmsApiStub.errorSimulate = true
         val viewModel = MainViewModel(filmsApiStub, database)
         viewModel.loadFilms()
-        Thread.sleep(100)
-        assert(viewModel.films.value == null)
-        assert(viewModel.loadError.value != null)
+        val expectedErrorMessage = ErrorMessage(R.string.network_error)
+        assert(viewModel.loadError.getOrAwaitValueTest() == expectedErrorMessage)
     }
 
     @Test
@@ -97,8 +95,6 @@ class MainViewModelTest : TestCase() {
         )
 
         viewModel.searchFilmsByName("t")
-        Thread.sleep(1000)
-        assert(viewModel.films.value!!.size == 2)
-        assert(viewModel.loadError.value == null)
+        assert(viewModel.films.getOrAwaitValueTest().size == 2)
     }
 }
