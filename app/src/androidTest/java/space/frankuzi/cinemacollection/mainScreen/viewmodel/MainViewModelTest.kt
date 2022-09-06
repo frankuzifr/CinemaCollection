@@ -16,6 +16,8 @@ import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.data.room.entity.FilmDbEntity
+import space.frankuzi.cinemacollection.mainscreen.viewmodel.ErrorMessage
+import space.frankuzi.cinemacollection.mainscreen.viewmodel.MainViewModel
 import space.frankuzi.cinemacollection.stubs.FilmsApiStub
 import space.frankuzi.cinemacollection.utils.getOrAwaitValueTest
 

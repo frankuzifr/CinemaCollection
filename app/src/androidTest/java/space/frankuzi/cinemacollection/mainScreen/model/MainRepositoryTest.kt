@@ -16,6 +16,7 @@ import org.junit.runners.JUnit4
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.data.room.entity.FilmDbEntity
+import space.frankuzi.cinemacollection.mainscreen.model.MainRepository
 import space.frankuzi.cinemacollection.stubs.FilmsApiStub
 
 @RunWith(JUnit4::class)

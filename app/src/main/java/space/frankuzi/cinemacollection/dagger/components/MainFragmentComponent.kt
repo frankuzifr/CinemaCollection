@@ -1,7 +1,7 @@
 package space.frankuzi.cinemacollection.dagger.components
 
 import dagger.Subcomponent
-import space.frankuzi.cinemacollection.mainScreen.view.FragmentMain
+import space.frankuzi.cinemacollection.mainscreen.view.FragmentMain
 
 @Subcomponent
 interface MainFragmentComponent {

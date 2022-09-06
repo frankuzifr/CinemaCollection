@@ -31,7 +31,7 @@ import space.frankuzi.cinemacollection.utils.LoadIdlingResource
 class MainScreenTest {
 
     @get:Rule
-    var activityScenarioRule = ActivityScenarioRule(TestActivity::class.java)
+    var activityScenarioRule = ActivityScenarioRule(TesViewSubscribersHandlertActivity::class.java)
 
     @Before
     fun registerIdLingResource() {

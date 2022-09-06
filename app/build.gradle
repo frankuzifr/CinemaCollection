@@ -8,6 +8,7 @@ plugins {
 
 android {
     compileSdk 32
+    compileOptions.incremental = false
 
     defaultConfig {
         applicationId "space.frankuzi.cinemacollection"
@@ -23,14 +24,49 @@ android {
                 arg("room.schemaLocation", "$projectDir/schemas")
             }
         }
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {
-        release {
+        production {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
+            resValue("bool", "FIREBASE_CRASH_ENABLED", "true")
+        }
+
+        dev {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable true
+            signingConfig signingConfigs.debug
+            resValue("bool", "FIREBASE_CRASH_ENABLED", "false")
+        }
+
+        release {
+            resValue("bool", "FIREBASE_CRASH_ENABLED", "true")
+        }
+
+        debug {
+            resValue("bool", "FIREBASE_CRASH_ENABLED", "false")
         }
     }
+
+    flavorDimensions "MODE"
+    productFlavors {
+        free {
+            dimension "MODE"
+            applicationIdSuffix ".free"
+            versionNameSuffix "-free"
+        }
+
+        paid {
+            dimension "MODE"
+            applicationIdSuffix ".paid"
+            versionNameSuffix "-paid"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

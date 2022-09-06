@@ -3,7 +3,7 @@ package space.frankuzi.cinemacollection.data.network
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import space.frankuzi.cinemacollection.MainActivity
+import space.frankuzi.cinemacollection.mainactivityview.MainActivity
 import space.frankuzi.cinemacollection.data.network.response.FilmWithDescriptionResponse
 import space.frankuzi.cinemacollection.data.network.response.GetFilmsResponse
 
