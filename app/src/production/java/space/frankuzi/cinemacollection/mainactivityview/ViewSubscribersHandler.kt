@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.view.View
 import com.bumptech.glide.Glide
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.utils.broadcastreceiver.WatchLaterTimeComeInBroadcast
@@ -37,6 +39,7 @@ class ViewSubscribersHandler(
 
         mainActivityController.detailViewModel.selectedItem.observe(mainActivityController.mainActivity) { filmItem ->
             filmItem?.let { film ->
+                sendAnalytics(film)
                 openFilmDetail(film)
             }
         }
@@ -97,5 +100,12 @@ class ViewSubscribersHandler(
         mainActivityController.mainBinding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
         mainActivityController.mainBinding.bottomSheet.loadedStatus.errorText.visibility = View.INVISIBLE
         mainActivityController.mainBinding.bottomSheet.loadedStatus.retryButton.visibility = View.INVISIBLE
+    }
+
+    private fun sendAnalytics(filmItem: FilmItem) {
+        mainActivityController.firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
+            param(FirebaseAnalytics.Param.ITEM_ID, filmItem.id.toString())
+            param(FirebaseAnalytics.Param.ITEM_NAME, filmItem.name.toString())
+        }
     }
 }
