@@ -102,9 +102,7 @@ class MainActivity : AppCompatActivity() {
             bottomNavigation.selectedItemId = popFromBackStack.navigationBarId
 
         } else {
-            ExitDialog {
-                super.onBackPressed()
-            }.show(supportFragmentManager, "dialog")
+            ExitDialog().show(supportFragmentManager, "dialog")
         }
     }
 

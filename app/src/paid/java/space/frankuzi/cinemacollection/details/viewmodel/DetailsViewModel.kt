@@ -1,9 +1,6 @@
 package space.frankuzi.cinemacollection.details.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import space.frankuzi.cinemacollection.data.FilmItem
@@ -29,7 +26,7 @@ class DetailsViewModel(
     private val _selectedItem = ExtendedLiveData<FilmItem?>()
     private val _loadError = SingleLiveEvent<String>()
     private val _favouriteStateChanged = SingleLiveEvent<FilmItem>()
-    private val _descriptionLoaded = SingleLiveEvent<String?>()
+    private val _descriptionLoaded = MutableLiveData<String?>()
     private val _watchLaterChanged = SingleLiveEvent<FilmItem>()
 
     val selectedItem: LiveData<FilmItem?> = _selectedItem
