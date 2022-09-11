@@ -1,6 +1,7 @@
 package space.frankuzi.cinemacollection.viewholder
 
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,6 +10,8 @@ import com.bumptech.glide.Glide
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.structs.FilmClickListener
 import space.frankuzi.cinemacollection.data.FilmItem
+import space.frankuzi.cinemacollection.mainactivityview.MainActivity
+import space.frankuzi.cinemacollection.utils.BounceInterpolator
 import com.google.android.material.card.MaterialCardView as MaterialCard
 
 class FilmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -34,6 +37,11 @@ class FilmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         _filmFavourite.setOnClickListener {
             listener.onFilmFavouriteClickListener(film, layoutPosition)
+
+            val anim = AnimationUtils.loadAnimation(_filmFavourite.context, R.anim.favourites_bounce)
+            val bounceInterpolator = BounceInterpolator(0.2, 20.0)
+            anim.interpolator = bounceInterpolator
+            _filmFavourite.startAnimation(anim)
         }
     }
 }

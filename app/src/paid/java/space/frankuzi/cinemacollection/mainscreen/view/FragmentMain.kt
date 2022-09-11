@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,6 +25,7 @@ import space.frankuzi.cinemacollection.mainscreen.adapter.RetryLoadListener
 import space.frankuzi.cinemacollection.mainscreen.viewmodel.MainViewModel
 import space.frankuzi.cinemacollection.structs.FilmClickListener
 import space.frankuzi.cinemacollection.structs.SnackBarAction
+import space.frankuzi.cinemacollection.utils.BounceInterpolator
 import space.frankuzi.cinemacollection.viewholder.viewholderanim.CustomItemAnimator
 import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffset
 import javax.inject.Inject
