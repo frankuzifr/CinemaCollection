@@ -9,6 +9,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import space.frankuzi.cinemacollection.App
 import space.frankuzi.cinemacollection.ExitDialog
+import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.databinding.ActivityMainBinding
 import space.frankuzi.cinemacollection.details.viewmodel.DetailsViewModel
 import space.frankuzi.cinemacollection.structs.SnackBarAction
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainActivityController: MainActivityController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        setTheme(R.style.Theme_CinemaCollection)
         super.onCreate(savedInstanceState)
 
         App.applicationComponentInstance?.mainActivityComponentFactory()?.create()?.inject(this)

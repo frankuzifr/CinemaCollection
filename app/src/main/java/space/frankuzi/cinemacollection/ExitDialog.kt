@@ -16,7 +16,7 @@ class ExitDialog(): DialogFragment() {
                 onCancel(dialog)
             }
             .setPositiveButton(getString(R.string.exit)) { _, _ ->
-                activity?.onBackPressed()
+                activity?.finishAffinity()
             }
             .create()
     }
