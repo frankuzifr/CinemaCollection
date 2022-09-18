@@ -69,6 +69,7 @@ class BottomSheetHandler(
                         mainActivityController.detailViewModel.closeDetail()
                         mainActivityController.mainBinding.bottomSheet.appBar.setExpanded(true)
                         mainActivityController.mainBinding.bottomSheet.filmDescription.text = ""
+                        mainActivityController.mainBinding.bottomSheet.notesContainer.removeAllViews()
                     }
                     else -> {
 
@@ -87,6 +88,5 @@ class BottomSheetHandler(
 
     fun closeDetail() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        mainActivityController.mainBinding.bottomSheet.notesContainer.removeAllViews()
     }
 }

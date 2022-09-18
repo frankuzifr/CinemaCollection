@@ -134,7 +134,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
                     getString(it.errorId)
                 }
             }
-            
+
             val mainActivity = activity as MainActivity
 
             mainActivity.showSnackBar(errorText, SnackBarAction(R.string.retry) {
