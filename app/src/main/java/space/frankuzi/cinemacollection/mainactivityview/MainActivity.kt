@@ -2,6 +2,7 @@ package space.frankuzi.cinemacollection.mainactivityview
 
 import android.app.AlarmManager
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -56,7 +57,6 @@ class MainActivity : AppCompatActivity() {
             mainActivityController.navigationBarHandler.setMainFragment()
 
         tryOpenFromNotification()
-
     }
 
     fun showSnackBar(snackBarText: String, snackBarAction: SnackBarAction) {

@@ -1,8 +1,15 @@
 package space.frankuzi.cinemacollection.mainactivityview
 
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import space.frankuzi.cinemacollection.R
+import space.frankuzi.cinemacollection.structs.FilmNote
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class BottomSheetHandler(
     private val mainActivityController: MainActivityController
@@ -31,6 +38,30 @@ class BottomSheetHandler(
             mainActivityController.detailViewModel.loadDescription()
         }
 
+        bottomSheet.leaveNoteButton.setOnClickListener {
+            val text = bottomSheet.comment.editText?.text.toString()
+            bottomSheet.comment.editText?.text?.clear()
+
+            val format = LocalDate.now().toString()
+            val filmNote = FilmNote(
+                date = format,
+                note = text
+            )
+
+            mainActivityController.detailViewModel.addFilmNote(filmNote)
+
+            val layoutInflater = LayoutInflater.from(mainActivityController.mainActivity)
+            val inflate = layoutInflater.inflate(R.layout.note_layout, null)
+
+            val dateLabel = inflate.findViewById<TextView>(R.id.date_label)
+            val noteLabel = inflate.findViewById<TextView>(R.id.note_label)
+
+            dateLabel.text = format
+            noteLabel.text = text
+
+            mainActivityController.mainBinding.bottomSheet.notesContainer.addView(inflate)
+        }
+
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
@@ -56,5 +87,6 @@ class BottomSheetHandler(
 
     fun closeDetail() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        mainActivityController.mainBinding.bottomSheet.notesContainer.removeAllViews()
     }
 }

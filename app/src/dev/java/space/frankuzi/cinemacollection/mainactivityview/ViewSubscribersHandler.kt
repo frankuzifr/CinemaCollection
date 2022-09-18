@@ -3,11 +3,20 @@ package space.frankuzi.cinemacollection.mainactivityview
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
+import androidx.appcompat.resources.Compatibility.Api21Impl.inflate
+import androidx.core.content.res.ColorStateListInflaterCompat.inflate
+import androidx.core.graphics.drawable.DrawableCompat.inflate
 import com.bumptech.glide.Glide
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
+import space.frankuzi.cinemacollection.databinding.FragmentMainBinding.inflate
+import space.frankuzi.cinemacollection.databinding.FragmentWatchLaterBinding.inflate
 import space.frankuzi.cinemacollection.utils.broadcastreceiver.WatchLaterTimeComeInBroadcast
+import kotlin.math.log
 
 class ViewSubscribersHandler(
     private val mainActivityController: MainActivityController
@@ -50,6 +59,20 @@ class ViewSubscribersHandler(
             mainActivityController.mainBinding.bottomSheet.loadedStatus.errorText.visibility = View.VISIBLE
             mainActivityController.mainBinding.bottomSheet.loadedStatus.errorText.text = it
             mainActivityController.mainBinding.bottomSheet.loadedStatus.retryButton.visibility = View.VISIBLE
+        }
+
+        mainActivityController.detailViewModel.filmNotes.observe(mainActivityController.mainActivity) { notes ->
+            val bottomSheet = mainActivityController.mainBinding.bottomSheet
+            val layoutInflater = LayoutInflater.from(mainActivityController.mainActivity)
+
+            for (note in notes) {
+                val noteLayout = layoutInflater.inflate(R.layout.note_layout, null)
+                val dateLabel = noteLayout.findViewById<TextView>(R.id.date_label)
+                val noteLabel = noteLayout.findViewById<TextView>(R.id.note_label)
+                dateLabel.text = note.date.toString()
+                noteLabel.text = note.note
+                bottomSheet.notesContainer.addView(noteLayout)
+            }
         }
     }
 

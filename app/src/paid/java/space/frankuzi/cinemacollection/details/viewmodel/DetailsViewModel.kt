@@ -1,5 +1,6 @@
 package space.frankuzi.cinemacollection.details.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -7,6 +8,8 @@ import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.details.repository.DetailRepository
 import space.frankuzi.cinemacollection.data.room.AppDatabase
+import space.frankuzi.cinemacollection.structs.FilmNote
+import space.frankuzi.cinemacollection.details.repository.NotesRepository
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
 import space.frankuzi.cinemacollection.utils.livedatavariations.ExtendedLiveData
 import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
@@ -22,18 +25,21 @@ class DetailsViewModel(
     private val _detailRepository = DetailRepository(api, database)
     private val _favouriteRepository = FavouriteRepository(database)
     private val _watchLaterRepository = WatchLaterRepository(database)
+    private val _notesRepository = NotesRepository(database)
 
     private val _selectedItem = ExtendedLiveData<FilmItem?>()
     private val _loadError = SingleLiveEvent<String>()
     private val _favouriteStateChanged = SingleLiveEvent<FilmItem>()
     private val _descriptionLoaded = MutableLiveData<String?>()
     private val _watchLaterChanged = SingleLiveEvent<FilmItem>()
+    private val _filmNotes = MutableLiveData<List<FilmNote>>()
 
     val selectedItem: LiveData<FilmItem?> = _selectedItem
-    val loadError: LiveData<String> = _detailRepository.error
+    val loadError: LiveData<String> = _loadError
     val favouriteStateChanged: LiveData<FilmItem> = _favouriteStateChanged
     val descriptionLoaded: LiveData<String?> = _descriptionLoaded
     val watchLaterChanged: LiveData<FilmItem> = _watchLaterChanged
+    val filmNotes: LiveData<List<FilmNote>> = _filmNotes
 
     private var job = Job()
         get() {
@@ -52,6 +58,8 @@ class DetailsViewModel(
             }
 
             _selectedItem.setValue(item)
+
+            loadNotes()
             loadDescription()
         }
     }
@@ -61,6 +69,8 @@ class DetailsViewModel(
             val filmItem = _detailRepository.getFilmById(id)
 
             _selectedItem.setValue(filmItem)
+
+            loadNotes()
 
             if (filmItem.description != null)
                 _descriptionLoaded.value = filmItem.description
@@ -114,6 +124,21 @@ class DetailsViewModel(
                 it.date = null
                 _watchLaterChanged.value = it
             }
+        }
+    }
+
+    fun addFilmNote(note: FilmNote) {
+        selectedItem.value?.let { filmItem ->
+            viewModelScope.launch(job) {
+                _notesRepository.addFilmNotes(filmItem.id, note)
+            }
+        }
+    }
+
+    private suspend fun loadNotes() {
+        selectedItem.value?.let {
+            val notes = _notesRepository.getFilmNotes(it.id)
+            _filmNotes.value = notes
         }
     }
 

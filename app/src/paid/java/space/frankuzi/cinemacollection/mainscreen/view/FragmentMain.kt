@@ -29,6 +29,7 @@ import space.frankuzi.cinemacollection.utils.BounceInterpolator
 import space.frankuzi.cinemacollection.viewholder.viewholderanim.CustomItemAnimator
 import space.frankuzi.cinemacollection.viewholder.viewholderdecor.ViewHolderOffset
 import javax.inject.Inject
+import kotlin.math.log
 
 
 class FragmentMain : Fragment(R.layout.fragment_main) {
@@ -133,7 +134,7 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
                     getString(it.errorId)
                 }
             }
-            _adapter.isLastPages = true
+            
             val mainActivity = activity as MainActivity
 
             mainActivity.showSnackBar(errorText, SnackBarAction(R.string.retry) {
@@ -184,7 +185,6 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
                 if (lastVisibleItemPosition == _adapter.itemCount - 1 && mainViewModel.isLastPage.value == false) {
-                    Log.i("", "refresh")
                     mainViewModel.loadNextPage()
                 }
             }
@@ -214,10 +214,15 @@ class FragmentMain : Fragment(R.layout.fragment_main) {
         })
 
         _searchView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View?) = Unit
+            var bundle = Bundle()
+
+            override fun onViewAttachedToWindow(v: View?) {
+                bundle.putParcelable("scroll", _mainFragmentBinding.itemsContainer.layoutManager?.onSaveInstanceState())
+            }
 
             override fun onViewDetachedFromWindow(v: View?) {
                 mainViewModel.checkIsLastPages()
+                _mainFragmentBinding.itemsContainer.layoutManager?.onRestoreInstanceState(bundle.getParcelable("scroll"))
             }
         })
     }
