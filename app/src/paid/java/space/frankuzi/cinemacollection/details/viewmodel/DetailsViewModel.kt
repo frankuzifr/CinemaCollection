@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.data.network.FilmsApi
 import space.frankuzi.cinemacollection.details.repository.DetailRepository
@@ -11,6 +13,7 @@ import space.frankuzi.cinemacollection.data.room.AppDatabase
 import space.frankuzi.cinemacollection.structs.FilmNote
 import space.frankuzi.cinemacollection.details.repository.NotesRepository
 import space.frankuzi.cinemacollection.favouritesScreen.model.FavouriteRepository
+import space.frankuzi.cinemacollection.mainscreen.viewmodel.ErrorMessage
 import space.frankuzi.cinemacollection.utils.livedatavariations.ExtendedLiveData
 import space.frankuzi.cinemacollection.utils.livedatavariations.SingleLiveEvent
 import space.frankuzi.cinemacollection.watchlater.datetime.DateTime
@@ -28,14 +31,14 @@ class DetailsViewModel(
     private val _notesRepository = NotesRepository(database)
 
     private val _selectedItem = ExtendedLiveData<FilmItem?>()
-    private val _loadError = SingleLiveEvent<String>()
+    private val _loadError = SingleLiveEvent<ErrorMessage>()
     private val _favouriteStateChanged = SingleLiveEvent<FilmItem>()
     private val _descriptionLoaded = MutableLiveData<String?>()
     private val _watchLaterChanged = SingleLiveEvent<FilmItem>()
     private val _filmNotes = MutableLiveData<List<FilmNote>>()
 
     val selectedItem: LiveData<FilmItem?> = _selectedItem
-    val loadError: LiveData<String> = _loadError
+    val loadError: LiveData<ErrorMessage> = _loadError
     val favouriteStateChanged: LiveData<FilmItem> = _favouriteStateChanged
     val descriptionLoaded: LiveData<String?> = _descriptionLoaded
     val watchLaterChanged: LiveData<FilmItem> = _watchLaterChanged
@@ -81,8 +84,14 @@ class DetailsViewModel(
 
     fun loadDescription() {
         selectedItem.value?.let {
-            viewModelScope.launch {
-                _descriptionLoaded.value = _detailRepository.getDescriptionById(it.id)
+            try {
+                viewModelScope.launch {
+                    _descriptionLoaded.value = _detailRepository.getDescriptionById(it.id)
+                }
+            } catch (httpException: HttpException) {
+                _loadError.value = ErrorMessage(R.string.error_code, httpException.code().toString())
+            } catch (throwable: Throwable) {
+                _loadError.value = ErrorMessage(R.string.network_error)
             }
         }
     }
@@ -170,6 +179,5 @@ class DetailsViewModel(
                 throw ClassNotFoundException()
             }
         }
-
     }
 }

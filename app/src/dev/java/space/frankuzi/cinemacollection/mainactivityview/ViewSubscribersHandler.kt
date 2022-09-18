@@ -3,20 +3,13 @@ package space.frankuzi.cinemacollection.mainactivityview
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.resources.Compatibility.Api21Impl.inflate
-import androidx.core.content.res.ColorStateListInflaterCompat.inflate
-import androidx.core.graphics.drawable.DrawableCompat.inflate
 import com.bumptech.glide.Glide
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
-import space.frankuzi.cinemacollection.databinding.FragmentMainBinding.inflate
-import space.frankuzi.cinemacollection.databinding.FragmentWatchLaterBinding.inflate
 import space.frankuzi.cinemacollection.utils.broadcastreceiver.WatchLaterTimeComeInBroadcast
-import kotlin.math.log
 
 class ViewSubscribersHandler(
     private val mainActivityController: MainActivityController
@@ -57,8 +50,18 @@ class ViewSubscribersHandler(
         mainActivityController.detailViewModel.loadError.observe(mainActivityController.mainActivity) {
             mainActivityController.mainBinding.bottomSheet.loadedStatus.progressBar.visibility = View.INVISIBLE
             mainActivityController.mainBinding.bottomSheet.loadedStatus.errorText.visibility = View.VISIBLE
-            mainActivityController.mainBinding.bottomSheet.loadedStatus.errorText.text = it
             mainActivityController.mainBinding.bottomSheet.loadedStatus.retryButton.visibility = View.VISIBLE
+
+            val errorText = when (it.errorId) {
+                R.string.error_code -> {
+                    mainActivityController.mainActivity.getString(it.errorId, it.parameters)
+                }
+                else -> {
+                    mainActivityController.mainActivity.getString(it.errorId)
+                }
+            }
+
+            mainActivityController.mainBinding.bottomSheet.loadedStatus.errorText.text = errorText
         }
 
         mainActivityController.detailViewModel.filmNotes.observe(mainActivityController.mainActivity) { notes ->
@@ -69,7 +72,7 @@ class ViewSubscribersHandler(
                 val noteLayout = layoutInflater.inflate(R.layout.note_layout, null)
                 val dateLabel = noteLayout.findViewById<TextView>(R.id.date_label)
                 val noteLabel = noteLayout.findViewById<TextView>(R.id.note_label)
-                dateLabel.text = note.date.toString()
+                dateLabel.text = note.date
                 noteLabel.text = note.note
                 bottomSheet.notesContainer.addView(noteLayout)
             }
