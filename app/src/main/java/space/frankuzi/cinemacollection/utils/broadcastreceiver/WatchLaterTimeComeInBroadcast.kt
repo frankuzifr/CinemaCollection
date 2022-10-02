@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import space.frankuzi.cinemacollection.MainActivity
+import space.frankuzi.cinemacollection.mainactivityview.MainActivity
 import space.frankuzi.cinemacollection.R
 
 class WatchLaterTimeComeInBroadcast : BroadcastReceiver() {

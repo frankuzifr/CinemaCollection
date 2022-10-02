@@ -7,9 +7,21 @@ import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
 import java.util.*
 
-class DatePickerFragment(
-    private val dateSelectHandler: DateSelectHandler
-) : DialogFragment(), DatePickerDialog.OnDateSetListener {
+class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {
+
+    private var watchLaterListener: WatchLaterListener? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            watchLaterListener = savedInstanceState.getParcelable(WatchLaterDialog.WATCH_LATER_LISTENER)
+        } else {
+            arguments?.let {
+                watchLaterListener = it.getParcelable(WatchLaterDialog.WATCH_LATER_LISTENER)
+            }
+        }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val calendar = Calendar.getInstance()
@@ -25,10 +37,25 @@ class DatePickerFragment(
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        dateSelectHandler.onDateSelected(dayOfMonth, month, year)
+        val timePickerFragment = TimePickerFragment()
+        val bundle = Bundle()
+        bundle.putInt(YEAR, year)
+        bundle.putInt(MONTH, month)
+        bundle.putInt(DAY, dayOfMonth)
+        bundle.putParcelable(WatchLaterDialog.WATCH_LATER_LISTENER, watchLaterListener)
+        timePickerFragment.arguments = bundle
+        timePickerFragment.show(parentFragmentManager, "timePickerDialog")
     }
-}
 
-interface DateSelectHandler {
-    fun onDateSelected(dayOfMonth: Int, month: Int, year: Int)
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(WatchLaterDialog.WATCH_LATER_LISTENER, watchLaterListener)
+
+        super.onSaveInstanceState(outState)
+    }
+
+    companion object {
+        const val YEAR = "year"
+        const val MONTH = "month"
+        const val DAY = "day"
+    }
 }

@@ -21,7 +21,8 @@
             android:value="@string/offers" />
 
         <activity
-            android:name=".MainActivity"
+            android:theme="@style/Theme.CinemaCollection.Launcher"
+            android:name=".mainactivityview.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             >
@@ -32,9 +33,13 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".utils.broadcastreceiver.WatchLaterTimeComeInBroadcast"
-            android:exported="false">
+        <activity android:name=".TestActivity"
+            android:exported="false"
+            />
 
+        <receiver android:name=".utils.broadcastreceiver.WatchLaterTimeComeInBroadcast"
+            android:exported="false"
+            android:enabled="true">
         </receiver>
 
         <service

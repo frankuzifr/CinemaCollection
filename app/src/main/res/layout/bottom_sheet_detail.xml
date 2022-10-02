@@ -118,12 +118,26 @@
                 tools:text="Просмотр запланирован на: 22.02.2022 16:30"
                 />
 
+            <LinearLayout
+                android:id="@+id/notes_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/watch_later_date_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                >
+
+            </LinearLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/comment"
-                app:layout_constraintTop_toBottomOf="@id/watch_later_date_label"
+                android:hint="@string/note"
+                app:layout_constraintTop_toBottomOf="@id/notes_container"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="10dp"
@@ -140,6 +154,17 @@
                     />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/leave_note_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorPrimaryVariant"
+                android:textColor="@color/white"
+                android:text="@string/leave_note"
+                app:layout_constraintTop_toBottomOf="@id/comment"
+                app:layout_constraintEnd_toEndOf="@id/comment"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

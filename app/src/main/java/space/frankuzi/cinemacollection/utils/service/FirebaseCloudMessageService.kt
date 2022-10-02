@@ -7,7 +7,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import space.frankuzi.cinemacollection.MainActivity
+import space.frankuzi.cinemacollection.mainactivityview.MainActivity
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.utils.broadcastreceiver.WatchLaterTimeComeInBroadcast
 

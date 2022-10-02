@@ -33,4 +33,8 @@
         <item name="android:textColorSecondary">@color/white</item>
         <item name="colorControlActivated">@color/white</item>
     </style>
+
+    <style name="Theme.CinemaCollection.Launcher">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
 </resources>

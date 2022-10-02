@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import space.frankuzi.cinemacollection.R
-import space.frankuzi.cinemacollection.mainScreen.adapter.RetryLoadListener
+import space.frankuzi.cinemacollection.mainscreen.adapter.RetryLoadListener
 
 class FooterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val _retryButton: Button = itemView.findViewById(R.id.retry_button)

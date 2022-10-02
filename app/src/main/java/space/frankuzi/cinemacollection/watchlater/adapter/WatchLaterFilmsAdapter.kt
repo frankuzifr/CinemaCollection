@@ -1,13 +1,11 @@
 package space.frankuzi.cinemacollection.watchlater.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import space.frankuzi.cinemacollection.R
 import space.frankuzi.cinemacollection.data.FilmItem
 import space.frankuzi.cinemacollection.structs.FilmClickListener
-import space.frankuzi.cinemacollection.viewholder.FilmItemViewHolder
 import space.frankuzi.cinemacollection.watchlater.viewholder.WatchLaterViewHolder
 
 class WatchLaterFilmsAdapter(

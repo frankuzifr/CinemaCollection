@@ -33,4 +33,8 @@
         <!-- The hint text that appears when the user has not typed anything -->
         <item name="queryHint">@string/search</item>
     </style>
+
+    <style name="Theme.CinemaCollection.Launcher">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
 </resources>

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7b7d4080642a75a91bc1bcbbc159073e",
+    "identityHash": "189be113c6ebee4796da1bd3f0589b1a",
     "entities": [
       {
         "tableName": "films",
@@ -177,12 +177,50 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "notes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kinopoisk_id` INTEGER NOT NULL, `note_date` TEXT NOT NULL, `note_text` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kinopoiskId",
+            "columnName": "kinopoisk_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noteDate",
+            "columnName": "note_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noteText",
+            "columnName": "note_text",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b7d4080642a75a91bc1bcbbc159073e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '189be113c6ebee4796da1bd3f0589b1a')"
     ]
   }
 }
